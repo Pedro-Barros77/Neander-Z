@@ -48,6 +48,8 @@ def quit_app():
 def restart_game(game):
     game.pressed_keys = []
     game.command_id = 0
+    game.map.rect.left = 0
+    game.map.update_pos()
     game.reset_players()
     
 def scale_image(image: pygame.Surface, scale):
@@ -101,7 +103,7 @@ def handle_connection(game, client: socket.socket, player_id):
             # print(f"P1: {player.pos}, P2: {data.player_pos}")
             game.handle_received_data(data)
             
-        time.sleep(0.01)
+        time.sleep(0.03)
         # print('while:', player_id)
                 
     client.close()

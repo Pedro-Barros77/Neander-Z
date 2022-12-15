@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.color = kwargs.pop("color", colors.GREEN)
         self.net_id = kwargs.pop("net_id", 0)
-        self.jump_force = kwargs.pop("jump_force", 15)
+        self.jump_force = kwargs.pop("jump_force", 12)
         self.name = kwargs.pop("name", "player")
         
         self.image = game_controller.scale_image(pygame.image.load(image), 2)
@@ -22,6 +22,8 @@ class Player(pygame.sprite.Sprite):
         	
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
+        
+        self.offset_camera = vec(0,0)
         
         self.last_rect = self.rect.copy()
         

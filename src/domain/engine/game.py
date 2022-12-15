@@ -41,6 +41,9 @@ class Game:
         self.collision_group = None
         """The group of objects that should collide.""" 
         
+        self.jumpable_group = None
+        """The group of objects the player can jump from.""" 
+        
         self.player = None
         """Player 1 (this player).""" 
         
@@ -73,6 +76,7 @@ class Game:
         self.player.speed = vec(0,0)
         self.player.acceleration = vec(0,0)
         self.player.last_rect = self.player.rect
+        self.player.offset_camera = vec(0,0)
         
         self.player2.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_2_IMAGE), 2)
         self.player2.pos = vec(p2_pos)
@@ -109,6 +113,7 @@ class Game:
         
         self.player_group = pygame.sprite.Group([self.player, self.player2])
         self.collision_group = pygame.sprite.Group([self.player2, self.map.floor, self.map.left_wall, self.map.right_wall])
+        self.jumpable_group = pygame.sprite.Group([self.player2, self.map.floor])
         
         if self.client_type == enums.ClientType.HOST:
             game_controller.host_game(self, constants.SERVER_ADDRESS, constants.SERVER_PORT)
@@ -138,8 +143,6 @@ class Game:
         self.player2.speed = vec(data.player_speed)
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.last_rect = data.player_last_rect
-        
-        
         self.player2.update_rect()
         
     def in_bounds(self, obj_rect, container_rect, dir: enums.Orientation):
@@ -152,56 +155,44 @@ class Game:
         self.player.last_rect = self.player.rect.copy()
         self.player.acceleration = vec(0,self.gravity_accelaration)
         
-        if pygame.K_SPACE in self.pressed_keys:
-            self.player.speed.y = -self.player.jump_force
             
         if pygame.K_RIGHT in self.pressed_keys and \
            pygame.K_LEFT not in self.pressed_keys:
             
             self.player.acceleration.x = self.gravity_accelaration
             
-            _half_screen = self.screen.get_width()/2
-            if self.player.pos.x > _half_screen and self.player.pos.x + _half_screen + (-self.map.pos[0]) < self.map.rect.width:
-                self.map.rect.left = self.map.pos[0] - self.player.speed.x
-                self.map.update_pos()
-                self.player.pos.x = _half_screen
-        
         if pygame.K_LEFT in self.pressed_keys and \
            pygame.K_RIGHT not in self.pressed_keys:
             self.player.acceleration.x = -self.gravity_accelaration
             
-            _half_screen = self.screen.get_width()/2
-            if self.player.pos.x < _half_screen and self.map.pos[0] < 0:
-                self.map.rect.left = self.map.pos[0] - self.player.speed.x
-                self.map.update_pos()
-                self.player.pos.x = _half_screen
-
-        if self.player.pos.x > self.screen.get_width():
-            self.player.pos.x = 0
-        
-        if self.player.pos.x < 0:
-            self.player.pos.x = self.screen.get_width()
-
         self.player.acceleration.x += self.player.speed.x * self.friction
         self.player.speed += self.player.acceleration
         self.player.pos += self.player.speed + 0.5 * self.player.acceleration
         
         self.player.update_rect()
-        self.handle_player_collision(enums.Orientation.HORIZONTAL)
+        _grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
+        print(_grounded)
+        if pygame.K_SPACE in self.pressed_keys and _grounded:
+            self.player.speed.y = -self.player.jump_force
+        
+        self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
+
+    
 
     def gravity(self):
         pass
-        
-
-    def handle_player_collision(self, direction: enums.Orientation):
+    
+    def player_collision(self, targets, direction: enums.Orientation):
         """Handles collision between the player and collidable objects.
 
         Args:
             direction (enums.Orientation): The direction that the player was moving.
         """
-        collision_objs = pygame.sprite.spritecollide(self.player, self.collision_group, False)
+        collision_objs = pygame.sprite.spritecollide(self.player, targets, False)
         if collision_objs:
             self.collision(self.player, collision_objs, direction)
+            return True
+        return False
     
     def collision(self, obj: pygame.sprite.Sprite, obstacles: list[pygame.sprite.Sprite], direction: enums.Orientation):
         """Calculates the collision between an object and a group of obstacles. Updates the position of the object to prevent overlapping.
@@ -212,6 +203,7 @@ class Game:
             direction (enums.Orientation): The direction that the obj was moving (vertical or horizontal).
         """     
         for o in obstacles:
+            print(o.name)
             match direction:
                 case enums.Orientation.HORIZONTAL:
                     # collision on the right
@@ -239,12 +231,19 @@ class Game:
                         obj.pos.y = obj.rect[1]
                         obj.speed.y = 0
 
+    def center_camera(self):
+        screen_size = self.screen.get_size()
+        
+        if self.player.pos.x > screen_size[0]/2 and (self.player.pos.x + screen_size[0]/2 < self.map.rect.width) :
+            self.player.offset_camera = vec(self.player.rect.left - screen_size[0]/2, 0)#self.player.rect.centery - screen_size[1]/2
+
     def game_loop(self):
         while game_controller.playing:
             
             game_controller.handle_events(self)
             
-            if pygame.K_r in self.pressed_keys and self.client_type == enums.ClientType.HOST:
+            if pygame.K_r in self.pressed_keys and \
+                (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
                 self.command_id = int(enums.Command.RESTART_GAME)
                 
                 import time
@@ -252,19 +251,21 @@ class Game:
                 game_controller.restart_game(self)
             
             self.player_movement()
-            self.handle_player_collision(enums.Orientation.VERTICAL)
+            self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
             
-            self.screen.blit(self.map.image, self.map.rect)
+            self.center_camera()
             
+            self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
             
-            self.map.floor.image.fill(colors.RED)
-            self.map.left_wall.image.fill(colors.RED)
-            self.map.right_wall.image.fill(colors.RED)
-            self.screen.blit(self.map.floor.image, self.map.floor.rect)
-            self.screen.blit(self.map.left_wall.image, self.map.left_wall.rect)
-            self.screen.blit(self.map.right_wall.image, self.map.right_wall.rect)
+            # self.map.floor.image.fill(colors.RED)
+            # self.map.left_wall.image.fill(colors.RED)
+            # self.map.right_wall.image.fill(colors.RED)
+            # self.screen.blit(self.map.floor.image, vec(self.map.floor.rect.topleft) - self.player.offset_camera)
+            # self.screen.blit(self.map.left_wall.image, vec(self.map.left_wall.rect.topleft) - self.player.offset_camera)
+            # self.screen.blit(self.map.right_wall.image, vec(self.map.right_wall.rect.topleft) - self.player.offset_camera)
             
-            self.player_group.draw(self.screen)
+            self.screen.blit(self.player.image, self.player.pos - self.player.offset_camera)
+            self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
             
             
             pygame.display.update()

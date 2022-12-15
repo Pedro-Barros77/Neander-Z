@@ -28,7 +28,7 @@ class Map(pygame.sprite.Sprite):
         self.left_wall = Rectangle((10, screen.get_height()), (0, 0), name = "left_wall")
         """A rectangle representing the left wall of the map."""  
         
-        self.right_wall = Rectangle((10, screen.get_height()), (screen.get_width() - 10, 0), name = "right_wall")
+        self.right_wall = Rectangle((10, screen.get_height()), (self.rect.right - 10, 0), name = "right_wall")
         """A rectangle representing the right wall of the map."""  
         
         
