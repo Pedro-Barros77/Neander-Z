@@ -1,6 +1,7 @@
 import pygame, sys, socket, threading, time, jsonpickle
 
 from domain.models.network_data import Data as NetData
+from domain.models.igravitable import IGravitable
 
 
 playing = False
@@ -46,18 +47,39 @@ def quit_app():
     sys.exit()
     
 def restart_game(game):
+    """Reset game properties to start a new round.
+
+    Args:
+        game (domain.engine.game): The game to be restarted.
+    """    
     game.pressed_keys = []
     game.command_id = 0
     game.map.rect.left = 0
     game.map.update_pos()
     game.reset_players()
     
-def scale_image(image: pygame.Surface, scale):
+def scale_image(image: pygame.Surface, scale: float):
+    """Scales a image to the given float size.
+
+    Args:
+        image (pygame.Surface): The image to be scaled.
+        scale (float): The scale proportional to the original image (1.5, 2.0, 0.5...)
+
+    Returns:
+        pygame.Surface: The scaled image.
+    """    
     img = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
     return img
 
     
-def host_game(game, host, port):
+def host_game(game, host: str, port: int):
+    """Creates a server on the specified address and port.
+
+    Args:
+        game (domain.engine.game): The game to host the game.
+        host (str): The IP address of the server.
+        port (int): The port number of the server.
+    """    
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
     server.listen(1)
@@ -68,7 +90,14 @@ def host_game(game, host, port):
     #implementar handle connection
     threading.Thread(target=handle_connection, args=(game, client, int(game.player.net_id))).start()
     
-def enter_game(game, host, port):
+def enter_game(game, host: str, port: int):
+    """Joins a server from specified address and port.
+
+    Args:
+        game (domain.engine.game): The game to enter.
+        host (str): The IP address of the server.
+        port (int): The port number of the server.
+    """   
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((host, port))
     
@@ -77,7 +106,14 @@ def enter_game(game, host, port):
     #implementar handle connection
     threading.Thread(target=handle_connection, args=(game, client, int(game.player.net_id))).start()
     
-def handle_connection(game, client: socket.socket, player_id):
+def handle_connection(game, client: socket.socket, player_id: int):
+    """Function executing on a different thread, sending and receiving data from players.
+
+    Args:
+        game (domain.engine.game): The game object.
+        client (socket.socket): The client object.
+        player_id (int): The ID of the player executing this function.
+    """    
     while playing:
         
         player = game.player
@@ -110,7 +146,23 @@ def handle_connection(game, client: socket.socket, player_id):
     
     
 def class_to_json(data):
+    """Encodes the class object to a json object.
+
+    Args:
+        data (class): The object to be converted.
+
+    Returns:
+        list[byte]: A array of bytes containing a json string version of the class.
+    """    
     return jsonpickle.encode(data).encode('utf-8')
 
 def json_to_class(data):
+    """Decodes the json string to a class object.
+
+    Args:
+        data (list[byte]): A array of bytes containing a json string version of the class.
+
+    Returns:
+        class: The converted class object.
+    """  
     return jsonpickle.decode(data.decode('utf-8'))

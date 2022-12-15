@@ -8,6 +8,8 @@ from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
 from domain.models.network_data import Data as NetData
 from domain.models.map import Map
+from domain.models.igravitable import IGravitable
+from domain.models.rectangle_sprite import Rectangle
 
 class Game:
     def __init__(self, client_type: enums.ClientType):
@@ -35,9 +37,6 @@ class Game:
         self.friction = 0       
         """The friction between objects."""
         
-        self.player_group = None
-        """The group of players.""" 
-        
         self.collision_group = None
         """The group of objects that should collide.""" 
         
@@ -54,8 +53,11 @@ class Game:
         """The map object for this game level."""
         
         self.command_id = 0
+        """A command sent from the host to execute some operation on both host and client, such as restart game."""
     
     def reset_players(self):
+        """Resets all players attributes to default values.
+        """        
         _y = self.screen.get_height() - 200
         
         p1_pos, p2_pos = None, None
@@ -66,7 +68,6 @@ class Game:
         else:
             p1_pos = (80, _y)
             p2_pos = (20, _y)
-            
         
         self.player.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_1_IMAGE), 2)
         self.player.pos = vec(p1_pos)
@@ -78,16 +79,20 @@ class Game:
         self.player.last_rect = self.player.rect
         self.player.offset_camera = vec(0,0)
         
-        self.player2.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_2_IMAGE), 2)
-        self.player2.pos = vec(p2_pos)
-        self.player2.rect = self.player2.image.get_rect()
-        self.player2.rect.topleft = self.player2.pos
-        self.player2.size = self.player2.rect.size
-        self.player2.speed = vec(0,0)
-        self.player2.acceleration = vec(0,0)
-        self.player2.last_rect = self.player2.rect
+        if self.client_type != enums.ClientType.SINGLE:
+            self.player2.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_2_IMAGE), 2)
+            self.player2.pos = vec(p2_pos)
+            self.player2.rect = self.player2.image.get_rect()
+            self.player2.rect.topleft = self.player2.pos
+            self.player2.size = self.player2.rect.size
+            self.player2.speed = vec(0,0)
+            self.player2.acceleration = vec(0,0)
+            self.player2.last_rect = self.player2.rect
+        
         
     def start(self):
+        """Starts the game.
+        """        
         pygame.init()
         
         if self.monitor_size == (0,0):
@@ -103,17 +108,21 @@ class Game:
         self.gravity_accelaration = 0.5
         self.friction = -0.12
         
-        
         self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         
         self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = self.client_type, name = "P1")
-        self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2")
+        
+        if self.client_type != enums.ClientType.SINGLE:
+            self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
         self.reset_players()
         
-        self.player_group = pygame.sprite.Group([self.player, self.player2])
-        self.collision_group = pygame.sprite.Group([self.player2, self.map.floor, self.map.left_wall, self.map.right_wall])
-        self.jumpable_group = pygame.sprite.Group([self.player2, self.map.floor])
+        self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
+        self.jumpable_group = pygame.sprite.Group([self.map.floor])
+        
+        if self.client_type != enums.ClientType.SINGLE:
+            self.collision_group.add(self.player2)
+            self.jumpable_group.add(self.player2)
         
         if self.client_type == enums.ClientType.HOST:
             game_controller.host_game(self, constants.SERVER_ADDRESS, constants.SERVER_PORT)
@@ -130,10 +139,7 @@ class Game:
             data (NetData): An object containing the transfered data.
         """        
         
-        print(data.command_id)
-        
         if data.command_id == int(enums.Command.RESTART_GAME):
-            print("restarting...")
             game_controller.restart_game(self)
                     
         self.player2.rect.topleft = data.player_pos
@@ -145,47 +151,70 @@ class Game:
         self.player2.last_rect = data.player_last_rect
         self.player2.update_rect()
         
-    def in_bounds(self, obj_rect, container_rect, dir: enums.Orientation):
-        if dir == enums.Orientation.HORIZONTAL:
-            return obj_rect.left > container_rect.left and obj_rect.right < container_rect.width + container_rect.left
-        else:
-            return obj_rect.top > container_rect.top and obj_rect.bottom < container_rect.height + container_rect.top
-        
     def player_movement(self):
+        """Handles the movement of player 1.
+        """        
         self.player.last_rect = self.player.rect.copy()
-        self.player.acceleration = vec(0,self.gravity_accelaration)
-        
+        self.player.acceleration.x = 0
             
+        # Move right
         if pygame.K_RIGHT in self.pressed_keys and \
            pygame.K_LEFT not in self.pressed_keys:
-            
             self.player.acceleration.x = self.gravity_accelaration
             
+        # Move left
         if pygame.K_LEFT in self.pressed_keys and \
            pygame.K_RIGHT not in self.pressed_keys:
             self.player.acceleration.x = -self.gravity_accelaration
             
+        # Movement
         self.player.acceleration.x += self.player.speed.x * self.friction
-        self.player.speed += self.player.acceleration
-        self.player.pos += self.player.speed + 0.5 * self.player.acceleration
+        self.player.speed.x += self.player.acceleration.x
+        self.player.pos.x += self.player.speed.x + 0.5 * self.player.acceleration.x
         
+        # Gravity
+        self.apply_gravity(self.player)
         self.player.update_rect()
+        
+        # jump
         _grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
-        print(_grounded)
         if pygame.K_SPACE in self.pressed_keys and _grounded:
             self.player.speed.y = -self.player.jump_force
         
+        # solid collision
         self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
 
     
 
-    def gravity(self):
-        pass
+    def apply_gravity(self, target: IGravitable):
+        """Applies gravity to the specified IGravitable object.
+
+        Args:
+            target (IGravitable): The object to apply gravity on.
+        """        
+        target.last_rect = target.rect.copy()
+        
+        target.acceleration.y = self.gravity_accelaration
+        target.speed.y += target.acceleration.y
+        target.pos.y += target.speed.y + 0.5 * target.acceleration.y
+        
+        
+    def process_gravitables(self):
+        """Applies gravity to all gravitable objects (subclasses of IGravitable)"""        
+        for obj in IGravitable.instances:
+            if obj.gravity_enabled:
+                self.apply_gravity(obj)
+                obj.rect.top = obj.pos.y
+        
+            if obj.collision_enabled:
+                obstacles = pygame.sprite.spritecollide(obj, self.collision_group, False)
+                self.collision(obj, obstacles, enums.Orientation.VERTICAL)
     
-    def player_collision(self, targets, direction: enums.Orientation):
+    def player_collision(self, targets: pygame.sprite.Group, direction: enums.Orientation):
         """Handles collision between the player and collidable objects.
 
         Args:
+            targets (pygame.sprite.Group | list[pygame.sprite.Sprite])
             direction (enums.Orientation): The direction that the player was moving.
         """
         collision_objs = pygame.sprite.spritecollide(self.player, targets, False)
@@ -232,12 +261,17 @@ class Game:
                         obj.speed.y = 0
 
     def center_camera(self):
+        """Calculates the required offset from the player to center the camera on.
+        """        
         screen_size = self.screen.get_size()
         
         if self.player.pos.x > screen_size[0]/2 and (self.player.pos.x + screen_size[0]/2 < self.map.rect.width) :
             self.player.offset_camera = vec(self.player.rect.left - screen_size[0]/2, 0)#self.player.rect.centery - screen_size[1]/2
 
     def game_loop(self):
+        """Main game loop.
+        """        
+        
         while game_controller.playing:
             
             game_controller.handle_events(self)
@@ -247,27 +281,38 @@ class Game:
                 self.command_id = int(enums.Command.RESTART_GAME)
                 
                 import time
-                time.sleep(0.5)
+                time.sleep(0.1)
                 game_controller.restart_game(self)
-            
+                
+            self.process_gravitables()    
+                
             self.player_movement()
+            
             self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
             
             self.center_camera()
             
+            # Map
             self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
-            
-            # self.map.floor.image.fill(colors.RED)
-            # self.map.left_wall.image.fill(colors.RED)
-            # self.map.right_wall.image.fill(colors.RED)
-            # self.screen.blit(self.map.floor.image, vec(self.map.floor.rect.topleft) - self.player.offset_camera)
-            # self.screen.blit(self.map.left_wall.image, vec(self.map.left_wall.rect.topleft) - self.player.offset_camera)
-            # self.screen.blit(self.map.right_wall.image, vec(self.map.right_wall.rect.topleft) - self.player.offset_camera)
-            
+            # P1
             self.screen.blit(self.player.image, self.player.pos - self.player.offset_camera)
-            self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
             
+            # P2
+            if self.client_type != enums.ClientType.SINGLE:
+                self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
+            
+            # self.blit_debug()
             
             pygame.display.update()
             self.clock.tick(60)
+        
+    def blit_debug(self):
+        """Draws objects that are invisible to the player. For debugging only.
+        """        
+        self.map.floor.image.fill(colors.RED)
+        self.map.left_wall.image.fill(colors.RED)
+        self.map.right_wall.image.fill(colors.RED)
+        self.screen.blit(self.map.floor.image, self.map.floor.pos - self.player.offset_camera)
+        self.screen.blit(self.map.left_wall.image, self.map.left_wall.pos - self.player.offset_camera)
+        self.screen.blit(self.map.right_wall.image, self.map.right_wall.pos - self.player.offset_camera)
         

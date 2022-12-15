@@ -1,0 +1,11 @@
+Bug fix:
+
+-Add collider on the feet of the players to prevent to be grounded 
+ when touching objects at the sides, which makes it possible to climb objects
+
+
+Feature:
+-Create enemies
+-Create life bar
+-Create Menu
+-Create guns
