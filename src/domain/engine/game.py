@@ -3,14 +3,15 @@ from datetime import datetime
 from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, drawer
+from domain.engine import enemies_controller
 from domain.utils import colors, math_utillity as math, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
 from domain.models.network_data import Data as NetData
 from domain.models.map import Map
 from domain.models.igravitable import IGravitable
-from domain.models.rectangle_sprite import Rectangle
-
+from domain.models.enemies.zombie_1 import Zombie1
+from domain.models.weapon import Weapon
 class Game:
     def __init__(self, client_type: enums.ClientType):
         self.screen = None
@@ -43,6 +44,9 @@ class Game:
         self.jumpable_group = None
         """The group of objects the player can jump from.""" 
         
+        self.enemies_group = None
+        """The group of enemies.""" 
+        
         self.player = None
         """Player 1 (this player).""" 
         
@@ -54,6 +58,7 @@ class Game:
         
         self.command_id = 0
         """A command sent from the host to execute some operation on both host and client, such as restart game."""
+        
     
     def reset_players(self):
         """Resets all players attributes to default values.
@@ -112,6 +117,13 @@ class Game:
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         
         self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = self.client_type, name = "P1")
+        self.player.current_weapon = Weapon((self.player.rect.width, self.player.rect.centery))
+        
+        _fire_frames = self.player.current_weapon.load_sprites(constants.PISTOL_FOLDER)
+        self.player.current_weapon.image = _fire_frames[0]
+        self.player.current_weapon.rect = _fire_frames[0].get_rect()
+        self.player.current_weapon.fire_frames = _fire_frames
+        
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
@@ -119,6 +131,9 @@ class Game:
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
+        self.enemies_group = pygame.sprite.Group()
+        
+        enemies_controller.spawn_random_enemy(self)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.collision_group.add(self.player2)
@@ -158,13 +173,13 @@ class Game:
         self.player.acceleration.x = 0
             
         # Move right
-        if pygame.K_RIGHT in self.pressed_keys and \
-           pygame.K_LEFT not in self.pressed_keys:
+        if pygame.K_d in self.pressed_keys and \
+           pygame.K_a not in self.pressed_keys:
             self.player.acceleration.x = self.gravity_accelaration
             
         # Move left
-        if pygame.K_LEFT in self.pressed_keys and \
-           pygame.K_RIGHT not in self.pressed_keys:
+        if pygame.K_a in self.pressed_keys and \
+           pygame.K_d not in self.pressed_keys:
             self.player.acceleration.x = -self.gravity_accelaration
             
         # Movement
@@ -183,9 +198,8 @@ class Game:
         
         # solid collision
         self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
-
     
-
+    
     def apply_gravity(self, target: IGravitable):
         """Applies gravity to the specified IGravitable object.
 
@@ -197,8 +211,7 @@ class Game:
         target.acceleration.y = self.gravity_accelaration
         target.speed.y += target.acceleration.y
         target.pos.y += target.speed.y + 0.5 * target.acceleration.y
-        
-        
+    
     def process_gravitables(self):
         """Applies gravity to all gravitable objects (subclasses of IGravitable)"""        
         for obj in IGravitable.instances:
@@ -223,6 +236,7 @@ class Game:
             return True
         return False
     
+    
     def collision(self, obj: pygame.sprite.Sprite, obstacles: list[pygame.sprite.Sprite], direction: enums.Orientation):
         """Calculates the collision between an object and a group of obstacles. Updates the position of the object to prevent overlapping.
 
@@ -232,7 +246,6 @@ class Game:
             direction (enums.Orientation): The direction that the obj was moving (vertical or horizontal).
         """     
         for o in obstacles:
-            print(o.name)
             match direction:
                 case enums.Orientation.HORIZONTAL:
                     # collision on the right
@@ -284,9 +297,15 @@ class Game:
                 time.sleep(0.1)
                 game_controller.restart_game(self)
                 
+            self.player.update()
+            self.enemies_group.update()
+            self.collision_group.update()
+            self.jumpable_group.update()
+        
             self.process_gravitables()    
                 
             self.player_movement()
+            # enemies_controller.enemies_movement(self, self.enemies_group)
             
             self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
             
@@ -296,10 +315,16 @@ class Game:
             self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
             # P1
             self.screen.blit(self.player.image, self.player.pos - self.player.offset_camera)
+            # self.screen.blit(self.player.current_weapon.image, self.player.current_weapon.pos + self.player.pos - self.player.offset_camera)
             
             # P2
             if self.client_type != enums.ClientType.SINGLE:
                 self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
+                
+            self.drawer.draw_enemies(self.screen, self.enemies_group)
+            
+            
+            self.screen.blit(self.player.weapon_container, vec(self.player.weapon_container_rect.topleft))
             
             # self.blit_debug()
             

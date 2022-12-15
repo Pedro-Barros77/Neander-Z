@@ -1,7 +1,10 @@
 import pygame, sys, socket, threading, time, jsonpickle
+from pygame.math import Vector2 as vec
+import math
 
 from domain.models.network_data import Data as NetData
-from domain.models.igravitable import IGravitable
+from domain.engine import enemies_controller
+from domain.utils import colors
 
 
 playing = False
@@ -14,6 +17,8 @@ def handle_events(game):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit_app()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            game.player.shoot()
         elif event.type == pygame.KEYDOWN:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP:
@@ -56,7 +61,9 @@ def restart_game(game):
     game.command_id = 0
     game.map.rect.left = 0
     game.map.update_pos()
+    game.enemies_group.empty()
     game.reset_players()
+    enemies_controller.spawn_random_enemy(game)
     
 def scale_image(image: pygame.Surface, scale: float):
     """Scales a image to the given float size.
@@ -70,6 +77,18 @@ def scale_image(image: pygame.Surface, scale: float):
     """    
     img = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
     return img
+
+def rotate_to_mouse(image: pygame.Surface, pos: vec):
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    rel_x, rel_y = mouse_x - pos.x, mouse_y - pos.y
+    
+    # pygame.draw.line(screen, colors.GREEN, pos, (mouse_x, mouse_y))
+    
+    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    _image = pygame.transform.rotate(image, int(angle))
+    _rect = _image.get_rect(center= pos)
+    
+    return _image, _rect, angle
 
     
 def host_game(game, host: str, port: int):
