@@ -78,16 +78,18 @@ def scale_image(image: pygame.Surface, scale: float):
     img = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
     return img
 
-def rotate_to_mouse(image: pygame.Surface, pos: vec):
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    rel_x, rel_y = mouse_x - pos.x, mouse_y - pos.y
+def rotate_to_mouse(image: pygame.Surface, pos: vec, mouse_pos: vec):
+    rel_x, rel_y = mouse_pos.x - pos.x, mouse_pos.y - pos.y
     
     # pygame.draw.line(screen, colors.GREEN, pos, (mouse_x, mouse_y))
-    
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    
+    return rotate_to_angle(image, pos, angle)
+    
+
+def rotate_to_angle(image: pygame.Surface, pos:vec, angle: float):
     _image = pygame.transform.rotate(image, int(angle))
     _rect = _image.get_rect(center= pos)
-    
     return _image, _rect, angle
 
     
@@ -107,7 +109,7 @@ def host_game(game, host: str, port: int):
     #define game objects
     
     #implementar handle connection
-    threading.Thread(target=handle_connection, args=(game, client, int(game.player.net_id))).start()
+    threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
     
 def enter_game(game, host: str, port: int):
     """Joins a server from specified address and port.
@@ -123,7 +125,7 @@ def enter_game(game, host: str, port: int):
     #define game objects
     
     #implementar handle connection
-    threading.Thread(target=handle_connection, args=(game, client, int(game.player.net_id))).start()
+    threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
     
 def handle_connection(game, client: socket.socket, player_id: int):
     """Function executing on a different thread, sending and receiving data from players.
@@ -142,11 +144,13 @@ def handle_connection(game, client: socket.socket, player_id: int):
                 message = f"Hello from player {player_id}",
                 player_pos = (player.pos.x, player.pos.y),
                 player_size = player.size,
-                player_color = player.color,
                 player_speed = (player.speed.x, player.speed.y),
                 player_acceleration = (player.acceleration.x, player.acceleration.y),
                 player_last_rect = player.last_rect,
-                command_id = game.command_id
+                command_id = game.command_id,
+                player2_mouse_pos = pygame.mouse.get_pos(),
+                player2_offset_camera = player.offset_camera,
+                player2_aim_angle = player.weapon_container_angle
             )
         
         client.send(class_to_json(data_to_send))
@@ -158,7 +162,7 @@ def handle_connection(game, client: socket.socket, player_id: int):
             # print(f"P1: {player.pos}, P2: {data.player_pos}")
             game.handle_received_data(data)
             
-        time.sleep(0.03)
+        time.sleep(0.01)
         # print('while:', player_id)
                 
     client.close()

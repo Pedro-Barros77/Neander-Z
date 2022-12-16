@@ -3,7 +3,7 @@ import pygame
 from pygame.math import Vector2 as vec
 
 
-from domain.utils import colors, constants
+from domain.utils import colors, constants, enums
 from domain.services import game_controller
 from domain.models.weapon import Weapon
 
@@ -32,16 +32,26 @@ class Player(pygame.sprite.Sprite):
         self.last_rect = self.rect.copy()
         
         self.current_weapon: Weapon = None
-        self.weapon_container: pygame.Surface = None
-        self.weapon_container_rect: pygame.Rect = None
+        self.weapon_container: pygame.Surface = pygame.Surface((1,1))
+        self.weapon_container_rect: pygame.Rect = pygame.Rect((0,0),(1,1))
         self.weapon_container_angle: float = 0
+        self.player2_mouse_pos: vec = vec(0,0)
+        self.player2_offset_camera: vec = vec(0,0)
         
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     # called each frame
     def update(self):
-        
+        if self.name == "P1":
+            _mouse_target = vec(pygame.mouse.get_pos())
+            _offset_camera_target = self.offset_camera
+        else:
+            _mouse_target = self.player2_mouse_pos
+            _offset_camera_target = vec(0,0)
+            print(self.player2_offset_camera)
+            
+            
         _size = vec(self.current_weapon.rect.size)
         _offset = vec(30,30)
         
@@ -49,25 +59,29 @@ class Player(pygame.sprite.Sprite):
         _wrapper = _wrapper.convert_alpha()
         _wrapper.fill((0, 0, 0, 0))
         _rect = _wrapper.get_rect()
-        _rect.center = vec(self.rect.center) - self.offset_camera
+        _rect.center = vec(self.rect.center) - _offset_camera_target
         _wrapper.blit(self.current_weapon.image, vec(_size.x + self.rect.width + _offset.x, self.rect.height/2 + _offset.y))
-        img, rec, angle = game_controller.rotate_to_mouse(_wrapper, vec(_rect.center))
+        
+        if self.name == "P1":
+            img, rec, angle = game_controller.rotate_to_mouse(_wrapper, vec(_rect.center), _mouse_target)
+        else:
+            img, rec, angle = game_controller.rotate_to_angle(_wrapper, vec(_rect.center), self.weapon_container_angle)
+            
         self.weapon_container = img
         self.weapon_container_rect = rec
         self.weapon_container_angle = angle
         
-        _mouse_pos = vec(pygame.mouse.get_pos())
-        _gun_pos = vec(self.current_weapon.rect.center) + self.pos - self.offset_camera
+        _gun_pos = vec(self.current_weapon.rect.center) + self.pos - _offset_camera_target
         def flip():
             self.current_weapon.image = pygame.transform.flip(self.current_weapon.image, False, True)
             self.current_weapon.last_dir = self.current_weapon.dir.copy()
     
         _flip_margin = 0
-        if _mouse_pos.x < _gun_pos.x - _flip_margin:
+        if _mouse_target.x < _gun_pos.x - _flip_margin:
             self.current_weapon.dir.x = -1
             if self.current_weapon.last_dir.x > self.current_weapon.dir.x:
                 flip()
-        elif _mouse_pos.x > _gun_pos.x + _flip_margin:
+        elif _mouse_target.x > _gun_pos.x + _flip_margin:
             self.current_weapon.dir.x = 1
             if self.current_weapon.last_dir.x < self.current_weapon.dir.x:
                 flip()
@@ -75,8 +89,6 @@ class Player(pygame.sprite.Sprite):
             self.current_weapon.dir.x = 0
         
         self.current_weapon.update()
-        
-        print(self.weapon_container_angle)
         
         
     def shoot(self):

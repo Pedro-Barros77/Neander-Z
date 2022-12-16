@@ -116,7 +116,7 @@ class Game:
         self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         
-        self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = self.client_type, name = "P1")
+        self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = int(self.client_type), name = "P1")
         self.player.current_weapon = Weapon((self.player.rect.width, self.player.rect.centery))
         
         _fire_frames = self.player.current_weapon.load_sprites(constants.PISTOL_FOLDER)
@@ -127,6 +127,15 @@ class Game:
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
+            self.player2.current_weapon = Weapon((self.player2.rect.width, self.player2.rect.centery))
+        
+            self.player2.current_weapon.image = _fire_frames[0]
+            self.player2.current_weapon.rect = _fire_frames[0].get_rect()
+            self.player2.current_weapon.fire_frames = _fire_frames
+        
+        
+        
+        
         self.reset_players()
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
@@ -160,10 +169,12 @@ class Game:
         self.player2.rect.topleft = data.player_pos
         self.player2.pos = vec(data.player_pos)
         self.player2.size = data.player_size
-        self.player2.color = data.player_color
         self.player2.speed = vec(data.player_speed)
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.last_rect = data.player_last_rect
+        self.player2.player2_mouse_pos = vec(data.player2_mouse_pos)
+        self.player2.player2_offset_camera = vec(data.player2_offset_camera)
+        self.player2.weapon_container_angle = data.player2_aim_angle
         self.player2.update_rect()
         
     def player_movement(self):
@@ -305,7 +316,7 @@ class Game:
             self.process_gravitables()    
                 
             self.player_movement()
-            # enemies_controller.enemies_movement(self, self.enemies_group)
+            enemies_controller.enemies_movement(self, self.enemies_group)
             
             self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
             
@@ -313,6 +324,8 @@ class Game:
             
             # Map
             self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
+            # Enemies
+            self.drawer.draw_enemies(self.screen, self.enemies_group)
             # P1
             self.screen.blit(self.player.image, self.player.pos - self.player.offset_camera)
             # self.screen.blit(self.player.current_weapon.image, self.player.current_weapon.pos + self.player.pos - self.player.offset_camera)
@@ -320,11 +333,11 @@ class Game:
             # P2
             if self.client_type != enums.ClientType.SINGLE:
                 self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
-                
-            self.drawer.draw_enemies(self.screen, self.enemies_group)
-            
+                self.screen.blit(self.player2.weapon_container, vec(self.player2.weapon_container_rect.topleft) - self.player.offset_camera)
             
             self.screen.blit(self.player.weapon_container, vec(self.player.weapon_container_rect.topleft))
+            
+            
             
             # self.blit_debug()
             
