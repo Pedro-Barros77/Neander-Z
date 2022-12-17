@@ -1,10 +1,11 @@
 import pygame, sys, socket, threading, time, jsonpickle
 from pygame.math import Vector2 as vec
 import math
+import os
 
 from domain.models.network_data import Data as NetData
 from domain.engine import enemies_controller
-from domain.utils import colors
+from domain.utils import colors, constants
 
 
 playing = False
@@ -64,6 +65,22 @@ def restart_game(game):
     game.enemies_group.empty()
     game.reset_players()
     enemies_controller.spawn_random_enemy(game)
+    
+def load_sprites(folder_path: str):
+    """Loads all png files from the specified folter into a list of pygame.Surface.
+
+    Args:
+        folder_path (str): The path to the folder containing the images.
+
+    Returns:
+        list[pygame.Surface]: A list of the images.
+    """    
+    _path = constants.ROOT_PATH + folder_path
+    if not os.path.exists(_path):
+        return
+    
+    images = [pygame.image.load(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.png')]
+    return images
     
 def scale_image(image: pygame.Surface, scale: float):
     """Scales a image to the given float size.

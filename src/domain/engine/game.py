@@ -24,7 +24,10 @@ class Game:
         """A service to draw game objects.""" 
         
         self.pressed_keys = []
+        
         """A list of the currently pressed keys.""" 
+        self.last_pressed_keys = []
+        """A list of the pressed keys on the previous frame.""" 
         
         self.monitor_size = (0,0)
         """The size of the user's monitor.""" 
@@ -117,23 +120,10 @@ class Game:
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         
         self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = int(self.client_type), name = "P1")
-        self.player.current_weapon = Weapon((self.player.rect.width, self.player.rect.centery))
-        
-        _fire_frames = self.player.current_weapon.load_sprites(constants.PISTOL_FOLDER)
-        self.player.current_weapon.image = _fire_frames[0]
-        self.player.current_weapon.rect = _fire_frames[0].get_rect()
-        self.player.current_weapon.fire_frames = _fire_frames
-        
+        self.player.health_bar.set_width(self.screen.get_width()/2)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
-            self.player2.current_weapon = Weapon((self.player2.rect.width, self.player2.rect.centery))
-        
-            self.player2.current_weapon.image = _fire_frames[0]
-            self.player2.current_weapon.rect = _fire_frames[0].get_rect()
-            self.player2.current_weapon.fire_frames = _fire_frames
-        
-        
         
         
         self.reset_players()
@@ -142,7 +132,7 @@ class Game:
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.enemies_group = pygame.sprite.Group()
         
-        enemies_controller.spawn_random_enemy(self)
+        # enemies_controller.spawn_random_enemy(self)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.collision_group.add(self.player2)
@@ -183,15 +173,61 @@ class Game:
         self.player.last_rect = self.player.rect.copy()
         self.player.acceleration.x = 0
             
+        pressing_right = pygame.K_d in self.pressed_keys
+        pressing_left = pygame.K_a in self.pressed_keys
+        was_pressing_right = pygame.K_d in self.last_pressed_keys
+        was_pressing_left = pygame.K_a in self.last_pressed_keys
+            
+            
         # Move right
-        if pygame.K_d in self.pressed_keys and \
-           pygame.K_a not in self.pressed_keys:
-            self.player.acceleration.x = self.gravity_accelaration
+        if pressing_right:
+            # pressing right but not left
+            if not pressing_left:
+                self.player.acceleration.x = self.gravity_accelaration
+                # was pressing both left and right, but released left
+                if was_pressing_left and was_pressing_right:
+                    self.player.running = False
+                    self.player.turning_dir = 1
+            # started to press right
+            if not was_pressing_right:
+                self.player.turning_dir = 1
+            # started to press left and right
+            if pressing_left:
+                self.player.running = False
+                self.player.turning_dir = -1
+        elif was_pressing_right:
+                self.player.running = 0
+                self.player.turning_dir = -1
             
         # Move left
-        if pygame.K_a in self.pressed_keys and \
-           pygame.K_d not in self.pressed_keys:
-            self.player.acceleration.x = -self.gravity_accelaration
+        if pressing_left:
+            # pressing left but not right
+            if not pressing_right:
+                self.player.acceleration.x = -self.gravity_accelaration
+                # was pressing both left and right, but released right
+                if was_pressing_left and was_pressing_right:
+                    self.player.running = False
+                    self.player.turning_dir = 1
+            # started to press left
+            if not was_pressing_left:
+                self.player.turning_dir = 1
+            # pressing left and right
+            if pressing_right:
+                self.player.running = False
+                self.player.turning_dir = -1
+        elif was_pressing_left and not pressing_right:
+                self.player.running = 0
+                self.player.turning_dir = -1
+            
+        if pygame.K_UP in self.pressed_keys:
+            self.player.get_health(20)
+            self.enemies_group.sprites()[0].get_health(5)
+            self.pressed_keys.remove(pygame.K_UP)
+            
+        if pygame.K_DOWN in self.pressed_keys:
+            self.player.take_damage(20)
+            self.enemies_group.sprites()[0].take_damage(5)
+            self.pressed_keys.remove(pygame.K_DOWN)
             
         # Movement
         self.player.acceleration.x += self.player.speed.x * self.friction
@@ -203,9 +239,23 @@ class Game:
         self.player.update_rect()
         
         # jump
-        _grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
-        if pygame.K_SPACE in self.pressed_keys and _grounded:
+        _was_grounded = self.player.grounded
+        _old_pos = self.player.pos.y
+        self.player.grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
+        if not _was_grounded and self.player.grounded and abs(_old_pos - self.player.pos.y) > 2 :
+            self.player.jumping = False
+            self.player.falling_ground = True
+            if pressing_left != pressing_right:
+                self.player.running = True
+        
+        if pygame.K_SPACE in self.pressed_keys and self.player.grounded:
             self.player.speed.y = -self.player.jump_force
+            if pressing_left != pressing_right:
+                self.player.falling_ground = False
+                self.player.running = False
+                self.player.jumping = True
+           
+            self.pressed_keys.remove(pygame.K_SPACE)
         
         # solid collision
         self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
@@ -259,7 +309,7 @@ class Game:
         for o in obstacles:
             match direction:
                 case enums.Orientation.HORIZONTAL:
-                    # collision on the right
+                    # collision with obj right and o left
                     if obj.rect.right >= o.rect.left and obj.last_rect.right <= o.last_rect.left:
                         obj.rect.right = o.rect.left
                         obj.pos.x = obj.rect[0]
@@ -324,22 +374,18 @@ class Game:
             
             # Map
             self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
+            # self.screen.fill(colors.WHITE)
             # Enemies
             self.drawer.draw_enemies(self.screen, self.enemies_group)
             # P1
-            self.screen.blit(self.player.image, self.player.pos - self.player.offset_camera)
-            # self.screen.blit(self.player.current_weapon.image, self.player.current_weapon.pos + self.player.pos - self.player.offset_camera)
-            
+            self.player.draw(self.screen, self.player.offset_camera)
             # P2
             if self.client_type != enums.ClientType.SINGLE:
-                self.screen.blit(self.player2.image, self.player2.pos - self.player.offset_camera)
-                self.screen.blit(self.player2.weapon_container, vec(self.player2.weapon_container_rect.topleft) - self.player.offset_camera)
-            
-            self.screen.blit(self.player.weapon_container, vec(self.player.weapon_container_rect.topleft))
-            
-            
+                self.player2.draw(self.screen, self.player.offset_camera)
             
             # self.blit_debug()
+            
+            self.last_pressed_keys = self.pressed_keys.copy()
             
             pygame.display.update()
             self.clock.tick(60)

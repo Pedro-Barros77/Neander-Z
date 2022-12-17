@@ -50,7 +50,7 @@ class Drawer:
     
     def draw_enemies(self, surface: pygame.Surface, enemies: pygame.sprite.Group):
         for e in enemies:
-            surface.blit(e.image, e.pos - self.game.player.offset_camera)
+            e.draw(surface, self.game.player.offset_camera)
             
     
     def draw_line(self, start: vec, end: vec):

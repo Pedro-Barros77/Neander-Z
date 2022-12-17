@@ -24,20 +24,20 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
         
-        self.fire_frames = []
+        
+        self.fire_frames = [pygame.Surface((1,1))]
+        _path = kwargs.pop("fire_frames_path", None) 
+        if _path != None:
+            self.fire_frames = game_controller.load_sprites(_path)
+            
+        self.image = self.fire_frames[0]
+        self.rect = self.fire_frames[0].get_rect()
+        
         self.reload_frames = []
         
         self.current_frame = 0
         self.firing = False
         
-    def load_sprites(self, folder_path: str):
-        _path = constants.ROOT_PATH + folder_path
-        if not path.exists(_path):
-            return
-        
-        images = [pygame.image.load(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.png')]
-        return images
-            
     def update(self):
         self.fire_anim()
         
