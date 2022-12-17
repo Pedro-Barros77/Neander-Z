@@ -13,6 +13,7 @@ from domain.models.progress_bar import ProgressBar
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, image, **kwargs):
         super().__init__()
+        self.screen_size: vec = vec(kwargs.pop("screen_size", vec(500,500)))
         self.net_id = kwargs.pop("net_id", 0)
         self.jump_force = kwargs.pop("jump_force", 12)
         self.name = kwargs.pop("name", "player")
@@ -21,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.grounded = False
+        self.health = 100
         
         self.image_scale = 2
         
@@ -35,15 +37,14 @@ class Player(pygame.sprite.Sprite):
         
         self.last_rect = self.rect.copy()
         
-        self.current_weapon: Weapon = None
         self.weapon_container: pygame.Surface = pygame.Surface((1,1))
         self.weapon_container_rect: pygame.Rect = pygame.Rect((0,0),(1,1))
         self.weapon_container_angle: float = 0
         self.player2_mouse_pos: vec = vec(0,0)
         self.player2_offset_camera: vec = vec(0,0)
         
+        self.firing = False
         self.current_weapon = Weapon((self.rect.width, self.rect.centery), fire_frames_path = constants.PISTOL_FOLDER)
-        self.health_bar = ProgressBar(100, pygame.Rect((10, 10), (100, 20)))
         
         self.turning_dir = 0
         self.turning_frame = 0
@@ -66,20 +67,29 @@ class Player(pygame.sprite.Sprite):
         fall_ground_folder = constants.get_character_frames(constants.Characters.CARLOS, constants.Actions.FALL_GROUND)
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder)
         
+        self.health_bar: ProgressBar = None
+        
+        if self.name == "P1":
+            self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (self.screen_size.x/2, 20)), hide_on_full = False)
+        else:
+            self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)))
+        
         
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     # called each frame
     def update(self):
-        self.health_bar.update()
         if self.name == "P1":
             _mouse_target = vec(pygame.mouse.get_pos())
             _offset_camera_target = self.offset_camera
         else:
             _mouse_target = self.player2_mouse_pos
             _offset_camera_target = vec(0,0)
+            self.health_bar.rect.centerx = self.rect.centerx
+            self.health_bar.rect.top = self.rect.top - 15
             
+        self.health_bar.update()
             
         _size = vec(self.current_weapon.rect.size)
         _offset = vec(30,30)
@@ -127,6 +137,12 @@ class Player(pygame.sprite.Sprite):
             self.run_anim(abs(self.speed.x / 26.4))
         if self.jumping:
             self.jump_anim(0.2)
+        _still_firing = False
+        if self.firing:
+            _still_firing = self.current_weapon.fire_anim()
+            self.firing = _still_firing
+        if not _still_firing:
+            self.current_weapon.image = self.current_weapon.idle_frame
         
     def draw(self, surface: pygame.Surface, offset: vec):
         surface.blit(self.image, self.pos - offset)
@@ -138,7 +154,7 @@ class Player(pygame.sprite.Sprite):
         self.health_bar.draw(surface)
         
     def shoot(self):
-        self.current_weapon.firing = True
+        self.firing = True
         
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)
@@ -180,7 +196,13 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, True, False)
         
     def take_damage(self, value: float):
+        if value < 0:
+            return
+        self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
         self.health_bar.remove_value(value)
         
     def get_health(self, value: float):
+        if value < 0:
+            return
+        self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         self.health_bar.add_value(value)

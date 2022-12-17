@@ -24,38 +24,39 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
         
-        
         self.fire_frames = [pygame.Surface((1,1))]
         _path = kwargs.pop("fire_frames_path", None) 
         if _path != None:
             self.fire_frames = game_controller.load_sprites(_path)
             
-        self.image = self.fire_frames[0]
+        self.idle_frame = self.fire_frames[0]
+            
+        self.image = self.idle_frame
         self.rect = self.fire_frames[0].get_rect()
         
         self.reload_frames = []
         
         self.current_frame = 0
-        self.firing = False
+        
         
     def update(self):
-        self.fire_anim()
+        pass
         
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
         
     def fire_anim(self):
-        if not self.firing: 
-            return
+        _still_firing = True
         self.current_frame += 0.1
         
         if self.current_frame > len(self.fire_frames)-1:
             self.current_frame = 0
-            self.firing = False
+            _still_firing = False
         self.image = self.fire_frames[int(self.current_frame)]
         
         if self.dir.x < 0:
             self.image = pygame.transform.flip(self.image, False, True)
+        return _still_firing
     
     def reload_anim(self):
         pass

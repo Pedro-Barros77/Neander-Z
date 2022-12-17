@@ -162,12 +162,18 @@ def handle_connection(game, client: socket.socket, player_id: int):
                 player_pos = (player.pos.x, player.pos.y),
                 player_size = player.size,
                 player_speed = (player.speed.x, player.speed.y),
+                player_health = player.health,
                 player_acceleration = (player.acceleration.x, player.acceleration.y),
                 player_last_rect = player.last_rect,
                 command_id = game.command_id,
-                player2_mouse_pos = pygame.mouse.get_pos(),
-                player2_offset_camera = player.offset_camera,
-                player2_aim_angle = player.weapon_container_angle
+                player_mouse_pos = pygame.mouse.get_pos(),
+                player_offset_camera = player.offset_camera,
+                player_aim_angle = player.weapon_container_angle,
+                player_falling_ground = player.falling_ground,
+                player_running = player.running,
+                player_jumping = player.jumping,
+                player_turning_dir = player.turning_dir,
+                player_firing = player.firing
             )
         
         client.send(class_to_json(data_to_send))
@@ -176,11 +182,9 @@ def handle_connection(game, client: socket.socket, player_id: int):
         if not data:
             continue
         else:
-            # print(f"P1: {player.pos}, P2: {data.player_pos}")
             game.handle_received_data(data)
             
         time.sleep(0.01)
-        # print('while:', player_id)
                 
     client.close()
     

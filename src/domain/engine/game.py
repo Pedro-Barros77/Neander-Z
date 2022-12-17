@@ -119,8 +119,7 @@ class Game:
         self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         
-        self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = int(self.client_type), name = "P1")
-        self.player.health_bar.set_width(self.screen.get_width()/2)
+        self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = int(self.client_type), name = "P1", screen_size = self.screen.get_size())
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
@@ -160,11 +159,24 @@ class Game:
         self.player2.pos = vec(data.player_pos)
         self.player2.size = data.player_size
         self.player2.speed = vec(data.player_speed)
+        _health_diff = self.player2.health - data.player_health
+        if _health_diff > 0:
+            self.player2.take_damage(_health_diff)
+        elif _health_diff < 0:
+            self.player2.get_health(-_health_diff)
+        
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.last_rect = data.player_last_rect
-        self.player2.player2_mouse_pos = vec(data.player2_mouse_pos)
-        self.player2.player2_offset_camera = vec(data.player2_offset_camera)
-        self.player2.weapon_container_angle = data.player2_aim_angle
+        self.player2.player2_mouse_pos = vec(data.player_mouse_pos)
+        self.player2.player2_offset_camera = vec(data.player_offset_camera)
+        self.player2.weapon_container_angle = data.player_aim_angle
+        
+        self.player2.falling_ground = data.player_falling_ground
+        self.player2.running = data.player_running
+        self.player2.jumping = data.player_jumping
+        self.player2.turning_dir = data.player_turning_dir
+        self.player2.firing = data.player_firing
+        
         self.player2.update_rect()
         
     def player_movement(self):
@@ -221,12 +233,10 @@ class Game:
             
         if pygame.K_UP in self.pressed_keys:
             self.player.get_health(20)
-            self.enemies_group.sprites()[0].get_health(5)
             self.pressed_keys.remove(pygame.K_UP)
             
         if pygame.K_DOWN in self.pressed_keys:
             self.player.take_damage(20)
-            self.enemies_group.sprites()[0].take_damage(5)
             self.pressed_keys.remove(pygame.K_DOWN)
             
         # Movement
@@ -350,6 +360,7 @@ class Game:
             
             game_controller.handle_events(self)
             
+            print(self.player2.firing)
             if pygame.K_r in self.pressed_keys and \
                 (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
                 self.command_id = int(enums.Command.RESTART_GAME)

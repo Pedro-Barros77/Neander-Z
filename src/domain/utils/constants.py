@@ -8,8 +8,7 @@ ROOT_PATH = f'{os.getcwd()}\\'
 
 IMAGES_PATH = "src\\domain\\resources\\images\\"
 
-PLAYER_1_IMAGE = f"{IMAGES_PATH}characters\\carlos\\idle.png"
-PLAYER_2_IMAGE = f"{IMAGES_PATH}cleiton.png"
+
 
 GRAVEYARD_MAP = f"{IMAGES_PATH}map_graveyard.png"
 
@@ -26,6 +25,9 @@ class Actions(Enum):
     JUMP = "jump"
     RUN = "run"
     FALL_GROUND = "fall_ground"
+    
+PLAYER_1_IMAGE = f"{IMAGES_PATH}characters\\{Characters.CARLOS.value}\\idle.png"
+PLAYER_2_IMAGE = f"{IMAGES_PATH}characters\\{Characters.CARLOS.value}\\idle.png"
 
 def get_character_frames(charac_name: str, action: Actions):
     return f'{IMAGES_PATH}characters\\{str(charac_name.value)}\\{str(action.value)}\\'

@@ -38,16 +38,18 @@ class ProgressBar(pygame.sprite.Sprite):
         """The color of the target bar on animation, when decreading the value."""
         self.use_animation = kwargs.pop("use_animation", True)
         """If the bar should be animated with target value bar."""
+        self.hide_on_full = kwargs.pop("hide_on_full", True)
+        """If the bar should be hidden when it's value is at the maximum, to prevend overflow of healthbars."""
         
         
         
-    def set_width(self, value: int):
+    def set_rect(self, value: pygame.Rect):
         """Sets the width of the bar.
 
         Args:
             value (int): The new width value.
         """        
-        self.rect.width = value
+        self.rect = value
         self.image = pygame.Surface(self.rect.size)
         self.value_ratio = self.max_value / self.rect.width
     
@@ -57,6 +59,8 @@ class ProgressBar(pygame.sprite.Sprite):
         Args:
             screen (pygame.Surface): The surface to draw the bar on.
         """        
+        if self.hide_on_full and self.value == self.max_value:
+            return
         screen.blit(self.image, self.rect)
         
     def update(self):
