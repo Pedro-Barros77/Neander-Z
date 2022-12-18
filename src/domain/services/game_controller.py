@@ -19,7 +19,8 @@ def handle_events(game):
         if event.type == pygame.QUIT:
             quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            game.player.shoot()
+            _bullet = game.player.shoot()
+            game.projectiles.append(_bullet)
         elif event.type == pygame.KEYDOWN:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP:
@@ -109,6 +110,10 @@ def rotate_to_angle(image: pygame.Surface, pos:vec, angle: float):
     _rect = _image.get_rect(center= pos)
     return _image, _rect, angle
 
+def point_to_angle_distance(pos: vec,distance: float,angle_in_radians: float):
+    x = pos.x + (distance*math.cos(angle_in_radians))
+    y = pos.y + (distance*math.sin(angle_in_radians))
+    return vec(x, y)
     
 def host_game(game, host: str, port: int):
     """Creates a server on the specified address and port.
@@ -160,14 +165,12 @@ def handle_connection(game, client: socket.socket, player_id: int):
                 net_id = player_id,
                 message = f"Hello from player {player_id}",
                 player_pos = (player.pos.x, player.pos.y),
-                player_size = player.size,
                 player_speed = (player.speed.x, player.speed.y),
                 player_health = player.health,
                 player_acceleration = (player.acceleration.x, player.acceleration.y),
                 player_last_rect = player.last_rect,
                 command_id = game.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
-                player_offset_camera = player.offset_camera,
                 player_aim_angle = player.weapon_container_angle,
                 player_falling_ground = player.falling_ground,
                 player_running = player.running,

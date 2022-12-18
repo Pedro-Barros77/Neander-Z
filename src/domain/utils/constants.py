@@ -15,6 +15,7 @@ GRAVEYARD_MAP = f"{IMAGES_PATH}map_graveyard.png"
 ZOMBIE_1 = f"{IMAGES_PATH}enemies\\zombie_1.png"
 
 PISTOL_FOLDER = f"{IMAGES_PATH}weapons\\pistol\\"
+SMALL_BULLET = f"{IMAGES_PATH}weapons\\small_bullet\\01.png"
 
 class Characters(Enum):
     CARLOS = "carlos"

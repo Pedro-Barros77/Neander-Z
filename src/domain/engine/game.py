@@ -62,6 +62,9 @@ class Game:
         self.command_id = 0
         """A command sent from the host to execute some operation on both host and client, such as restart game."""
         
+        self.projectiles = []
+        """A list of the projectiles that are still in the game screen."""
+        
     
     def reset_players(self):
         """Resets all players attributes to default values.
@@ -81,7 +84,6 @@ class Game:
         self.player.pos = vec(p1_pos)
         self.player.rect = self.player.image.get_rect()
         self.player.rect.topleft = self.player.pos
-        self.player.size = self.player.rect.size
         self.player.speed = vec(0,0)
         self.player.acceleration = vec(0,0)
         self.player.last_rect = self.player.rect
@@ -168,14 +170,14 @@ class Game:
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.last_rect = data.player_last_rect
         self.player2.player2_mouse_pos = vec(data.player_mouse_pos)
-        self.player2.player2_offset_camera = vec(data.player_offset_camera)
         self.player2.weapon_container_angle = data.player_aim_angle
         
         self.player2.falling_ground = data.player_falling_ground
         self.player2.running = data.player_running
         self.player2.jumping = data.player_jumping
         self.player2.turning_dir = data.player_turning_dir
-        self.player2.firing = data.player_firing
+        if data.player_firing:
+            self.player2.firing = True
         
         self.player2.update_rect()
         
@@ -189,7 +191,6 @@ class Game:
         pressing_left = pygame.K_a in self.pressed_keys
         was_pressing_right = pygame.K_d in self.last_pressed_keys
         was_pressing_left = pygame.K_a in self.last_pressed_keys
-            
             
         # Move right
         if pressing_right:
@@ -360,7 +361,6 @@ class Game:
             
             game_controller.handle_events(self)
             
-            print(self.player2.firing)
             if pygame.K_r in self.pressed_keys and \
                 (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
                 self.command_id = int(enums.Command.RESTART_GAME)
@@ -379,6 +379,11 @@ class Game:
             self.player_movement()
             enemies_controller.enemies_movement(self, self.enemies_group)
             
+            for p in self.projectiles:
+                _should_kill = p.move()
+                if _should_kill:
+                    self.projectiles.remove(p)
+            
             self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
             
             self.center_camera()
@@ -393,10 +398,14 @@ class Game:
             # P2
             if self.client_type != enums.ClientType.SINGLE:
                 self.player2.draw(self.screen, self.player.offset_camera)
+                
+            for p in self.projectiles:
+                p.draw(self.screen)
             
             # self.blit_debug()
             
             self.last_pressed_keys = self.pressed_keys.copy()
+            print(len(self.projectiles))
             
             pygame.display.update()
             self.clock.tick(60)
