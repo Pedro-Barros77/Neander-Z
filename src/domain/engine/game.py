@@ -4,14 +4,13 @@ from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, drawer
 from domain.engine import enemies_controller
-from domain.utils import colors, math_utillity as math, enums, constants
+from domain.utils import colors, recyclables, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
 from domain.models.network_data import Data as NetData
 from domain.models.map import Map
 from domain.models.igravitable import IGravitable
-from domain.models.enemies.zombie_1 import Zombie1
-from domain.models.weapon import Weapon
+from domain.models.rectangle_sprite import Rectangle
 class Game:
     def __init__(self, client_type: enums.ClientType):
         self.screen = None
@@ -65,10 +64,15 @@ class Game:
         self.projectiles = []
         """A list of the projectiles that are still in the game screen."""
         
+        self.test_objects = []
+        
     
     def reset_players(self):
         """Resets all players attributes to default values.
         """        
+        game_controller.screen_size = self.screen.get_size()
+        game_controller.map_size = vec(self.map.rect.size)
+        
         _y = self.screen.get_height() - 200
         
         p1_pos, p2_pos = None, None
@@ -80,7 +84,7 @@ class Game:
             p1_pos = (80, _y)
             p2_pos = (20, _y)
         
-        self.player.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_1_IMAGE), 2)
+        self.player.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale)
         self.player.pos = vec(p1_pos)
         self.player.rect = self.player.image.get_rect()
         self.player.rect.topleft = self.player.pos
@@ -90,7 +94,7 @@ class Game:
         self.player.offset_camera = vec(0,0)
         
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2.image = game_controller.scale_image(pygame.image.load(constants.PLAYER_2_IMAGE), 2)
+            self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale)
             self.player2.pos = vec(p2_pos)
             self.player2.rect = self.player2.image.get_rect()
             self.player2.rect.topleft = self.player2.pos
@@ -111,6 +115,8 @@ class Game:
         self.screen = pygame.display.set_mode(self.monitor_size)
 
         game_controller.playing = True
+        game_controller.screen_size = vec(self.screen.get_size())
+        
         
         self.clock = pygame.time.Clock()
         self.drawer = drawer.Drawer(self)
@@ -120,11 +126,12 @@ class Game:
         
         self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
+        game_controller.map_size = vec(self.map.rect.size)
         
-        self.player = Player((20, 0), constants.PLAYER_1_IMAGE, net_id = int(self.client_type), name = "P1", screen_size = self.screen.get_size())
+        self.player = Player((20, 0), enums.Characters.CARLOS, net_id = int(self.client_type), name = "P1", screen_size = self.screen.get_size())
         
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2 = Player((80, 0), constants.PLAYER_2_IMAGE, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
+            self.player2 = Player((80, 0), enums.Characters.CARLOS, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
         
         
         self.reset_players()
@@ -133,7 +140,11 @@ class Game:
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.enemies_group = pygame.sprite.Group()
         
-        # enemies_controller.spawn_random_enemy(self)
+        # exec(recyclables.create_box)
+        
+        game_controller.bullet_groups = [self.collision_group, self.enemies_group]
+        
+        enemies_controller.spawn_random_enemy(self)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.collision_group.add(self.player2)
@@ -372,9 +383,9 @@ class Game:
                 game_controller.restart_game(self)
                 
             self.player.update()
-            self.enemies_group.update()
-            self.collision_group.update()
-            self.jumpable_group.update()
+            self.enemies_group.update(group_name = "enemies")
+            self.collision_group.update(group_name = "collision")
+            self.jumpable_group.update(group_name = "jumpable")
         
             self.process_gravitables()    
                 
@@ -382,7 +393,7 @@ class Game:
             enemies_controller.enemies_movement(self, self.enemies_group)
             
             for p in self.projectiles:
-                _should_kill = p.move()
+                _should_kill = p.move(self.player.offset_camera)
                 if _should_kill:
                     self.projectiles.remove(p)
             
@@ -420,4 +431,9 @@ class Game:
         self.screen.blit(self.map.floor.image, self.map.floor.pos - self.player.offset_camera)
         self.screen.blit(self.map.left_wall.image, self.map.left_wall.pos - self.player.offset_camera)
         self.screen.blit(self.map.right_wall.image, self.map.right_wall.pos - self.player.offset_camera)
+        
+        for o in self.test_objects:
+            o.draw(self.screen, self.player.offset_camera)
+            
+        
         

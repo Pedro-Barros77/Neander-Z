@@ -12,10 +12,10 @@ from domain.models.weapons.small_bullet import SmallBullet
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, image, **kwargs):
+    def __init__(self, pos, character: enums.Characters, **kwargs):
         super().__init__()
-        self.screen_size: vec = vec(kwargs.pop("screen_size", vec(500,500)))
-        """The size of the game screen, for reference."""
+        self.character: enums.Characters = character
+        """Name of the character."""
         self.net_id = kwargs.pop("net_id", 0)
         """The ID of this player in the network."""
         self.jump_force = kwargs.pop("jump_force", 12)
@@ -37,7 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.image_scale = 2
         """How much the image will be scaled from original file."""
         
-        self.image = game_controller.scale_image(pygame.image.load(image), self.image_scale)
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale)
         """The surface of the player."""
         	
         self.rect = self.image.get_rect()
@@ -68,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         """The directino that tha player is turning to (left: -1, right: 1)."""
         self.turning_frame = 0
         """The current frame index of the turning animation."""
-        turn_folder = constants.get_character_frames(constants.Characters.CARLOS, constants.Actions.TURN)
+        turn_folder = constants.get_character_frames(self.character, enums.AnimActions.TURN)
         self.turn_frames = game_controller.load_sprites(turn_folder)
         """The frames of the turning animation."""
         
@@ -76,7 +76,7 @@ class Player(pygame.sprite.Sprite):
         """If the jumping animation is running."""
         self.jumping_frame = 0
         """The current frame index of the jumping animation."""
-        jump_folder = constants.get_character_frames(constants.Characters.CARLOS, constants.Actions.JUMP)
+        jump_folder = constants.get_character_frames(self.character, enums.AnimActions.JUMP)
         self.jump_frames = game_controller.load_sprites(jump_folder)
         """The frames of the jumping animation."""
         self.jump_frames.append(self.jump_frames[-1])
@@ -85,7 +85,7 @@ class Player(pygame.sprite.Sprite):
         """If the running animation is running."""
         self.running_frame = 0
         """The current frame index of the running animation."""
-        run_folder = constants.get_character_frames(constants.Characters.CARLOS, constants.Actions.RUN)
+        run_folder = constants.get_character_frames(self.character, enums.AnimActions.RUN)
         self.run_frames = game_controller.load_sprites(run_folder)
         """The frames of the running animation."""
         
@@ -93,7 +93,7 @@ class Player(pygame.sprite.Sprite):
         """If the falling ground animation is running."""
         self.falling_ground_frame = 0
         """The current frame index of the falling ground animation."""
-        fall_ground_folder = constants.get_character_frames(constants.Characters.CARLOS, constants.Actions.FALL_GROUND)
+        fall_ground_folder = constants.get_character_frames(self.character, enums.AnimActions.FALL_GROUND)
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder)
         """The frames of the falling ground animation."""
         
@@ -104,7 +104,7 @@ class Player(pygame.sprite.Sprite):
         """The health bar of the player."""
         
         if self.name == "P1":
-            self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (self.screen_size.x/2, 20)), hide_on_full = False)
+            self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
         else:
             self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)))
         
@@ -112,7 +112,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     # called each frame
-    def update(self):
+    def update(self, **kwargs):
+        group_name = kwargs.pop("group_name", "")
+        if group_name == "jumpable":
+            return
+        
         is_p1 = self.name == "P1"
         
         self.health_bar.update()
@@ -121,7 +125,6 @@ class Player(pygame.sprite.Sprite):
             _mouse_target = vec(pygame.mouse.get_pos())
             _offset_camera_target = self.offset_camera
         else:
-            print("p2")
             _mouse_target = self.player2_mouse_pos
             _offset_camera_target = vec(0,0)
             self.health_bar.rect.centerx = self.rect.centerx
@@ -173,6 +176,7 @@ class Player(pygame.sprite.Sprite):
             self.firing = self.current_weapon.fire_anim()
             
         #endregion Animation Triggers
+        
         return
         
     def draw(self, surface: pygame.Surface, offset: vec):
@@ -187,8 +191,9 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         self.firing = True
         _offset_camera = self.offset_camera if self.name == "P1" else vec(0,0)
-        _bullet_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft) + self.weapon_anchor - _offset_camera, self.rect.width/2 + 30 + 20, -maths.radians(self.weapon_aim_angle))
-        return SmallBullet(constants.SMALL_BULLET, _bullet_pos, self.weapon_aim_angle, 5)
+        _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft - _offset_camera, self.rect.width/2 + 30, -maths.radians(self.weapon_aim_angle))
+        
+        return SmallBullet(constants.SMALL_BULLET, _bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage)
         
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)
@@ -202,7 +207,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, True, False)
             
     def jump_anim(self, speed: float):
-        if self.jumping_frame > len(self.jump_frames):
+        if self.jumping_frame > len(self.jump_frames)-1:
             self.jumping_frame = 0
             self.jumping = False
         self.image = game_controller.scale_image(self.jump_frames[int(self.jumping_frame)], self.image_scale)
@@ -222,7 +227,7 @@ class Player(pygame.sprite.Sprite):
     def run_anim(self, speed: float):
         self.running_frame += speed
         
-        if self.running_frame > len(self.run_frames)-1:
+        if self.running_frame > len(self.run_frames):
             self.running_frame = 0
         self.image = game_controller.scale_image(self.run_frames[int(self.running_frame)], self.image_scale)
         if self.acceleration.x > 0:

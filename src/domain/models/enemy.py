@@ -1,19 +1,22 @@
 import pygame
 from pygame.math import Vector2 as vec
 
-from domain.utils import colors, constants
+from domain.utils import colors, enums, constants
 from domain.services import game_controller
 from domain.models.progress_bar import ProgressBar
 
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, image):
+    def __init__(self, pos, enemy_name: enums.Enemies, **kwargs):
         super().__init__()
         
         self.name = "enemy"
         self.jump_force = 12
         self.damage = 1
+        self.enemy_name = enemy_name
+        self.image_scale = 2
+        self.movement_speed = kwargs.pop("movement_speed", 5)
         
         self.pos: vec = vec((pos))
         self.speed = vec(0,0)
@@ -21,7 +24,16 @@ class Enemy(pygame.sprite.Sprite):
         self.dir: vec = vec(0,0)
         self.last_dir: vec = self.dir.copy()
         
-        self.image = game_controller.scale_image(pygame.image.load(image), 2)
+        self.is_alive = True
+        
+        self.running = True
+        """If the running animation is running."""
+        self.running_frame = 0
+        """The current frame index of the running animation."""
+        run_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.RUN)
+        self.run_frames = game_controller.load_sprites(run_folder)
+        
+        self.image = game_controller.scale_image(self.run_frames[0], self.image_scale)
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()
@@ -34,9 +46,6 @@ class Enemy(pygame.sprite.Sprite):
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
         
-    def update(self):
-        self.health_bar.update()
-        
     def draw(self, surface: pygame.Surface, offset: vec):
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset
         surface.blit(self.image, self.pos - offset)
@@ -44,6 +53,9 @@ class Enemy(pygame.sprite.Sprite):
         
     def take_damage(self, value: float):
         self.health_bar.remove_value(value)
+        if self.health_bar.target_value <= 0:
+            self.is_alive = False
+            
         
     def get_health(self, value: float):
         self.health_bar.add_value(value)

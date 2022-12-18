@@ -9,6 +9,10 @@ from domain.utils import colors, constants
 
 
 playing = False
+screen_size: vec = vec(0,0)
+map_size: vec = vec(0,0)
+
+bullet_groups = []
 
 def handle_events(game):
     """Iterates through each event and call it's appropriate function.
@@ -65,6 +69,8 @@ def restart_game(game):
     game.map.update_pos()
     game.enemies_group.empty()
     game.reset_players()
+    screen_size: vec = vec(0,0)
+    map_size: vec = vec(0,0)
     enemies_controller.spawn_random_enemy(game)
     
 def load_sprites(folder_path: str):
@@ -110,7 +116,7 @@ def rotate_image(image: pygame.Surface, angle: float):
     # new_rect = rotated_image.get_rect(center = image.get_rect().center)
     return rotated_image
 
-def point_to_angle_distance(pos: vec,distance: float,angle_in_radians: float):
+def point_to_angle_distance(pos: vec,distance: float, angle_in_radians: float):
     x = pos.x + (distance*math.cos(angle_in_radians))
     y = pos.y + (distance*math.sin(angle_in_radians))
     return vec(x, y)

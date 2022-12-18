@@ -7,6 +7,8 @@ class Pistol(Weapon):
     def __init__(self, pos, **kwargs):
         super().__init__(pos, **kwargs)
         
+        self.damage = 5
+        
         self.reload_frames = []
         """The animation frames of this weapon when reloading."""
         

@@ -1,4 +1,5 @@
 from enum import Enum
+from domain.utils import enums
 import os
 
 SERVER_ADDRESS = '000.000.00.000'
@@ -17,19 +18,12 @@ ZOMBIE_1 = f"{IMAGES_PATH}enemies\\zombie_1.png"
 PISTOL_FOLDER = f"{IMAGES_PATH}weapons\\pistol\\"
 SMALL_BULLET = f"{IMAGES_PATH}weapons\\small_bullet\\01.png"
 
-class Characters(Enum):
-    CARLOS = "carlos"
-    CLEITON = "cleiton"
-
-class Actions(Enum):
-    TURN = "turn"
-    JUMP = "jump"
-    RUN = "run"
-    FALL_GROUND = "fall_ground"
+def get_character_frames(charac_name: enums.Characters, action: enums.AnimActions):
+    if action == enums.AnimActions.IDLE:
+        return f'{IMAGES_PATH}characters\\{str(charac_name.value)}\\{str(action.value)}.png'
     
-PLAYER_1_IMAGE = f"{IMAGES_PATH}characters\\{Characters.CARLOS.value}\\idle.png"
-PLAYER_2_IMAGE = f"{IMAGES_PATH}characters\\{Characters.CARLOS.value}\\idle.png"
-
-def get_character_frames(charac_name: str, action: Actions):
     return f'{IMAGES_PATH}characters\\{str(charac_name.value)}\\{str(action.value)}\\'
+
+def get_zombie_frames(z_name: enums.Characters, action: enums.AnimActions):
+    return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}\\'
     

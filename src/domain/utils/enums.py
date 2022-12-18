@@ -19,6 +19,20 @@ class Orientation(Enum):
     VERTICAL = 0
     HORIZONTAL = 1
     
+class Characters(Enum):
+    CARLOS = "carlos"
+    CLEITON = "cleiton"
+    
+class Enemies(Enum):
+    Z_ROGER = "z_roger"
+    
+class AnimActions(Enum):
+    TURN = "turn"
+    JUMP = "jump"
+    RUN = "run"
+    FALL_GROUND = "fall_ground"
+    IDLE = "idle"
+    
 class Command(Enum):
     RESTART_GAME = 1
     

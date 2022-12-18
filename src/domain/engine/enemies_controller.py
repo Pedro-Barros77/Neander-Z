@@ -12,7 +12,7 @@ def spawn_enemy(game, enemy: Enemy):
     game.enemies_group.add(enemy)
     
 def spawn_random_enemy(game):
-    spawn_enemy(game, Zombie1((500,300), constants.ZOMBIE_1))
+    spawn_enemy(game, Zombie1((500,300), enums.Enemies.Z_ROGER, movement_speed = 0.1))
 
 def enemies_movement(game, enemies: list[Enemy]):
     """Handles the movement of the enemies.
@@ -28,6 +28,9 @@ def enemies_movement(game, enemies: list[Enemy]):
         
     for e in enemies:
         
+        if not e.is_alive:
+            enemies.remove(e)
+        
         if player_pos.x < e.rect.centerx - _flip_margin:
             e.dir.x = -1
             if e.last_dir.x > e.dir.x:
@@ -39,15 +42,12 @@ def enemies_movement(game, enemies: list[Enemy]):
         else:
             e.dir.x = 0
             
-        
-        
         e.acceleration.x = 0
         e.last_rect = e.rect.copy()
         
-            
         # Movement
         if e.dir.x != 0:
-            e.acceleration.x = (game.gravity_accelaration/2) * e.dir.x
+            e.acceleration.x = e.movement_speed * e.dir.x
         
         e.acceleration.x += e.speed.x * game.friction
         e.speed.x += e.acceleration.x
@@ -64,6 +64,7 @@ def enemies_movement(game, enemies: list[Enemy]):
         
         # solid collision
         enemy_collision(game, e, game.collision_group, enums.Orientation.HORIZONTAL)
+        
 
 def enemy_collision(game, enemy: Enemy, targets: pygame.sprite.Group, direction: enums.Orientation):
         """Handles collision between the enemy and collidable objects.

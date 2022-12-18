@@ -43,3 +43,6 @@ class Rectangle(pygame.sprite.Sprite, IGravitable):
         
     def update_pos(self):
         self.pos = self.rect.topleft
+        
+    def draw(self, surface: pygame.Surface, offset: vec):
+        surface.blit(self.image, self.rect.topleft - offset)
