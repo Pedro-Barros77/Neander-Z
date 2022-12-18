@@ -96,19 +96,19 @@ def scale_image(image: pygame.Surface, scale: float):
     img = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
     return img
 
-def rotate_to_mouse(image: pygame.Surface, pos: vec, mouse_pos: vec):
+def angle_to_mouse(pos: vec, mouse_pos: vec):
     rel_x, rel_y = mouse_pos.x - pos.x, mouse_pos.y - pos.y
+    return (180 / math.pi) * -math.atan2(rel_y, rel_x)
     
-    # pygame.draw.line(screen, colors.GREEN, pos, (mouse_x, mouse_y))
-    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-    
-    return rotate_to_angle(image, pos, angle)
-    
-
 def rotate_to_angle(image: pygame.Surface, pos:vec, angle: float):
     _image = pygame.transform.rotate(image, int(angle))
     _rect = _image.get_rect(center= pos)
-    return _image, _rect, angle
+    return _image, _rect
+
+def rotate_image(image: pygame.Surface, angle: float):
+    rotated_image = pygame.transform.rotate(image, angle)
+    # new_rect = rotated_image.get_rect(center = image.get_rect().center)
+    return rotated_image
 
 def point_to_angle_distance(pos: vec,distance: float,angle_in_radians: float):
     x = pos.x + (distance*math.cos(angle_in_radians))
@@ -164,14 +164,15 @@ def handle_connection(game, client: socket.socket, player_id: int):
         data_to_send = NetData(
                 net_id = player_id,
                 message = f"Hello from player {player_id}",
-                player_pos = (player.pos.x, player.pos.y),
+                player_rect = (player.rect.left, player.rect.top, player.rect.width, player.rect.height),
+                player_last_rect = (player.last_rect.left, player.last_rect.top, player.last_rect.width, player.last_rect.height),
                 player_speed = (player.speed.x, player.speed.y),
                 player_health = player.health,
                 player_acceleration = (player.acceleration.x, player.acceleration.y),
-                player_last_rect = player.last_rect,
                 command_id = game.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
-                player_aim_angle = player.weapon_container_angle,
+                player_offset_camera = player.offset_camera,
+                player_aim_angle = player.weapon_aim_angle,
                 player_falling_ground = player.falling_ground,
                 player_running = player.running,
                 player_jumping = player.jumping,

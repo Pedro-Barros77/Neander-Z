@@ -1,4 +1,4 @@
-import pygame
+import pygame, math as maths
 
 from pygame.math import Vector2 as vec
 
@@ -50,14 +50,14 @@ class Player(pygame.sprite.Sprite):
         self.last_rect = self.rect.copy()
         """The rect of the player on the previous frame."""
         
-        self.weapon_container: pygame.Surface = pygame.Surface((1,1))
-        """A surface centered on the player containing the gun, for rotating on it's centered pivot."""
-        self.weapon_container_rect: pygame.Rect = pygame.Rect((0,0),(1,1))
-        """The rect of the weapon container."""
-        self.weapon_container_angle: float = 0
+        self.weapon_aim_angle: float = 0
         """The angle that the container is rotated along with the weapon."""
         self.player2_mouse_pos: vec = vec(0,0)
-        """The mouse position of the oter player."""
+        """The mouse position of the other player."""
+        self.player2_offset_camera: vec = vec(0,0)
+        """The adjustment that every object should do to their position so the camera is centered on the player 2."""
+        
+        self.player2_rect: pygame.Rect = pygame.Rect(0,0,1,1)
         
         self.firing = False
         """If the weapon firing animation is running."""
@@ -97,6 +97,9 @@ class Player(pygame.sprite.Sprite):
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder)
         """The frames of the falling ground animation."""
         
+        self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
+        """The anchor point of the weapon (the center of the circle it orbits around), relative to the player position"""
+        
         self.health_bar: ProgressBar = None
         """The health bar of the player."""
         
@@ -105,61 +108,58 @@ class Player(pygame.sprite.Sprite):
         else:
             self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)))
         
-        
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     # called each frame
     def update(self):
-        if self.name == "P1":
+        is_p1 = self.name == "P1"
+        
+        self.health_bar.update()
+        
+        if is_p1:
             _mouse_target = vec(pygame.mouse.get_pos())
             _offset_camera_target = self.offset_camera
         else:
+            print("p2")
             _mouse_target = self.player2_mouse_pos
             _offset_camera_target = vec(0,0)
             self.health_bar.rect.centerx = self.rect.centerx
             self.health_bar.rect.top = self.rect.top - 15
-            
-        self.health_bar.update()
-            
-        _size = vec(self.current_weapon.rect.size)
-        _offset = vec(30,30)
+
+        #region Weapon Animation
         
-        _wrapper = pygame.Surface(_size*2 + vec(self.rect.size) + _offset)
-        _wrapper = _wrapper.convert_alpha()
-        _wrapper.fill((0, 0, 0, 0))
-        _rect = _wrapper.get_rect()
-        _rect.center = vec(self.rect.center) - _offset_camera_target
-        _local_pos = vec(_size.x + self.rect.width + _offset.x, self.rect.height/2 + _offset.y)
-        _wrapper.blit(self.current_weapon.image, _local_pos)
-        
-        if self.name == "P1":
-            img, rec, angle = game_controller.rotate_to_mouse(_wrapper, vec(_rect.center), _mouse_target)
-        else:
-            img, rec, angle = game_controller.rotate_to_angle(_wrapper, vec(_rect.center), self.weapon_container_angle)
-            
-        self.weapon_container = img
-        self.weapon_container_rect = rec
-        self.weapon_container_angle = angle
-        
-        _gun_pos = vec(self.current_weapon.rect.center) + self.pos - _offset_camera_target
         def flip():
-            self.current_weapon.image = pygame.transform.flip(self.current_weapon.image, False, True)
+            self.current_weapon.current_frame = pygame.transform.flip(self.current_weapon.current_frame, False, True)
             self.current_weapon.last_dir = self.current_weapon.dir
-    
-        _flip_margin = 0
-        if _mouse_target.x < _gun_pos.x - _flip_margin:
+            
+        if _mouse_target.x < self.rect.centerx - _offset_camera_target.x:
             self.current_weapon.dir = -1
             if self.current_weapon.last_dir > self.current_weapon.dir:
                 flip()
-        elif _mouse_target.x > _gun_pos.x + _flip_margin:
+        elif _mouse_target.x > self.rect.centerx- _offset_camera_target.x:
             self.current_weapon.dir = 1
             if self.current_weapon.last_dir < self.current_weapon.dir:
                 flip()
         else:
             self.current_weapon.dir = 0
         
-        self.current_weapon.update()
+        
+        _weapon_center: vec = self.weapon_anchor + self.rect.topleft - _offset_camera_target
+        
+        if is_p1:
+            self.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
+        
+        # The distance from the weapon anchor to position the weapon
+        _weapon_distance = self.rect.width/2 + 30
+        # Weapon pos
+        self.current_weapon.rect.center = game_controller.point_to_angle_distance(_weapon_center, _weapon_distance, -maths.radians(self.weapon_aim_angle)) + self.current_weapon.barrel_offset
+        # Weapon rotation
+        self.current_weapon.image, self.current_weapon.rect = game_controller.rotate_to_angle(self.current_weapon.current_frame, vec(self.current_weapon.rect.center),self.weapon_aim_angle)
+        
+        #endregion Weapon Animation
+        
+        #region Animation Triggers
         
         if self.turning_dir != 0:
             self.turn_anim(0.3)
@@ -171,21 +171,24 @@ class Player(pygame.sprite.Sprite):
             self.jump_anim(0.2)
         if self.firing:
             self.firing = self.current_weapon.fire_anim()
+            
+        #endregion Animation Triggers
+        return
         
     def draw(self, surface: pygame.Surface, offset: vec):
         surface.blit(self.image, self.pos - offset)
         if self.name == "P1":
-            surface.blit(self.weapon_container, vec(self.weapon_container_rect.topleft))
+            surface.blit(self.current_weapon.image, self.current_weapon.rect)
         else:
-            surface.blit(self.weapon_container, vec(self.weapon_container_rect.topleft) - offset)
+            surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft)- offset)
             
         self.health_bar.draw(surface)
         
-        pygame.draw.circle(surface, colors.GREEN, self.current_weapon.world_pos, 15, 2)
-        
     def shoot(self):
         self.firing = True
-        return SmallBullet(constants.SMALL_BULLET, vec(self.weapon_container_rect.right, self.weapon_container_rect.centery), self.weapon_container_angle, 5)
+        _offset_camera = self.offset_camera if self.name == "P1" else vec(0,0)
+        _bullet_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft) + self.weapon_anchor - _offset_camera, self.rect.width/2 + 30 + 20, -maths.radians(self.weapon_aim_angle))
+        return SmallBullet(constants.SMALL_BULLET, _bullet_pos, self.weapon_aim_angle, 5)
         
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)

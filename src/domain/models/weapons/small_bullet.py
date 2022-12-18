@@ -14,9 +14,8 @@ class SmallBullet(pygame.sprite.Sprite):
         
     
     def draw(self, screen: pygame.Surface):
-        print("drawing")
-        # screen.blit(self.image, self.rect)
-        # pygame.draw.circle(screen, colors.RED, self.rect.topleft, 15, 2)
+        screen.blit(self.image, self.rect)
+        pygame.draw.circle(screen, colors.RED, self.rect.topleft, 15, 1)
         
     def move(self):
         # print("moving")

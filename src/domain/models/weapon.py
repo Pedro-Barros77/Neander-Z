@@ -32,11 +32,12 @@ class Weapon(pygame.sprite.Sprite):
         self.image = self.idle_frame
         """The surface of this weapon."""
         
+        self.current_frame = self.idle_frame
+        """The image of the current animation frame, without rotating."""
+        
         self.rect = self.image.get_rect()
         """The rect of this weapon."""
         self.rect.topleft = pos
         
         self.firing_frame = 0
         """The current frame of firing animation."""
-        
-        self.world_pos: vec = vec(0,0)

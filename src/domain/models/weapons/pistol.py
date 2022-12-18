@@ -1,4 +1,5 @@
 import pygame
+from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
 
@@ -9,6 +10,8 @@ class Pistol(Weapon):
         self.reload_frames = []
         """The animation frames of this weapon when reloading."""
         
+        self.barrel_offset = vec(0, 7)
+        
     
     def fire_anim(self):
         _still_firing = True
@@ -17,10 +20,10 @@ class Pistol(Weapon):
         if self.firing_frame > len(self.fire_frames)-1:
             self.firing_frame = 0
             _still_firing = False
-        self.image = self.fire_frames[int(self.firing_frame)]
+        self.current_frame = self.fire_frames[int(self.firing_frame)]
         
         if self.dir < 0:
-            self.image = pygame.transform.flip(self.image, False, True)
+            self.current_frame = pygame.transform.flip(self.current_frame, False, True)
         return _still_firing
     
     def reload_anim(self):

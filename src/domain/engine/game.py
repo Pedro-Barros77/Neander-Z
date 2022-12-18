@@ -156,10 +156,10 @@ class Game:
         
         if data.command_id == int(enums.Command.RESTART_GAME):
             game_controller.restart_game(self)
-                    
-        self.player2.rect.topleft = data.player_pos
-        self.player2.pos = vec(data.player_pos)
-        self.player2.size = data.player_size
+        
+        self.player2.rect = pygame.Rect(data.player_rect)
+        self.player2.last_rect = pygame.Rect(data.player_last_rect)
+        self.player2.pos = vec(self.player2.rect.topleft)
         self.player2.speed = vec(data.player_speed)
         _health_diff = self.player2.health - data.player_health
         if _health_diff > 0:
@@ -168,9 +168,10 @@ class Game:
             self.player2.get_health(-_health_diff)
         
         self.player2.acceleration = vec(data.player_acceleration)
-        self.player2.last_rect = data.player_last_rect
         self.player2.player2_mouse_pos = vec(data.player_mouse_pos)
-        self.player2.weapon_container_angle = data.player_aim_angle
+        self.player.player2_mouse_pos = vec(data.player_mouse_pos)
+        self.player.player2_offset_camera = vec(data.player_offset_camera)
+        self.player2.weapon_aim_angle = data.player_aim_angle
         
         self.player2.falling_ground = data.player_falling_ground
         self.player2.running = data.player_running
@@ -180,9 +181,10 @@ class Game:
             self.player2.firing = True
         
         self.player2.update_rect()
+        self.player.player2_rect = self.player2.rect
         
     def player_movement(self):
-        """Handles the movement of player 1.
+        """Handles the mov2ement of player 1.
         """        
         self.player.last_rect = self.player.rect.copy()
         self.player.acceleration.x = 0
@@ -405,7 +407,6 @@ class Game:
             # self.blit_debug()
             
             self.last_pressed_keys = self.pressed_keys.copy()
-            print(len(self.projectiles))
             
             pygame.display.update()
             self.clock.tick(60)
