@@ -1,11 +1,11 @@
-import pygame, sys, socket, threading, time, jsonpickle
+import pygame, socket, threading, time, jsonpickle
 from pygame.math import Vector2 as vec
 import math
 import os
 
 from domain.models.network_data import Data as NetData
 from domain.engine import enemies_controller
-from domain.utils import colors, constants
+from domain.utils import constants
 from domain.services import menu_controller
 
 
@@ -135,7 +135,7 @@ def host_game(game, host: str, port: int):
     #implementar handle connection
     threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
     
-def enter_game(game, host: str, port: int):
+def try_enter_game(game, host: str, port: int, timeout = 2):
     """Joins a server from specified address and port.
 
     Args:
@@ -144,13 +144,17 @@ def enter_game(game, host: str, port: int):
         port (int): The port number of the server.
     """   
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((host, port))
-    
-    #define game objects
-    
-    #implementar handle connection
-    threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
-    
+    client.settimeout(timeout)
+    result = client.connect_ex((host, port))
+    if result == 0:
+        print("Port is open")
+        threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
+        return True
+    else:
+        print("Port is closed")
+        client.close()
+        return False
+
 def handle_connection(game, client: socket.socket, player_id: int):
     """Function executing on a different thread, sending and receiving data from players.
 
@@ -173,7 +177,6 @@ def handle_connection(game, client: socket.socket, player_id: int):
                 player_acceleration = (player.acceleration.x, player.acceleration.y),
                 command_id = game.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
-                player_offset_camera = player.offset_camera,
                 player_aim_angle = player.weapon_aim_angle,
                 player_falling_ground = player.falling_ground,
                 player_running = player.running,

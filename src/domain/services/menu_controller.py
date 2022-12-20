@@ -2,6 +2,7 @@ import pygame, sys
 
 from domain.services.save_manager import SaveManager
 from domain.utils import constants, enums
+from domain.models.ui.popup_text import Popup
 
 pages_history: list = []
 save_manager = SaveManager('.save', constants.SAVE_PATH)
@@ -19,6 +20,8 @@ config_state = {
     "port": ""
 }
 
+popup_group = pygame.sprite.Group()
+
 def save_states(states: list[object]):
     state_names = [s["state_name"] for s in states]
     save_manager.save_game_data(states, state_names)
@@ -32,6 +35,9 @@ def load_all_states():
     global config_state, player_state
     _states = [config_state, player_state]
     config_state, player_state = save_manager.load_game_data([s["state_name"] for s in _states], _states)
+
+def popup(popup: Popup):
+    popup_group.add(popup)
 
 def quit_app():
     """Stops the game and closes application.
@@ -67,8 +73,13 @@ def app_loop():
                 
         # update
         current_page.update(events = _events)
+        popup_group.update()
+        
         # draw
         current_page.draw()
+        
+        for p in popup_group.sprites():
+            p.draw(current_page.screen)
         
         pygame.display.update()
         clock.tick(60)

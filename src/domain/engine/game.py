@@ -168,7 +168,6 @@ class Game(Page):
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.player2_mouse_pos = vec(data.player_mouse_pos)
         self.player.player2_mouse_pos = vec(data.player_mouse_pos)
-        self.player.player2_offset_camera = vec(data.player_offset_camera)
         self.player2.weapon_aim_angle = data.player_aim_angle
         
         self.player2.falling_ground = data.player_falling_ground

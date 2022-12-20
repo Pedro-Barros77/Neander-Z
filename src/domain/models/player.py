@@ -58,9 +58,6 @@ class Player(pygame.sprite.Sprite):
         """The angle that the container is rotated along with the weapon."""
         self.player2_mouse_pos: vec = vec(0,0)
         """The mouse position of the other player."""
-        self.player2_offset_camera: vec = vec(0,0)
-        """The adjustment that every object should do to their position so the camera is centered on the player 2."""
-        
         self.player2_rect: pygame.Rect = pygame.Rect(0,0,1,1)
         
         self.firing = False

@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.ui.text_input import TextInput
 from domain.models.ui.pages.page import Page
 from domain.models.ui.button import Button
+from domain.models.ui.popup_text import Popup
 from domain.utils import constants, colors, enums
 from domain.services import menu_controller, game_controller
 from domain.engine.game import Game
@@ -22,7 +23,8 @@ class NewGame(Page):
         self.buttons.extend([
             Button(vec(0,250), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Single Player", on_click = lambda: self.start_game(enums.ClientType.SINGLE),**btn_dict),
             Button(vec(0,395), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Host Game", on_click = lambda: self.start_game(enums.ClientType.HOST),**btn_dict),
-            Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict)
+            Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
+            # Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.popup_teste,**btn_dict)
         ])
         
         for b in self.buttons:
@@ -64,6 +66,11 @@ class NewGame(Page):
         self.logo_image: pygame.Surface = None
         
         self.set_background(f'{constants.IMAGES_PATH}ui\\bg_main_menu.png')
+    
+    def popup_teste(self):
+        menu_controller.popup(Popup("1", self.buttons[-1].rect.topleft - vec(50,0),500))
+        
+        
         
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
@@ -110,6 +117,7 @@ class NewGame(Page):
                 menu_controller.config_state["port"] = port
             menu_controller.save_states([menu_controller.config_state])
             
+            
         game = Game(client_type, self.screen)
         game.setup()
         
@@ -121,7 +129,9 @@ class NewGame(Page):
                 game_controller.host_game(game, ip, int(port))
                 
             case enums.ClientType.GUEST:
-                game_controller.enter_game(game, ip, int(port))
+                succeeded = game_controller.try_enter_game(game, ip, int(port), timeout=0.3)
+                if not succeeded:
+                    return
               
         menu_controller.pages_history.append(game)
                 

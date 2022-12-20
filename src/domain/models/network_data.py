@@ -1,7 +1,3 @@
-import pygame
-
-from domain.utils import colors
-
 class Data:
     def __init__(self, **kwargs):
         self.player_rect = kwargs.pop("player_rect", (0,0, 1,1))
@@ -18,9 +14,10 @@ class Data:
         self.player_firing = kwargs.pop("player_firing", False)
         
         self.player_mouse_pos = kwargs.pop("player_mouse_pos", (0,0))
-        self.player_offset_camera = kwargs.pop("player_offset_camera", (0,0))
         self.player_aim_angle = kwargs.pop("player_aim_angle", 0)
         
         self.net_id = kwargs.pop("net_id", 0)
         self.command_id = kwargs.pop("command_id", 0)
         self.message = kwargs.pop("message", "")
+        
+        self._json_size_ = ""

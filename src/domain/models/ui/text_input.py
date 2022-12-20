@@ -1,4 +1,4 @@
-import pygame, re
+import pygame
 import pygame.locals as pl
 import pyperclip
 from pygame.math import Vector2 as vec
