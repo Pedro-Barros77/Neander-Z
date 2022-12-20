@@ -1,10 +1,9 @@
-import pygame, sys, pygame_textinput
+import pygame, sys
 
-from domain.models.ui.pages.page import Page
 from domain.services.save_manager import SaveManager
 from domain.utils import constants, enums
 
-pages_history: list[Page] = []
+pages_history: list = []
 save_manager = SaveManager('.save', constants.SAVE_PATH)
 
 player_state = {
@@ -22,7 +21,6 @@ config_state = {
 
 def save_states(states: list[object]):
     state_names = [s["state_name"] for s in states]
-    print(state_names)
     save_manager.save_game_data(states, state_names)
 
 def save_all_states():
@@ -52,18 +50,7 @@ def get_text_surface(text: str, color: tuple[int,int,int], font: pygame.font.Fon
         text_surface.set_alpha(a[0])
     return text_surface
 
-cmd_keys = [pygame.K_BACKSPACE, pygame.K_RETURN, pygame.K_KP_ENTER]
-def validate_input(txt: pygame_textinput.TextInputVisualizer, key):
-
-    if txt.size != (0,0) and txt.get_line_width(txt.manager.y_cursor) + txt.padding[0] + txt.border_width > txt.size[0] and key not in cmd_keys:
-        return False
-    
-    if (key == pygame.K_KP_ENTER or key == pygame.K_RETURN) and txt.surface.get_height() + txt.font_object.get_height() > txt.size[1] - (txt.border_width*2):
-        return False
-    
-    return True
-
-def start_page(page: Page):
+def start_page(page):
     pygame.key.set_repeat(200, 25)
     pages_history.append(page)
     app_loop()

@@ -1,6 +1,7 @@
-import pygame, pygame_textinput, os
+import pygame, os
 from pygame.math import Vector2 as vec
 
+from domain.models.ui.text_input import TextInput
 from domain.models.ui.pages.page import Page
 from domain.models.ui.button import Button
 from domain.utils import constants, colors, enums
@@ -37,40 +38,25 @@ class NewGame(Page):
         self.line_divider_rect = pygame.Rect((self.btn_panel_rect.left, self.buttons[0].rect.bottom + 20), (self.line_divider.get_size()))
         self.line_divider.fill(colors.WHITE)
         
-        _txt_ip_manager = pygame_textinput.TextInputManager(validator=menu_controller.validate_input)
-        self.txt_ip_input = pygame_textinput.TextInputVisualizer(
-            manager = _txt_ip_manager, 
-            font_object = pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 22),
+        self.txt_ip_input = TextInput(
+            pygame.Rect((self.buttons[0].rect.left, self.line_divider_rect.top + 20), (self.buttons[0].rect.width*0.6,30)),
+            font = pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 22),
             font_color = colors.BLACK,
             background_color = colors.WHITE,
             border_color = colors.LIGHT_GRAY,
             border_width = 2,
-            size = (self.buttons[0].rect.width*0.6,30),
-            pos = (self.buttons[0].rect.left, self.line_divider_rect.top + 20),
             cursor_color = colors.BLACK,
             padding = (5,5),
             place_holder="IP Address",
-            place_holder_color = colors.LIGHT_GRAY,
-            use_python_colormap = False)
+            place_holder_color = colors.LIGHT_GRAY)
         
-        _txt_port_manager = pygame_textinput.TextInputManager(validator=menu_controller.validate_input)
-        self.txt_port_input = pygame_textinput.TextInputVisualizer(
-            manager = _txt_port_manager, 
-            font_object = pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 22),
-            font_color = colors.BLACK,
-            background_color = colors.WHITE,
-            border_color = colors.LIGHT_GRAY,
-            border_width = 2,
-            size = (self.buttons[0].rect.width*0.3,30),
-            pos = (self.txt_ip_input.pos[0] + self.txt_ip_input.size[0] + self.buttons[0].rect.width*0.1, self.line_divider_rect.top + 20),
-            cursor_color = colors.BLACK,
-            padding = (5,5),
-            place_holder="Port",
-            place_holder_color = colors.LIGHT_GRAY,
-            use_python_colormap = False)
+        self.txt_port_input = self.txt_ip_input.from_this_template(
+            pygame.Rect((self.txt_ip_input.rect.left + self.txt_ip_input.rect.width + self.buttons[0].rect.width*0.1, self.line_divider_rect.top + 20),(self.buttons[0].rect.width*0.3,30)),
+            place_holder="Port"
+        )
         
-        self.txt_ip_input.manager.set_buffer([menu_controller.config_state['ip']])
-        self.txt_port_input.manager.set_buffer([menu_controller.config_state['port']])
+        self.txt_ip_input.set_buffer([menu_controller.config_state['ip']])
+        self.txt_port_input.set_buffer([menu_controller.config_state['port']])
         
         self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{constants.IMAGES_PATH}ui\\logo_anim\\')
         self.logo_scale = 0.5
@@ -106,36 +92,12 @@ class NewGame(Page):
         self.screen.blit(self.line_divider, self.line_divider_rect)
         
         #ip input:
-        self.draw_txt_input(self.txt_ip_input)
-        self.draw_txt_input(self.txt_port_input)
+        self.txt_ip_input.draw(self.screen)
+        self.txt_port_input.draw(self.screen)
         
         
         
         return super().draw()
-    
-    def draw_txt_input(self, txt: pygame_textinput.TextInputVisualizer):
-        _input_rect = txt.surface.get_rect()
-        _input_rect.width += txt.padding[0]*2
-        _input_rect.height += txt.padding[1]*2
-        _input_rect.topleft = txt.pos - vec(txt.padding)
-        pygame.draw.rect(self.screen, txt.background_color, pygame.Rect(txt.pos, txt.size))
-        pygame.draw.rect(self.screen, txt.border_color, pygame.Rect(txt.pos, txt.size), txt.border_width)
-        self.screen.blit(txt.surface, txt.pos + vec(txt.padding))
-        
-    def test(self, mode):
-        ip = self.txt_ip_input.get_value()
-        port = self.txt_port_input.get_value()
-        
-        if mode == "save":
-            menu_controller.config_state["ip"] = ip
-            menu_controller.config_state["port"] = port
-            menu_controller.save_states([menu_controller.config_state])
-        elif mode == "load":
-            menu_controller.config_state = menu_controller.save_manager.load_game_data(['config'], [menu_controller.config_state])
-            ip = menu_controller.config_state["ip"]
-            port = menu_controller.config_state["port"]
-        self.txt_ip_input.manager.set_buffer([ip])
-        self.txt_port_input.manager.set_buffer([port])
         
     def start_game(self, client_type: enums.ClientType):
         ip = self.txt_ip_input.get_value()
