@@ -46,4 +46,4 @@ dist
 *.so
 __pycache__
 _headers/*
-src/domain/utils/constants.py
+src/saves/

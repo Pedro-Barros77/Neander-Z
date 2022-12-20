@@ -2,9 +2,6 @@ from enum import Enum
 from domain.utils import enums
 import os
 
-SERVER_ADDRESS = '000.000.00.000'
-SERVER_PORT = 0000
-
 ROOT_PATH = f'{os.getcwd()}\\'
 
 IMAGES_PATH = "src\\domain\\resources\\images\\"
