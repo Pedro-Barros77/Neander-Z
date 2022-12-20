@@ -17,7 +17,7 @@ class Weapon(pygame.sprite.Sprite):
         
         self.dir: int = 0
         """The direction that this weapon is pointing to (left: -1, right: 1)."""
-        self.last_dir: int = self.dir
+        self.last_dir: int = 1
         """The direction that this weapon was pointing to on the last frame (left: -1, right: 1)."""
         
         self.fire_frames = [pygame.Surface((1,1))]

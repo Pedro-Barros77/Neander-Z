@@ -44,6 +44,5 @@ class SmallBullet(pygame.sprite.Sprite):
                 if isinstance(c, Enemy):
                     c.take_damage(self.damage)
             if collisions:
-                print("collided")
                 return True
         return False

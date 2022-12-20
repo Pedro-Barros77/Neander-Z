@@ -1,4 +1,5 @@
 /.vscode
+.save
 
 # Pygame build process: config.py setup.py
 /Setup

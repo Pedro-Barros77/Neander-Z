@@ -2,7 +2,7 @@ import pygame, os
 from datetime import datetime
 from pygame.math import Vector2 as vec
 
-from domain.services import game_controller, drawer
+from domain.services import game_controller, drawer, menu_controller
 from domain.engine import enemies_controller
 from domain.utils import colors, recyclables, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
@@ -11,14 +11,13 @@ from domain.models.network_data import Data as NetData
 from domain.models.map import Map
 from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
-class Game:
-    def __init__(self, client_type: enums.ClientType):
-        self.screen = None
+from domain.models.ui.pages.page import Page
+class Game(Page):
+    def __init__(self, client_type: enums.ClientType, screen: pygame.Surface, **kwargs):
+        super().__init__(**kwargs)
+        self.screen = screen
         """The game main surface.""" 
-               
-        self.clock = None
-        """Pygame clock to control FPS.""" 
-        
+
         self.drawer = None
         """A service to draw game objects.""" 
         
@@ -93,6 +92,8 @@ class Game:
         self.player.last_rect = self.player.rect
         self.player.offset_camera = vec(0,0)
         
+        self.player.load_state(menu_controller.player_state)
+        
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale)
             self.player2.pos = vec(p2_pos)
@@ -104,21 +105,13 @@ class Game:
             self.player2.last_rect = self.player2.rect
         
         
-    def start(self):
+    def setup(self):
         """Starts the game.
         """        
-        pygame.init()
-        
-        if self.monitor_size == (0,0):
-            self.monitor_size = (900, 600)
-            
-        self.screen = pygame.display.set_mode(self.monitor_size)
 
         game_controller.playing = True
         game_controller.screen_size = vec(self.screen.get_size())
         
-        
-        self.clock = pygame.time.Clock()
         self.drawer = drawer.Drawer(self)
 
         self.gravity_accelaration = 0.5
@@ -130,8 +123,10 @@ class Game:
         
         self.player = Player((20, 0), enums.Characters.CARLOS, net_id = int(self.client_type), name = "P1", screen_size = self.screen.get_size())
         
+        
+        
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2 = Player((80, 0), enums.Characters.CARLOS, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
+            self.player2 = Player((80, 0), enums.Characters.CLEITON, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
         
         
         self.reset_players()
@@ -149,14 +144,6 @@ class Game:
         if self.client_type != enums.ClientType.SINGLE:
             self.collision_group.add(self.player2)
             self.jumpable_group.add(self.player2)
-        
-        if self.client_type == enums.ClientType.HOST:
-            game_controller.host_game(self, constants.SERVER_ADDRESS, constants.SERVER_PORT)
-            
-        elif self.client_type == enums.ClientType.GUEST:
-            game_controller.enter_game(self, constants.SERVER_ADDRESS, constants.SERVER_PORT)
-        
-        self.game_loop()
         
     def handle_received_data(self, data: NetData):
         """Handles the data received from player 2.
@@ -209,7 +196,7 @@ class Game:
         if pressing_right:
             # pressing right but not left
             if not pressing_left:
-                self.player.acceleration.x = self.gravity_accelaration
+                self.player.acceleration.x = self.player.movement_speed
                 # was pressing both left and right, but released left
                 if was_pressing_left and was_pressing_right:
                     self.player.running = False
@@ -229,7 +216,7 @@ class Game:
         if pressing_left:
             # pressing left but not right
             if not pressing_right:
-                self.player.acceleration.x = -self.gravity_accelaration
+                self.player.acceleration.x = -self.player.movement_speed
                 # was pressing both left and right, but released right
                 if was_pressing_left and was_pressing_right:
                     self.player.running = False
@@ -366,61 +353,56 @@ class Game:
         if self.player.pos.x > screen_size[0]/2 and (self.player.pos.x + screen_size[0]/2 < self.map.rect.width) :
             self.player.offset_camera = vec(self.player.rect.left - screen_size[0]/2, 0)#self.player.rect.centery - screen_size[1]/2
 
-    def game_loop(self):
-        """Main game loop.
-        """        
+    def update(self, **kwargs):
+        events = kwargs.pop("events", None)
         
-        while game_controller.playing:
-            
-            game_controller.handle_events(self)
-            
-            if pygame.K_r in self.pressed_keys and \
-                (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
-                self.command_id = int(enums.Command.RESTART_GAME)
-                
-                import time
-                time.sleep(0.1)
-                game_controller.restart_game(self)
-                
-            self.player.update()
-            self.enemies_group.update(group_name = "enemies")
-            self.collision_group.update(group_name = "collision")
-            self.jumpable_group.update(group_name = "jumpable")
+        game_controller.handle_events(self, events)
         
-            self.process_gravitables()    
-                
-            self.player_movement()
-            enemies_controller.enemies_movement(self, self.enemies_group)
+        if pygame.K_r in self.pressed_keys and \
+            (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
+            self.command_id = int(enums.Command.RESTART_GAME)
             
-            for p in self.projectiles:
-                _should_kill = p.move(self.player.offset_camera)
-                if _should_kill:
-                    self.projectiles.remove(p)
+            import time
+            time.sleep(0.1)
+            game_controller.restart_game(self)
             
-            self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
+        self.player.update()
+        self.enemies_group.update(group_name = "enemies")
+        self.collision_group.update(group_name = "collision")
+        self.jumpable_group.update(group_name = "jumpable")
+    
+        self.process_gravitables()    
             
-            self.center_camera()
+        self.player_movement()
+        enemies_controller.enemies_movement(self, self.enemies_group)
+        
+        for p in self.projectiles:
+            _should_kill = p.move(self.player.offset_camera)
+            if _should_kill:
+                self.projectiles.remove(p)
+        
+        self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
+        
+        self.center_camera()
+    
+    def draw(self):
+        # Map
+        self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
+        # self.screen.fill(colors.WHITE)
+        # Enemies
+        self.drawer.draw_enemies(self.screen, self.enemies_group)
+        # P1
+        self.player.draw(self.screen, self.player.offset_camera)
+        # P2
+        if self.client_type != enums.ClientType.SINGLE:
+            self.player2.draw(self.screen, self.player.offset_camera)
             
-            # Map
-            self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
-            # self.screen.fill(colors.WHITE)
-            # Enemies
-            self.drawer.draw_enemies(self.screen, self.enemies_group)
-            # P1
-            self.player.draw(self.screen, self.player.offset_camera)
-            # P2
-            if self.client_type != enums.ClientType.SINGLE:
-                self.player2.draw(self.screen, self.player.offset_camera)
-                
-            for p in self.projectiles:
-                p.draw(self.screen)
-            
-            # self.blit_debug()
-            
-            self.last_pressed_keys = self.pressed_keys.copy()
-            
-            pygame.display.update()
-            self.clock.tick(60)
+        for p in self.projectiles:
+            p.draw(self.screen)
+        
+        # self.blit_debug()
+        
+        self.last_pressed_keys = self.pressed_keys.copy()
         
     def blit_debug(self):
         """Draws objects that are invisible to the player. For debugging only.

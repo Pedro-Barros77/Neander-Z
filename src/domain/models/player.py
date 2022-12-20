@@ -20,6 +20,13 @@ class Player(pygame.sprite.Sprite):
         """The ID of this player in the network."""
         self.jump_force = kwargs.pop("jump_force", 12)
         """The force of the player for jumping."""
+        self.movement_speed = kwargs.pop("movement_speed", 0.5)
+        """The movement speed of the player."""
+        self.health = 100
+        """The current health of the player."""
+        self.max_health = self.health
+        """The maximum health of the player."""
+        
         self.name = kwargs.pop("name", "player")
         """The name of this object, for debugging."""
         
@@ -31,9 +38,6 @@ class Player(pygame.sprite.Sprite):
         """How much the player is accelerating (gaining speed) over time."""
         self.grounded = False
         """If the player is touching the ground (or any jumpable object)."""
-        self.health = 100
-        """The current health of the player."""
-        
         self.image_scale = 2
         """How much the image will be scaled from original file."""
         
@@ -110,6 +114,12 @@ class Player(pygame.sprite.Sprite):
         
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
+        
+    def load_state(self, state: dict):
+        self.character = state["character"]
+        self.max_health = state["max_health"]
+        self.movement_speed = state["movement_speed"]
+        self.jump_force = state["jump_force"]
     
     # called each frame
     def update(self, **kwargs):

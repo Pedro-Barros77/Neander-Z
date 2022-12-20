@@ -6,6 +6,7 @@ import os
 from domain.models.network_data import Data as NetData
 from domain.engine import enemies_controller
 from domain.utils import colors, constants
+from domain.services import menu_controller
 
 
 playing = False
@@ -14,14 +15,14 @@ map_size: vec = vec(0,0)
 
 bullet_groups = []
 
-def handle_events(game):
+def handle_events(game, events: list[pygame.event.Event]):
     """Iterates through each event and call it's appropriate function.
     Args:
         game (Game): The currently running game.
     """
-    for event in pygame.event.get():
+    for event in events:
         if event.type == pygame.QUIT:
-            quit_app()
+             menu_controller.quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             _bullet = game.player.shoot()
             game.projectiles.append(_bullet)
@@ -50,12 +51,7 @@ def handle_keyup(key, game):
     if key in game.pressed_keys:
         game.pressed_keys.remove(key)
 
-def quit_app():
-    """Stops the game and closes application.
-    """
-    pygame.display.quit()
-    pygame.quit()
-    sys.exit()
+
     
 def restart_game(game):
     """Reset game properties to start a new round.
