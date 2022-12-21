@@ -5,7 +5,7 @@ Bug fix:
 
 
 Feature:
--Create enemies
--Create life bar
--Create Menu
--Create guns
+-Gun rate of fire
+-Zombies and bullets multiplayer
+-Take Damage
+-Spawn random zombies

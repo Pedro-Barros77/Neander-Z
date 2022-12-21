@@ -23,7 +23,7 @@ def handle_events(game, events: list[pygame.event.Event]):
     for event in events:
         if event.type == pygame.QUIT:
              menu_controller.quit_app()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             _bullet = game.player.shoot()
             game.projectiles.append(_bullet)
         elif event.type == pygame.KEYDOWN:
@@ -155,6 +155,9 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         client.close()
         return False
 
+send_count = 0
+receive_count = 0
+
 def handle_connection(game, client: socket.socket, player_id: int):
     """Function executing on a different thread, sending and receiving data from players.
 
@@ -162,7 +165,7 @@ def handle_connection(game, client: socket.socket, player_id: int):
         game (domain.engine.game): The game object.
         client (socket.socket): The client object.
         player_id (int): The ID of the player executing this function.
-    """    
+    """  
     while playing:
         
         player = game.player
@@ -186,7 +189,16 @@ def handle_connection(game, client: socket.socket, player_id: int):
             )
         
         client.send(class_to_json(data_to_send))
-        data: NetData = json_to_class(client.recv(1024))
+        
+        
+        json_string: str = client.recv(1024).decode('utf-8')
+        
+        if json_string[0] != "{":
+            continue
+        
+        final_json = validate_json(json_string)
+        
+        data: NetData = json_to_class(final_json)
         
         if not data:
             continue
@@ -197,6 +209,15 @@ def handle_connection(game, client: socket.socket, player_id: int):
                 
     client.close()
     
+    
+    
+def validate_json(value):
+    i = value.index("_json_size_") + 17
+    # extra = value[i:]
+    # print('\nvalue:\n\n',value)
+    # print('\extra:\n\n',extra)
+    # print(len(extra))
+    return value[:i]
     
 def class_to_json(data):
     """Encodes the class object to a json object.
@@ -218,4 +239,5 @@ def json_to_class(data):
     Returns:
         class: The converted class object.
     """  
-    return jsonpickle.decode(data.decode('utf-8'))
+
+    return jsonpickle.decode(data)
