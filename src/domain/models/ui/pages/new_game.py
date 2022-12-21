@@ -24,7 +24,7 @@ class NewGame(Page):
             Button(vec(0,250), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Single Player", on_click = lambda: self.start_game(enums.ClientType.SINGLE),**btn_dict),
             Button(vec(0,395), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Host Game", on_click = lambda: self.start_game(enums.ClientType.HOST),**btn_dict),
             Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
-            # Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.popup_teste,**btn_dict)
+            # Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
         ])
         
         for b in self.buttons:
@@ -67,10 +67,8 @@ class NewGame(Page):
         
         self.set_background(f'{constants.IMAGES_PATH}ui\\bg_main_menu.png')
     
-    def popup_teste(self):
-        menu_controller.popup(Popup("1", self.buttons[-1].rect.topleft - vec(50,0),500))
-        
-        
+    def teste(self):
+        print("teste")
         
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
@@ -131,6 +129,10 @@ class NewGame(Page):
             case enums.ClientType.GUEST:
                 succeeded = game_controller.try_enter_game(game, ip, int(port), timeout=0.3)
                 if not succeeded:
+                    menu_controller.popup(Popup("Cannot connect to host!", vec(self.screen.get_rect().center),
+                        **constants.POPUPS["error"]
+                        , name = "can't connect to host", unique = True
+                        ), center=True)
                     return
               
         menu_controller.pages_history.append(game)

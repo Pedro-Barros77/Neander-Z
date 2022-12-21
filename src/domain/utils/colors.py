@@ -12,5 +12,15 @@ LIGHT_GRAY = (150,150,150)
 
 SELECTION_BLUE = (10,103,214)
 
-def add_alpha(color: tuple[int,int,int], value = 255):
+def set_alpha(color: tuple[int,int,int], value = 255):
+    if color == None:
+        return None
     return (color[0], color[1], color[2], value)
+
+def alpha_or_default(color: tuple[int,int,int], value = 255):
+    if color == None:
+        return None
+    alpha = value
+    if len(color) > 3:
+        alpha = color[3]
+    return (color[0], color[1], color[2], alpha)

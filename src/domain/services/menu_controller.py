@@ -1,4 +1,5 @@
 import pygame, sys
+from pygame.math import Vector2 as vec
 
 from domain.services.save_manager import SaveManager
 from domain.utils import constants, enums
@@ -36,7 +37,12 @@ def load_all_states():
     _states = [config_state, player_state]
     config_state, player_state = save_manager.load_game_data([s["state_name"] for s in _states], _states)
 
-def popup(popup: Popup):
+def popup(popup: Popup, center = False):
+    if popup.unique and len([p.name for p in popup_group.sprites() if p.name == popup.name]) > 0:
+        return
+    if center:
+        popup.rect.center = vec(pages_history[-1].screen.get_size())/2
+        popup.start_pos = vec(popup.rect.topleft)
     popup_group.add(popup)
 
 def quit_app():
@@ -68,6 +74,8 @@ def app_loop():
         for event in _events:
             if event.type == pygame.QUIT:
                 quit_app()
+            if event.type == pygame.KEYDOWN and len(popup_group.sprites()) > 0:
+                popup_group.sprites()[0].hide()
                 
         current_page = pages_history[-1]
                 
@@ -80,6 +88,6 @@ def app_loop():
         
         for p in popup_group.sprites():
             p.draw(current_page.screen)
-        
+            
         pygame.display.update()
         clock.tick(60)

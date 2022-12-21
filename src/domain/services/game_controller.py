@@ -147,11 +147,9 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
     client.settimeout(timeout)
     result = client.connect_ex((host, port))
     if result == 0:
-        print("Port is open")
         threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
         return True
     else:
-        print("Port is closed")
         client.close()
         return False
 
