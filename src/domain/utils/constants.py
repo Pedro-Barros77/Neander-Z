@@ -25,7 +25,7 @@ def get_character_frames(charac_name: enums.Characters, action: enums.AnimAction
     
     return f'{IMAGES_PATH}characters\\{str(charac_name.value)}\\{str(action.value)}\\'
 
-def get_zombie_frames(z_name: enums.Characters, action: enums.AnimActions):
+def get_zombie_frames(z_name: enums.Enemies, action: enums.AnimActions):
     return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}\\'
     
 

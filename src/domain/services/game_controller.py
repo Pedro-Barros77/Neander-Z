@@ -58,16 +58,12 @@ def restart_game(game):
 
     Args:
         game (domain.engine.game): The game to be restarted.
-    """    
+    """
     game.pressed_keys = []
     game.command_id = 0
     game.map.rect.left = 0
-    game.map.update_pos()
     game.enemies_group.empty()
     game.reset_players()
-    screen_size: vec = vec(0,0)
-    map_size: vec = vec(0,0)
-    enemies_controller.spawn_random_enemy(game)
     
 def load_sprites(folder_path: str):
     """Loads all png files from the specified folter into a list of pygame.Surface.
@@ -133,7 +129,7 @@ def host_game(game, host: str, port: int):
     #define game objects
     
     #implementar handle connection
-    threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
+    threading.Thread(target=handle_connection, args=(game, client)).start()
     
 def try_enter_game(game, host: str, port: int, timeout = 2):
     """Joins a server from specified address and port.
@@ -147,7 +143,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
     client.settimeout(timeout)
     result = client.connect_ex((host, port))
     if result == 0:
-        threading.Thread(target=handle_connection, args=(game, client, game.player.net_id)).start()
+        threading.Thread(target=handle_connection, args=(game, client)).start()
         return True
     else:
         client.close()
@@ -156,7 +152,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
 send_count = 0
 receive_count = 0
 
-def handle_connection(game, client: socket.socket, player_id: int):
+def handle_connection(game, client: socket.socket):
     """Function executing on a different thread, sending and receiving data from players.
 
     Args:
@@ -168,28 +164,14 @@ def handle_connection(game, client: socket.socket, player_id: int):
         
         player = game.player
         
-        data_to_send = NetData(
-                net_id = player_id,
-                message = f"Hello from player {player_id}",
-                player_rect = (player.rect.left, player.rect.top, player.rect.width, player.rect.height),
-                player_last_rect = (player.last_rect.left, player.last_rect.top, player.last_rect.width, player.last_rect.height),
-                player_speed = (player.speed.x, player.speed.y),
-                player_health = player.health,
-                player_acceleration = (player.acceleration.x, player.acceleration.y),
-                command_id = game.command_id,
-                player_mouse_pos = pygame.mouse.get_pos(),
-                player_aim_angle = player.weapon_aim_angle,
-                player_falling_ground = player.falling_ground,
-                player_running = player.running,
-                player_jumping = player.jumping,
-                player_turning_dir = player.turning_dir,
-                player_firing = player.firing
-            )
+        data_to_send = game.get_net_data()
+        
+        
         
         client.send(class_to_json(data_to_send))
         
         
-        json_string: str = client.recv(1024).decode('utf-8')
+        json_string: str = client.recv(2048).decode('utf-8')
         
         if json_string[0] != "{":
             continue

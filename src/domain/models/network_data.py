@@ -18,6 +18,7 @@ class Data:
         
         self.net_id = kwargs.pop("net_id", 0)
         self.command_id = kwargs.pop("command_id", 0)
-        self.message = kwargs.pop("message", "")
+        
+        self.enemies = []
         
         self._json_size_ = ""

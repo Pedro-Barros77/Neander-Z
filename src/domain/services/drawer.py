@@ -48,10 +48,5 @@ class Drawer:
             text_surface.set_alpha(a[0])
         return text_surface
     
-    def draw_enemies(self, surface: pygame.Surface, enemies: pygame.sprite.Group):
-        for e in enemies:
-            e.draw(surface, self.game.player.offset_camera)
-            
-    
     def draw_line(self, start: vec, end: vec):
         pygame.draw.line(self.game.screen, colors.RED, start, end, width=2)

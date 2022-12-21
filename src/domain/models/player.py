@@ -30,8 +30,6 @@ class Player(pygame.sprite.Sprite):
         self.name = kwargs.pop("name", "player")
         """The name of this object, for debugging."""
         
-        self.pos: vec = vec((pos))
-        """The X and Y position coordinates of the player."""
         self.speed = kwargs.pop("speed", vec(0,0))
         """The current X and Y movement speed of the player."""
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
@@ -46,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         	
         self.rect = self.image.get_rect()
         """The rect of the player."""
-        self.rect.topleft = self.pos
+        self.rect.topleft = pos
         
         self.offset_camera = vec(0,0)
         """The adjustment that every object should do to their position so the camera is centered on the player."""
@@ -108,9 +106,6 @@ class Player(pygame.sprite.Sprite):
             self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
         else:
             self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)))
-        
-    def update_rect(self):
-        self.rect.topleft = (self.pos.x, self.pos.y)
         
     def load_state(self, state: dict):
         self.character = state["character"]
@@ -187,7 +182,7 @@ class Player(pygame.sprite.Sprite):
         return
         
     def draw(self, surface: pygame.Surface, offset: vec):
-        surface.blit(self.image, self.pos - offset)
+        surface.blit(self.image, vec(self.rect.topleft) - offset)
         if self.name == "P1":
             surface.blit(self.current_weapon.image, self.current_weapon.rect)
         else:

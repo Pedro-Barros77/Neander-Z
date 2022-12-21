@@ -9,12 +9,11 @@ class IGravitable:
         self.__class__.instances.append(self)
         
     
-    pos: vec = vec((0,0))
     speed: vec = vec(0,0)
     acceleration: vec = vec(0,0)
     
     size = (10,10)
-    rect = pygame.Rect(pos, size)
+    rect = pygame.Rect((0,0), size)
     last_rect = rect.copy()
     
     gravity_enabled = True
