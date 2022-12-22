@@ -1,4 +1,4 @@
-import pygame, socket, threading, time, jsonpickle
+import pygame, socket, threading, time, jsonpickle, importlib
 from pygame.math import Vector2 as vec
 import math
 import os
@@ -7,12 +7,11 @@ from domain.models.network_data import Data as NetData
 from domain.utils import constants, enums
 from domain.services import menu_controller
 
-
-playing = False
 screen_size: vec = vec(0,0)
 map_size: vec = vec(0,0)
 
-bullet_groups = []
+bullet_target_groups = []
+enemy_target_groups = []
 
 enemies_count = 0
 bullets_count = 0
@@ -74,7 +73,7 @@ def restart_game(game):
     game.pressed_keys = []
     game.command_id = 0
     game.map.rect.left = 0
-    game.reset_players()
+    game.reset_game()
     
 def load_sprites(folder_path: str):
     """Loads all png files from the specified folter into a list of pygame.Surface.
@@ -170,10 +169,8 @@ def handle_connection(game, client: socket.socket):
         game (domain.engine.game): The game object.
         client (socket.socket): The client object.
         player_id (int): The ID of the player executing this function.
-    """  
-    while playing:
-        
-        player = game.player
+    """ 
+    while menu_controller.playing:
         
         data_to_send = game.get_net_data()
         
@@ -197,7 +194,9 @@ def handle_connection(game, client: socket.socket):
             game.handle_received_data(data)
             
         time.sleep(0.01)
-                
+              
+    
+    print("closing connection")
     client.close()
     
     

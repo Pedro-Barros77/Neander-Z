@@ -9,7 +9,7 @@ from domain.services import menu_controller, game_controller
 
 class MainMenu(Page):
     def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__("MainMenu", **kwargs)
         
         menu_controller.load_all_states()
         

@@ -16,7 +16,7 @@ class SmallBullet(pygame.sprite.Sprite):
         self.rect.topleft = pos
         self.angle = angle
         self.speed = speed
-        self.collision_groups = game_controller.bullet_groups
+        self.collision_groups = game_controller.bullet_target_groups
         self.damage = damage
         self.bullet_name = enums.Bullets.SMALL_BULLET
         self.owner_offset = vec(0,0)
@@ -38,8 +38,6 @@ class SmallBullet(pygame.sprite.Sprite):
         if _new_pos.x > game_controller.map_size.x or _new_pos.x < 0 or\
             _new_pos.y > game_controller.map_size.y or _new_pos.y < 0:
             self.kill()
-        
-        offset = kwargs.pop("offset", vec(0,0))
         
         # movement
         self.rect.topleft = _new_pos

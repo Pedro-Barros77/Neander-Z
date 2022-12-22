@@ -41,6 +41,7 @@ class ZRoger(Enemy):
     def attack(self):
         self.hiting = True
         self.hit_rectangle = Rectangle(self.attack_box, vec(self.rect.center) + vec(20 * self.dir.x,-20) )
+       
         collided = self.attack_collision(self.hit_rectangle)
         if len(collided) > 0:
             for c in collided:

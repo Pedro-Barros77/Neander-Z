@@ -53,7 +53,7 @@ class ProgressBar(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.rect.size)
         self.value_ratio = self.max_value / self.rect.width
     
-    def draw(self, screen: pygame.Surface):
+    def draw(self, screen: pygame.Surface, offset: vec):
         """Draws the bar on the specified surface.
 
         Args:
@@ -61,7 +61,7 @@ class ProgressBar(pygame.sprite.Sprite):
         """        
         if self.hide_on_full and self.value == self.max_value:
             return
-        screen.blit(self.image, self.rect)
+        screen.blit(self.image, vec(self.rect.topleft) - offset)
         
     def update(self):
         """Updates the bar animation.

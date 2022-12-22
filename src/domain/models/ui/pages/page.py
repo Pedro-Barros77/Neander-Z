@@ -3,10 +3,12 @@ import pygame
 from domain.models.ui.button import Button
 
 class Page:
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, name: str, **kwargs) -> None:
+        self.name = name
         self.buttons: list[Button] = kwargs.pop("buttons", [])
         self.screen: pygame.Surface = kwargs.pop("screen", None)
         self.background_image: pygame.Surface = kwargs.pop("background_image", None)
+        
 
     def update(self, **kwargs):
         for b in self.buttons:

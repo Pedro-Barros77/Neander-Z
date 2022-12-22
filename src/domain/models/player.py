@@ -106,10 +106,14 @@ class Player(pygame.sprite.Sprite):
         self.health_bar: ProgressBar = None
         """The health bar of the player."""
         
-        if self.name == "P1":
+        self.player2_offset = vec(0,0)
+        
+        self.is_player1 = self.name == "P1"
+        
+        if self.is_player1:
             self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
         else:
-            self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)))
+            self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)), border_width = 1)
         
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
@@ -126,11 +130,9 @@ class Player(pygame.sprite.Sprite):
         if group_name == "jumpable":
             return
         
-        is_p1 = self.name == "P1"
-        
         self.health_bar.update()
         
-        if is_p1:
+        if self.is_player1:
             _mouse_target = vec(pygame.mouse.get_pos())
             _offset_camera_target = self.offset_camera
         else:
@@ -159,7 +161,7 @@ class Player(pygame.sprite.Sprite):
         
         _weapon_center: vec = self.weapon_anchor + self.rect.topleft - _offset_camera_target
         
-        if is_p1:
+        if self.is_player1:
             self.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
         
         # The distance from the weapon anchor to position the weapon
@@ -190,16 +192,14 @@ class Player(pygame.sprite.Sprite):
         
     def draw(self, surface: pygame.Surface, offset: vec):
         surface.blit(self.image, self.pos - offset)
-        if self.name == "P1":
-            surface.blit(self.current_weapon.image, self.current_weapon.rect)
-        else:
-            surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft)- offset)
-            
-        self.health_bar.draw(surface)
+        _target_offset = offset if not self.is_player1 else vec(0,0)
+        
+        surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft) - _target_offset)
+        self.health_bar.draw(surface, _target_offset)
         
     def shoot(self):
         self.firing = True
-        _offset_camera = self.offset_camera if self.name == "P1" else vec(0,0)
+        _offset_camera = self.offset_camera if self.is_player1 else vec(0,0)
         _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft, self.rect.width/2 + 30, -maths.radians(self.weapon_aim_angle))
         
         return SmallBullet(_bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage, self.net_id, game_controller.get_bullet_id())
@@ -247,7 +247,12 @@ class Player(pygame.sprite.Sprite):
             return
         self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
         self.health_bar.remove_value(value)
-        menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
+        
+        
+        if self.is_player1:
+            menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
+        else:
+            menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
         
         
     def get_health(self, value: float):
@@ -255,4 +260,4 @@ class Player(pygame.sprite.Sprite):
             return
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         self.health_bar.add_value(value)
-        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["health"]))
+        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["health"]))

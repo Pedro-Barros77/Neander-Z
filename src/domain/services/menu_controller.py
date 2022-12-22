@@ -7,7 +7,7 @@ from domain.models.ui.popup_text import Popup
 
 pages_history: list = []
 save_manager = SaveManager('.save', constants.SAVE_PATH)
-
+playing = False
 player_state = {
     "state_name": "player",
     "character": enums.Characters.CARLOS,
@@ -38,6 +38,7 @@ def load_all_states():
     config_state, player_state = save_manager.load_game_data([s["state_name"] for s in _states], _states)
 
 def popup(popup: Popup, center = False):
+    global pages_history
     if popup.unique and len([p.name for p in popup_group.sprites() if p.name == popup.name]) > 0:
         return
     if center:
@@ -62,12 +63,18 @@ def get_text_surface(text: str, color: tuple[int,int,int], font: pygame.font.Fon
         text_surface.set_alpha(a[0])
     return text_surface
 
+def is_current_page(page):
+    global pages_history
+    return pages_history[-1].name == page.name
+
 def start_page(page):
+    global pages_history
     pygame.key.set_repeat(200, 25)
     pages_history.append(page)
     app_loop()
 
 def app_loop():
+    global pages_history, playing
     clock = pygame.time.Clock()
     while True:
         _events = pygame.event.get()
@@ -78,7 +85,12 @@ def app_loop():
                 popup_group.sprites()[0].hide()
                 
         current_page = pages_history[-1]
-                
+        
+        playing = current_page.name == "Game"
+            
+            
+        
+        
         # update
         current_page.update(events = _events)
         popup_group.update()

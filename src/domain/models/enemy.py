@@ -20,7 +20,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image_scale = 2
         self.movement_speed = kwargs.pop("movement_speed", 5)
         self.health = kwargs.pop("health", 30)
-        self.attack_targets = kwargs.pop("attack_targets", [])
+        self.attack_targets = game_controller.enemy_target_groups
+        self.client_type = enums.ClientType.UNDEFINED
         
         
         
@@ -76,6 +77,10 @@ class Enemy(pygame.sprite.Sprite):
     def client_update(self, **kwargs):
         if not self.is_alive:
             self.kill()
+            
+        game = kwargs.pop("game", None)
+        player = self.get_closest_player(game.player, game.player2)
+        player_center: vec = vec(player.rect.center)
         
         def flip():
             self.image = pygame.transform.flip(self.image, True, False)
@@ -84,10 +89,16 @@ class Enemy(pygame.sprite.Sprite):
             flip()
         if self.last_dir.x < self.dir.x:
             flip()
+            
+        if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
+            self.attacking = True
         
         self.health_bar.update()
             
     def host_update(self, **kwargs):
+        if not self.is_alive:
+            self.kill()
+            
         game = kwargs.pop("game", None)
         player = self.get_closest_player(game.player, game.player2)
         player_center: vec = vec(player.rect.center)
@@ -97,8 +108,6 @@ class Enemy(pygame.sprite.Sprite):
             self.last_dir = self.dir.copy()
             self.speed.x = 0
         
-        if not self.is_alive:
-            self.kill()
         
         if player_center.x < self.rect.centerx - self.image_flip_margin:
             self.dir.x = -1
@@ -134,9 +143,7 @@ class Enemy(pygame.sprite.Sprite):
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
 
-        
-
-        if abs(player_center.x - self.rect.centerx) <= self.attack_distance:
+        if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
             self.attacking = True
 
         self.health_bar.update()
@@ -145,8 +152,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     def update(self, **kwargs):
-        client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)
-        if client_type == enums.ClientType.GUEST:
+        self.client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)
+        if self.client_type == enums.ClientType.GUEST:
             self.client_update(**kwargs)
         else:
             self.host_update(**kwargs)
@@ -157,7 +164,7 @@ class Enemy(pygame.sprite.Sprite):
     def draw(self, surface: pygame.Surface, offset: vec):
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset
         surface.blit(self.image, self.pos - offset)
-        self.health_bar.draw(surface)
+        self.health_bar.draw(surface, vec(0,0))
         self.player_offset = offset
 
         
@@ -252,5 +259,4 @@ class Enemy(pygame.sprite.Sprite):
             collisions = pygame.sprite.spritecollide(obj, group, False)
             if collisions:
                 _hit_targets.extend([*collisions])
-                
         return _hit_targets
