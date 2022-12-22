@@ -210,7 +210,7 @@ class Enemy(pygame.sprite.Sprite):
         }
         return values
     
-    def load_net_data(self, data: dict):
+    def load_netdata(self, data: dict):
         self.enemy_name = enums.Enemies[data.pop("enemy_name", str(enums.Enemies.Z_ROGER.name))]
         self.rect = pygame.Rect(data.pop("rect", (0,0, 1,1)))
         self.speed = vec(data.pop("speed", (0,0)))

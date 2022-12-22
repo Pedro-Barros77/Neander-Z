@@ -25,6 +25,9 @@ class Characters(Enum):
     
 class Enemies(Enum):
     Z_ROGER = "z_roger"
+
+class Bullets(Enum):
+    SMALL_BULLET = "small_bullet"
     
 class AnimActions(Enum):
     TURN = "turn"

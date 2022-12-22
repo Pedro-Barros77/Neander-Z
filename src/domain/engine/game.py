@@ -48,6 +48,9 @@ class Game(Page):
         self.enemies_group = None
         """The group of enemies.""" 
         
+        self.bullets_group = None
+        """The group of projectiles that are still in the game screen."""
+        
         self.player = None
         """Player 1 (this player).""" 
         
@@ -59,9 +62,6 @@ class Game(Page):
         
         self.command_id = 0
         """A command sent from the host to execute some operation on both host and client, such as restart game."""
-        
-        self.projectiles = []
-        """A list of the projectiles that are still in the game screen."""
         
         self.test_objects = []
         
@@ -137,6 +137,7 @@ class Game(Page):
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.enemies_group = pygame.sprite.Group()
+        self.bullets_group = pygame.sprite.Group()
         
         self.reset_players()
         
@@ -167,6 +168,9 @@ class Game(Page):
                 player_firing = self.player.firing,
                 
             )
+        
+        _bullets = [b.get_netdata() for b in self.bullets_group.sprites() if b.owner == self.player.net_id]
+        data.bullets = _bullets
         if self.client_type == enums.ClientType.HOST:
             _enemies = [e.get_netdata() for e in self.enemies_group.sprites()]
             data.enemies = _enemies
@@ -207,18 +211,27 @@ class Game(Page):
         self.player2.update_rect()
         
         current_enemy_ids = [x.id for x in self.enemies_group.sprites()]
-        new_enemy_ids = [x['id'] for x in data.enemies]
-        
         if self.client_type == enums.ClientType.GUEST:
             for e_data in data.enemies:
                 enemy = [x for x in self.enemies_group.sprites() if x.id == e_data['id']]
                 if len(enemy) > 0:
-                    enemy[0].load_net_data(e_data)
+                    enemy[0].load_netdata(e_data)
                 else:
-                    if len(self.enemies_group.sprites()) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
+                    if len(current_enemy_ids) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
                         enemies_controller.create_netdata_enemy(self, e_data)
-                        
-                        
+
+        current_bullets_ids = [x.id for x in self.bullets_group.sprites()]
+        for b_data in data.bullets:
+            # if it's not p1 bullet
+            if b_data['owner'] != self.player.net_id:
+                # if bullet already exists here
+                if b_data['id'] in current_bullets_ids:
+                    bullet = [b for b in self.bullets_group.sprites() if b.id == b_data['id']]
+                    if len(bullet) > 0:
+                        bullet[0].load_netdata(b_data)
+                else:
+                    if len(current_bullets_ids) < len(data.bullets) and b_data['id'] not in current_bullets_ids:
+                        enemies_controller.create_netdata_bullet(self, b_data)
             
         
         self.player.player2_rect = self.player2.rect
@@ -419,10 +432,7 @@ class Game(Page):
             
         self.player_movement()
         
-        for p in self.projectiles:
-            _should_kill = p.move(self.player.offset_camera)
-            if _should_kill:
-                self.projectiles.remove(p)
+        self.bullets_group.update(offset = self.player.offset_camera)
         
         self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
         
@@ -442,8 +452,8 @@ class Game(Page):
             self.player2.draw(self.screen, self.player.offset_camera)
             
         # bullets
-        for p in self.projectiles:
-            p.draw(self.screen)
+        for b in self.bullets_group:
+            b.draw(self.screen, self.player.offset_camera)
         
         self.blit_debug()
         

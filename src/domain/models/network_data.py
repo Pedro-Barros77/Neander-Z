@@ -20,5 +20,6 @@ class Data:
         self.command_id = kwargs.pop("command_id", 0)
         
         self.enemies = []
+        self.bullets = []
         
         self._json_size_ = ""

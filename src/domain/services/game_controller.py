@@ -4,8 +4,7 @@ import math
 import os
 
 from domain.models.network_data import Data as NetData
-from domain.engine import enemies_controller
-from domain.utils import constants
+from domain.utils import constants, enums
 from domain.services import menu_controller
 
 
@@ -14,6 +13,19 @@ screen_size: vec = vec(0,0)
 map_size: vec = vec(0,0)
 
 bullet_groups = []
+
+enemies_count = 0
+bullets_count = 0
+
+def get_enemy_id():
+    global enemies_count
+    enemies_count += 1
+    return enemies_count
+
+def get_bullet_id():
+    global bullets_count
+    bullets_count += 1
+    return bullets_count
 
 def handle_events(game, events: list[pygame.event.Event]):
     """Iterates through each event and call it's appropriate function.
@@ -25,7 +37,7 @@ def handle_events(game, events: list[pygame.event.Event]):
              menu_controller.quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             _bullet = game.player.shoot()
-            game.projectiles.append(_bullet)
+            game.bullets_group.add(_bullet)
         elif event.type == pygame.KEYDOWN:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP:

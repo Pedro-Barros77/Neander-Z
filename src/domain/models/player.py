@@ -198,9 +198,9 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         self.firing = True
         _offset_camera = self.offset_camera if self.name == "P1" else vec(0,0)
-        _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft - _offset_camera, self.rect.width/2 + 30, -maths.radians(self.weapon_aim_angle))
+        _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft, self.rect.width/2 + 30, -maths.radians(self.weapon_aim_angle))
         
-        return SmallBullet(constants.SMALL_BULLET, _bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage)
+        return SmallBullet(_bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage, self.net_id, game_controller.get_bullet_id())
         
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)
