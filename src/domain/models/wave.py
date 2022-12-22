@@ -11,6 +11,7 @@ class Wave():
         self.game = game
         self.enemies_count = 0
         self.enemies_group = pygame.sprite.Group()
+        self.max_enemies = 0
 
         self.schedule_time: datetime.datetime = None
         self.schedule_interval = 0
@@ -39,7 +40,8 @@ class Wave():
 
     def update(self, **kwargs):
         self.enemies_group.update(group_name = "enemies", game = self.game, client_type = self.game.client_type)
-        self.run_schedule()
+        if self.schedule_time != None:
+            self.run_schedule()
         #implemented by the child
         pass
     

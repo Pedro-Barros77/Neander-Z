@@ -174,14 +174,13 @@ def handle_connection(game, client: socket.socket):
         
         data_to_send = game.get_net_data()
         
-        
-        
         client.send(class_to_json(data_to_send))
+        teste = client.recv(20048)
+        print(len(teste))
         
+        json_string: str = teste.decode('utf-8')
         
-        json_string: str = client.recv(2048).decode('utf-8')
-        
-        if json_string[0] != "{":
+        if json_string[0] != "{" or "_json_size_" not in json_string:
             continue
         
         final_json = validate_json(json_string)
