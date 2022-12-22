@@ -74,7 +74,6 @@ def restart_game(game):
     game.pressed_keys = []
     game.command_id = 0
     game.map.rect.left = 0
-    game.enemies_group.empty()
     game.reset_players()
     
 def load_sprites(folder_path: str):

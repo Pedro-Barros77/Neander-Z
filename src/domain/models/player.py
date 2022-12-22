@@ -4,10 +4,12 @@ from pygame.math import Vector2 as vec
 
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller
-from domain.models.weapons.pistol import Pistol
+from domain.services import game_controller, menu_controller
+from domain.content.weapons.pistol import Pistol
 from domain.models.progress_bar import ProgressBar
-from domain.models.weapons.small_bullet import SmallBullet
+from domain.content.weapons.small_bullet import SmallBullet
+from domain.models.ui.popup_text import Popup
+
 
 
 
@@ -245,9 +247,12 @@ class Player(pygame.sprite.Sprite):
             return
         self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
         self.health_bar.remove_value(value)
+        menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
+        
         
     def get_health(self, value: float):
         if value < 0:
             return
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         self.health_bar.add_value(value)
+        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["health"]))
