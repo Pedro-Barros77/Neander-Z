@@ -15,6 +15,7 @@ class ZRoger(Enemy):
         self.name = kwargs.pop("name", f"zombie_1")
         self.jump_force = kwargs.pop("jump_force", 12)
         
+        self.pos: vec = vec((pos))
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)

@@ -84,8 +84,9 @@ class Game(Page):
             p2_pos = (20, _y)
         
         self.player.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale)
+        self.player.pos = vec(p1_pos)
         self.player.rect = self.player.image.get_rect()
-        self.player.rect.topleft = vec(p1_pos)
+        self.player.rect.topleft = self.player.pos
         self.player.speed = vec(0,0)
         self.player.acceleration = vec(0,0)
         self.player.last_rect = self.player.rect
@@ -95,8 +96,9 @@ class Game(Page):
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale)
+            self.player2.pos = vec(p2_pos)
             self.player2.rect = self.player2.image.get_rect()
-            self.player2.rect.topleft = vec(p2_pos)
+            self.player2.rect.topleft = self.player2.pos
             self.player2.size = self.player2.rect.size
             self.player2.speed = vec(0,0)
             self.player2.acceleration = vec(0,0)
@@ -182,6 +184,7 @@ class Game(Page):
         
         self.player2.rect = pygame.Rect(data.player_rect)
         self.player2.last_rect = pygame.Rect(data.player_last_rect)
+        self.player2.pos = vec(self.player2.rect.topleft)
         self.player2.speed = vec(data.player_speed)
         _health_diff = self.player2.health - data.player_health
         if _health_diff > 0:
@@ -200,6 +203,8 @@ class Game(Page):
         self.player2.turning_dir = data.player_turning_dir
         if data.player_firing:
             self.player2.firing = True
+        
+        self.player2.update_rect()
         
         current_enemy_ids = [x.id for x in self.enemies_group.sprites()]
         new_enemy_ids = [x['id'] for x in data.enemies]
@@ -221,7 +226,6 @@ class Game(Page):
     def player_movement(self):
         """Handles the movement of player 1.
         """        
-        print(self.player.movement_speed)
         self.player.last_rect = self.player.rect.copy()
         self.player.acceleration.x = 0
             
@@ -281,19 +285,17 @@ class Game(Page):
         # Movement
         self.player.acceleration.x += self.player.speed.x * self.friction
         self.player.speed.x += self.player.acceleration.x
-        self.player.rect.left += self.player.speed.x + 0.5 * self.player.acceleration.x
-        
-        # solid collision
-        self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
+        self.player.pos.x += self.player.speed.x + 0.5 * self.player.acceleration.x
         
         # Gravity
         self.apply_gravity(self.player)
+        self.player.update_rect()
         
         # jump
         _was_grounded = self.player.grounded
-        _old_pos = self.player.rect.top
+        _old_pos = self.player.pos.y
         self.player.grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
-        if not _was_grounded and self.player.grounded and abs(_old_pos - self.player.rect.top) > 2 :
+        if not _was_grounded and self.player.grounded and abs(_old_pos - self.player.pos.y) > 2 :
             self.player.jumping = False
             self.player.falling_ground = True
             if pressing_left != pressing_right:
@@ -308,6 +310,9 @@ class Game(Page):
            
             self.pressed_keys.remove(pygame.K_SPACE)
     
+        # solid collision
+        self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
+    
     
     def apply_gravity(self, target: IGravitable):
         """Applies gravity to the specified IGravitable object.
@@ -319,14 +324,14 @@ class Game(Page):
         
         target.acceleration.y = self.gravity_accelaration
         target.speed.y += target.acceleration.y
-        target.rect.top += target.speed.y + 0.5 * target.acceleration.y
+        target.pos.y += target.speed.y + 0.5 * target.acceleration.y
     
     def process_gravitables(self):
         """Applies gravity to all gravitable objects (subclasses of IGravitable)"""        
         for obj in IGravitable.instances:
             if obj.gravity_enabled:
                 self.apply_gravity(obj)
-                obj.rect.top = obj.rect.top
+                obj.rect.top = obj.pos.y
         
             if obj.collision_enabled:
                 obstacles = pygame.sprite.spritecollide(obj, self.collision_group, False)
@@ -341,9 +346,6 @@ class Game(Page):
         """
         collision_objs = pygame.sprite.spritecollide(self.player, targets, False)
         if collision_objs:
-            if direction == enums.Orientation.HORIZONTAL:
-                pass
-                # print("parede")
             self.collision(self.player, collision_objs, direction)
             return True
         return False
@@ -365,22 +367,26 @@ class Game(Page):
                     # collision with obj right and o left
                     if obj.rect.right >= o.rect.left and obj.last_rect.right <= o.last_rect.left:
                         obj.rect.right = o.rect.left
+                        obj.pos.x = obj.rect[0]
                         obj.speed.x = 0
                         
-                    # collision with obj left and o right
+                    # collision on the left
                     elif obj.rect.left <= o.rect.right and obj.last_rect.left >= o.last_rect.right:
                         obj.rect.left = o.rect.right
+                        obj.pos.x = obj.rect[0]
                         obj.speed.x = 0
             
                 case enums.Orientation.VERTICAL:
                     # collision on the bottom
                     if obj.rect.bottom >= o.rect.top and obj.last_rect.bottom <= o.last_rect.top:
                         obj.rect.bottom = o.rect.top
+                        obj.pos.y = obj.rect[1]
                         obj.speed.y = 0
                         
                     # collision on the top
                     elif obj.rect.top >= o.rect.top and obj.last_rect.top >= o.last_rect.bottom:
                         obj.rect.top = o.rect.bottom
+                        obj.pos.y = obj.rect[1]
                         obj.speed.y = 0
 
     def center_camera(self):
@@ -388,7 +394,7 @@ class Game(Page):
         """        
         screen_size = self.screen.get_size()
         
-        if self.player.rect.left > screen_size[0]/2 and (self.player.rect.left + screen_size[0]/2 < self.map.rect.width) :
+        if self.player.pos.x > screen_size[0]/2 and (self.player.pos.x + screen_size[0]/2 < self.map.rect.width) :
             self.player.offset_camera = vec(self.player.rect.left - screen_size[0]/2, 0)#self.player.rect.centery - screen_size[1]/2
 
     def update(self, **kwargs):

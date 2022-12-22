@@ -12,6 +12,9 @@ class Rectangle(pygame.sprite.Sprite, IGravitable):
         self.size = size
         """The width and height of the surface.""" 
         
+        self.pos = vec(pos)
+        """The position of the top-left corner of the surface.""" 
+        
         self.image = pygame.Surface(size)
         """The map image/surface.""" 
         
@@ -31,9 +34,15 @@ class Rectangle(pygame.sprite.Sprite, IGravitable):
         self.collision_enabled = kwargs.pop("collision_enabled", False)
         """If this object should collide with other objects.""" 
         	
-        self.rect.topleft = pos
+        self.rect.topleft = self.pos
         
         self.last_rect = self.rect.copy()
+        
+    def update_rect(self):
+        self.rect.topleft = self.pos
+        
+    def update_pos(self):
+        self.pos = self.rect.topleft
         
     def draw(self, surface: pygame.Surface, offset: vec):
         surface.blit(self.image, self.rect.topleft - offset)

@@ -11,7 +11,7 @@ save_manager = SaveManager('.save', constants.SAVE_PATH)
 player_state = {
     "state_name": "player",
     "character": enums.Characters.CARLOS,
-    "movement_speed": 0.12,
+    "movement_speed": 0.5,
     "jump_force": 12,
     "max_health": 100
 }

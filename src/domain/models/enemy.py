@@ -20,6 +20,7 @@ class Enemy(pygame.sprite.Sprite):
         self.movement_speed = kwargs.pop("movement_speed", 5)
         self.health = kwargs.pop("health", 30)
         
+        self.pos: vec = vec((pos))
         self.speed = vec(0,0)
         self.acceleration: vec = vec(0,0)
         self.dir: vec = vec(0,0)
@@ -44,13 +45,13 @@ class Enemy(pygame.sprite.Sprite):
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()
-        self.rect.topleft = pos
+        self.rect.topleft = self.pos
         self.image_flip_margin = 10
         
         
         self.last_rect = self.rect.copy()
         
-        self.health_bar = ProgressBar(self.health, pygame.Rect(vec(self.rect.topleft) - vec(0,-15), (self.rect.width * 1.3, 7)), 
+        self.health_bar = ProgressBar(self.health, pygame.Rect(self.pos - vec(0,-15), (self.rect.width * 1.3, 7)), 
                 border_width = 1, 
                 border_color = colors.LIGHT_GRAY, 
                 value_anim_speed = 0.2)
@@ -114,10 +115,11 @@ class Enemy(pygame.sprite.Sprite):
         
         self.acceleration.x += self.speed.x * game.friction
         self.speed.x += self.acceleration.x
-        self.rect.left += self.speed.x + 0.5 * self.acceleration.x
+        self.pos.x += self.speed.x + 0.5 * self.acceleration.x
         
         # Gravity
         game.apply_gravity(self)
+        self.update_rect()
         
         # jump
         self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL)
@@ -129,8 +131,10 @@ class Enemy(pygame.sprite.Sprite):
         
         self.health_bar.update()
     
+    def update_rect(self):
+        self.rect.topleft = (self.pos.x, self.pos.y)
+    
     def update(self, **kwargs):
-        print(f'speed: {self.speed.x + 0.5 * self.acceleration.x}, acc: self.acceleration.x')
         client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)
         if client_type == enums.ClientType.GUEST:
             self.client_update(**kwargs)
@@ -139,7 +143,7 @@ class Enemy(pygame.sprite.Sprite):
         
     def draw(self, surface: pygame.Surface, offset: vec):
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset
-        surface.blit(self.image, vec(self.rect.topleft) - offset)
+        surface.blit(self.image, self.pos - offset)
         self.health_bar.draw(surface)
         
     def kill(self):
@@ -191,6 +195,7 @@ class Enemy(pygame.sprite.Sprite):
             
             # ennemy attributes
             "health": self.health,
+            "pos": tuple(self.pos),
             "jump_force": self.jump_force,
             "damage": self.damage,
             "movement_speed": self.movement_speed,
@@ -211,7 +216,7 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = vec(data.pop("speed", (0,0)))
         self.acceleration = vec(data.pop("acceleration", (0,0)))
         self.dir = vec(data.pop("dir", (0,0)))
-        
+        self.pos = vec(data.pop("pos", (0,0)))
         
         
         _health = data.pop("health", 0)
