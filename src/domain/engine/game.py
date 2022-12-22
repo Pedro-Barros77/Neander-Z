@@ -12,6 +12,9 @@ from domain.models.map import Map
 from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.ui.pages.page import Page
+from domain.content.enemies.z_roger import ZRoger
+from domain.content.waves.wave_1 import Wave_1
+
 class Game(Page):
     def __init__(self, client_type: enums.ClientType, screen: pygame.Surface, **kwargs):
         super().__init__(**kwargs)
@@ -41,6 +44,9 @@ class Game(Page):
         
         self.collision_group = None
         """The group of objects that should collide.""" 
+
+        self.players_group = None
+        """The group of player that should collide.""" 
         
         self.jumpable_group = None
         """The group of objects the player can jump from.""" 
@@ -64,6 +70,8 @@ class Game(Page):
         """A list of the projectiles that are still in the game screen."""
         
         self.test_objects = []
+
+        self.current_wave = None
         
     
     def reset_players(self):
@@ -107,6 +115,8 @@ class Game(Page):
         if self.client_type != enums.ClientType.GUEST:
             enemies_controller.spawn_random_enemy(self)
         
+        self.current_wave = Wave_1
+        
         
         
     def setup(self):
@@ -135,11 +145,13 @@ class Game(Page):
         
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
+        self.players_group =  pygame.sprite.Group([self.player])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
-        self.enemies_group = pygame.sprite.Group()
+        
         
         self.reset_players()
         
+    
         # exec(recyclables.create_box)
         
         game_controller.bullet_groups = [self.collision_group, self.enemies_group]
@@ -172,6 +184,7 @@ class Game(Page):
             data.enemies = _enemies
             
         return data
+    
         
     def handle_received_data(self, data: NetData):
         """Handles the data received from player 2.
@@ -216,13 +229,23 @@ class Game(Page):
                     enemy[0].load_net_data(e_data)
                 else:
                     if len(self.enemies_group.sprites()) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
-                        enemies_controller.create_netdata_enemy(self, e_data)
+                        self.create_netdata_enemy(e_data)
                         
                         
             
         
         self.player.player2_rect = self.player2.rect
+    
+    def create_netdata_enemy(self, data: dict):
+        e = None
+        match data["enemy_name"]:
+            case str(enums.Enemies.Z_ROGER.name):
+                e = ZRoger((0,0), enums.Enemies.Z_ROGER)
+                e.load_net_data(data)
         
+        if e != None:
+            spawn_enemy(e)
+            
     def player_movement(self):
         """Handles the movement of player 1.
         """        
@@ -445,7 +468,7 @@ class Game(Page):
         for p in self.projectiles:
             p.draw(self.screen)
         
-        self.blit_debug()
+        # self.blit_debug()
         
         self.last_pressed_keys = self.pressed_keys.copy()
         
@@ -461,6 +484,9 @@ class Game(Page):
         
         for o in self.test_objects:
             o.draw(self.screen, self.player.offset_camera)
-            
+        
+        for e in self.enemies_group.sprites():
+            if e.hit_rectangle != None:
+                e.hit_rectangle.draw(self.screen, self.player.offset_camera)
         
         

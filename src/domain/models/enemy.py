@@ -2,8 +2,9 @@ import pygame
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
-from domain.services import game_controller
+from domain.services import game_controller, menu_controller
 from domain.models.progress_bar import ProgressBar
+from domain.models.ui.popup_text import Popup
 
 
 
@@ -19,6 +20,9 @@ class Enemy(pygame.sprite.Sprite):
         self.image_scale = 2
         self.movement_speed = kwargs.pop("movement_speed", 5)
         self.health = kwargs.pop("health", 30)
+        self.attack_targets = kwargs.pop("attack_targets", [])
+        
+        
         
         self.pos: vec = vec((pos))
         self.speed = vec(0,0)
@@ -47,6 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
         self.image_flip_margin = 10
+        self.player_offset = vec(0,0)
         
         
         self.last_rect = self.rect.copy()
@@ -112,10 +117,10 @@ class Enemy(pygame.sprite.Sprite):
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        
-        self.acceleration.x += self.speed.x * game.friction
-        self.speed.x += self.acceleration.x
-        self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        if not self.attacking:
+            self.acceleration.x += self.speed.x * game.friction
+            self.speed.x += self.acceleration.x
+            self.pos.x += self.speed.x + 0.5 * self.acceleration.x
         
         # Gravity
         game.apply_gravity(self)
@@ -128,7 +133,12 @@ class Enemy(pygame.sprite.Sprite):
         
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
+
         
+
+        if abs(player_center.x - self.rect.centerx) <= self.attack_distance:
+            self.attacking = True
+
         self.health_bar.update()
     
     def update_rect(self):
@@ -141,10 +151,15 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.host_update(**kwargs)
         
+        
+
+       
     def draw(self, surface: pygame.Surface, offset: vec):
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset
         surface.blit(self.image, self.pos - offset)
         self.health_bar.draw(surface)
+        self.player_offset = offset
+
         
     def kill(self):
         super().kill()
@@ -172,7 +187,9 @@ class Enemy(pygame.sprite.Sprite):
         
         if self.health_bar.target_value <= 0:
             self.is_alive = False
-            
+        menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["damage"]))
+
+
     def get_health(self, value: float):
         if value < 0:
             return
@@ -180,9 +197,9 @@ class Enemy(pygame.sprite.Sprite):
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         
         self.health_bar.add_value(value)
+        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["health"]))
         
-    def attack(self):
-        pass    
+      
     
     def get_netdata(self):
         values = {
@@ -228,3 +245,12 @@ class Enemy(pygame.sprite.Sprite):
         
         for item, value in data.items():
             setattr(self, item, value)
+    
+    def attack_collision(self, obj):
+        _hit_targets = []
+        for group in self.attack_targets:
+            collisions = pygame.sprite.spritecollide(obj, group, False)
+            if collisions:
+                _hit_targets.extend([*collisions])
+                
+        return _hit_targets

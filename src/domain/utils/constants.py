@@ -47,7 +47,7 @@ POPUPS = {
         "fade_out_ms": 500,
         "text_color": colors.RED,
         "float_anim_distance": 20,
-        "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 30)
+        "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 20)
     },
     "health":{
         "timeout_ms": 100,
@@ -55,6 +55,6 @@ POPUPS = {
         "fade_out_ms": 500,
         "text_color": colors.GREEN,
         "float_anim_distance": 20,
-        "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 30)
+        "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 20)
     }
 }
