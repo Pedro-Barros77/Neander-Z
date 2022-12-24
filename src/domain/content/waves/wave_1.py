@@ -21,8 +21,8 @@ class Wave_1(Wave):
 
     def start(self):
         self.spawn()
-        if self.game.client_type == enums.ClientType.HOST:
-            self.set_schedule(2000, self.spawn)
+        # if self.game.client_type != enums.ClientType.GUEST:
+        #     self.set_schedule(500, self.spawn)
         
     def spawn(self):
         if len(self.enemies_group.sprites()) < self.max_enemies:

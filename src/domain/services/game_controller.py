@@ -131,15 +131,21 @@ def host_game(game, host: str, port: int):
         host (str): The IP address of the server.
         port (int): The port number of the server.
     """    
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server.bind((host, port))
-    server.listen(1)
-    client, addr = server.accept()
+    # server started #
     
-    #define game objects
+    # waiting for client connection attempt
+    message, client_address = server.recvfrom(8)
     
-    #implementar handle connection
-    threading.Thread(target=handle_connection, args=(game, client)).start()
+    message = message.decode('utf-8')
+    print("client message:", message)
+    # if the message is a connection attempt
+    if message == "CONNECT":
+        # return ok and start the game
+        server.sendto('OK'.encode('utf-8'), client_address)
+        threading.Thread(target=handle_connection, args=(game, server, client_address)).start()
+    
     
 def try_enter_game(game, host: str, port: int, timeout = 2):
     """Joins a server from specified address and port.
@@ -149,20 +155,31 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         host (str): The IP address of the server.
         port (int): The port number of the server.
     """   
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.settimeout(timeout)
-    result = client.connect_ex((host, port))
-    if result == 0:
-        threading.Thread(target=handle_connection, args=(game, client)).start()
-        return True
-    else:
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # trying to connect to host
+    client.sendto('CONNECT'.encode('utf-8'), (host, port))
+    
+    try:
+        # check for response
+        message, host_address = client.recvfrom(8)
+        message = message.decode('utf-8')
+        print("server message:", message)
+        
+        # if response is ok, start the game
+        if message == "OK":
+            threading.Thread(target=handle_connection, args=(game, client, host_address)).start()
+            return True
+        else:
+            client.close()
+            return False
+    except ConnectionResetError:
         client.close()
         return False
 
 send_count = 0
 receive_count = 0
 
-def handle_connection(game, client: socket.socket):
+def handle_connection(game, client: socket.socket, remote_address: tuple[str, int]):
     """Function executing on a different thread, sending and receiving data from players.
 
     Args:
@@ -174,39 +191,24 @@ def handle_connection(game, client: socket.socket):
         
         data_to_send = game.get_net_data()
         
-        client.send(class_to_json(data_to_send))
-        teste = client.recv(20048)
-        print(len(teste))
+        client.sendto(class_to_json(data_to_send), remote_address)
+        received_buffer = client.recvfrom(2048)[0]
+        print(len(received_buffer))
         
-        json_string: str = teste.decode('utf-8')
-        
-        if json_string[0] != "{" or "_json_size_" not in json_string:
-            continue
-        
-        final_json = validate_json(json_string)
-        
-        data: NetData = json_to_class(final_json)
+        json_string: str = received_buffer.decode('utf-8')
+        data: NetData = json_to_class(json_string)
         
         if not data:
             continue
         else:
             game.handle_received_data(data)
             
-        time.sleep(0.01)
+        # time.sleep(0.01)
               
     
     print("closing connection")
     client.close()
     
-    
-    
-def validate_json(value):
-    i = value.index("_json_size_") + 17
-    # extra = value[i:]
-    # print('\nvalue:\n\n',value)
-    # print('\extra:\n\n',extra)
-    # print(len(extra))
-    return value[:i]
     
 def class_to_json(data):
     """Encodes the class object to a json object.
