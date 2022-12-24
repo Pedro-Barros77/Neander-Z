@@ -141,4 +141,24 @@ class ProgressBar(pygame.sprite.Sprite):
         if self.border_width > 0:
             pygame.draw.rect(self.image, self.border_color, ((0,0), self.rect.size), self.border_width)
         
+    
+    def set_max_value(self, value):
+        if value < 0:
+            return
+        if value < self.value:
+            self.value = value
+            self.target_value = value
         
+        self.max_value = value
+        self.value_ratio = self.max_value / self.rect.width
+        
+    def set_value(self, value):
+        if value < 0:
+            return
+        
+        self.value = value
+        self.target_value = value
+        
+        if value > self.max_value:
+            self.set_max_value(value)
+    

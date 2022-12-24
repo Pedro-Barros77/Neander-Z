@@ -54,6 +54,10 @@ class Enemy(pygame.sprite.Sprite):
         self.image_flip_margin = 10
         self.player_offset = vec(0,0)
         
+        #debug
+        self.damage_request_count = 0
+        self.damage_request_limit = 5
+        
         
         self.last_rect = self.rect.copy()
         
@@ -126,19 +130,19 @@ class Enemy(pygame.sprite.Sprite):
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        if not self.attacking:
-            self.acceleration.x += self.speed.x * game.friction
-            self.speed.x += self.acceleration.x
-            self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        # if not self.attacking:
+        #     self.acceleration.x += self.speed.x * game.friction
+        #     self.speed.x += self.acceleration.x
+        #     self.pos.x += self.speed.x + 0.5 * self.acceleration.x
         
         # Gravity
         game.apply_gravity(self)
         self.update_rect()
         
         # jump
-        self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL)
-        if self.dir.y > 0 and self.grounded:
-            self.speed.y = - self.jump_force
+        self.grounded = self.collision(game, game.collision_group, enums.Orientation.VERTICAL)
+        # if self.dir.y > 0 and self.grounded:
+        #     self.speed.y = - self.jump_force
         
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
@@ -245,10 +249,19 @@ class Enemy(pygame.sprite.Sprite):
         
         _health = data.pop("health", 0)
         _health_diff = self.health - _health
+        
         if _health_diff > 0:
-            self.take_damage(_health_diff)  
+            self.damage_request_count += 1
+            if self.damage_request_count > self.damage_request_limit:
+                self.take_damage(_health_diff)  
+                self.damage_request_count = 0
         elif _health_diff < 0:
             self.get_health(-_health_diff)
+        
+        #if max health changed
+        if _health > self.health_bar.max_value:
+            self.health_bar.set_value(_health)
+            self.health = _health
         
         for item, value in data.items():
             setattr(self, item, value)

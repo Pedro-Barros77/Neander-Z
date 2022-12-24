@@ -129,6 +129,9 @@ class Player(pygame.sprite.Sprite):
         group_name = kwargs.pop("group_name", "")
         if group_name == "jumpable":
             return
+        game = kwargs.pop("game", None)
+        
+        self.movement(game)
         
         self.health_bar.update()
         
@@ -197,10 +200,108 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft) - _target_offset)
         self.health_bar.draw(surface, _target_offset)
         
+    
+    def movement(self, game):
+        """Handles the movement of player 1.
+        """
+        if not self.is_player1:
+            return
+        self.last_rect = self.rect.copy()
+        self.acceleration.x = 0
+            
+        pressing_right = pygame.K_d in game.pressed_keys
+        pressing_left = pygame.K_a in game.pressed_keys
+        was_pressing_right = pygame.K_d in game.last_pressed_keys
+        was_pressing_left = pygame.K_a in game.last_pressed_keys
+            
+        # Move right
+        if pressing_right:
+            # pressing right but not left
+            if not pressing_left:
+                self.acceleration.x = self.movement_speed
+                # was pressing both left and right, but released left
+                if was_pressing_left and was_pressing_right:
+                    self.running = False
+                    self.turning_dir = 1
+            # started to press right
+            if not was_pressing_right:
+                self.turning_dir = 1
+            # started to press left and right
+            if pressing_left:
+                self.running = False
+                self.turning_dir = -1
+        elif was_pressing_right:
+                self.running = 0
+                self.turning_dir = -1
+            
+        # Move left
+        if pressing_left:
+            # pressing left but not right
+            if not pressing_right:
+                self.acceleration.x = -self.movement_speed
+                # was pressing both left and right, but released right
+                if was_pressing_left and was_pressing_right:
+                    self.running = False
+                    self.turning_dir = 1
+            # started to press left
+            if not was_pressing_left:
+                self.turning_dir = 1
+            # pressing left and right
+            if pressing_right:
+                self.running = False
+                self.turning_dir = -1
+        elif was_pressing_left and not pressing_right:
+                self.running = 0
+                self.turning_dir = -1
+            
+        # Movement
+        self.acceleration.x += self.speed.x * game.friction
+        self.speed.x += self.acceleration.x
+        self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        
+        # Gravity
+        game.apply_gravity(self)
+        self.update_rect()
+        
+        # jump
+        _was_grounded = self.grounded
+        _old_pos = self.pos.y
+        self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL)
+        if not _was_grounded and self.grounded and abs(_old_pos - self.pos.y) > 2 :
+            self.jumping = False
+            self.falling_ground = True
+            if pressing_left != pressing_right:
+                self.running = True
+        
+        if pygame.K_SPACE in game.pressed_keys and self.grounded:
+            self.speed.y = -self.jump_force
+            if pressing_left != pressing_right:
+                self.falling_ground = False
+                self.running = False
+                self.jumping = True
+           
+            game.pressed_keys.remove(pygame.K_SPACE)
+    
+        # solid collision
+        self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
+        
+    def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation):
+        """Handles collision between the player and collidable objects.
+
+        Args:
+            targets (pygame.sprite.Group | list[pygame.sprite.Sprite])
+            direction (enums.Orientation): The direction that the player was moving.
+        """
+        collision_objs = pygame.sprite.spritecollide(self, targets, False)
+        if collision_objs:
+            game.collision(self, collision_objs, direction)
+            return True
+        return False    
+    
+        
     def shoot(self):
         self.firing = True
-        _offset_camera = self.offset_camera if self.is_player1 else vec(0,0)
-        _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft, self.rect.width/2 + 30, -maths.radians(self.weapon_aim_angle))
+        _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft, self.rect.width/2 + 5, -maths.radians(self.weapon_aim_angle))
         
         return SmallBullet(_bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage, self.net_id, game_controller.get_bullet_id())
         

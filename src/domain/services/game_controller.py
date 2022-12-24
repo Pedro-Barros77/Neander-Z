@@ -139,7 +139,6 @@ def host_game(game, host: str, port: int):
     message, client_address = server.recvfrom(8)
     
     message = message.decode('utf-8')
-    print("client message:", message)
     # if the message is a connection attempt
     if message == "CONNECT":
         # return ok and start the game
@@ -163,7 +162,6 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         # check for response
         message, host_address = client.recvfrom(8)
         message = message.decode('utf-8')
-        print("server message:", message)
         
         # if response is ok, start the game
         if message == "OK":
@@ -192,8 +190,8 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         data_to_send = game.get_net_data()
         
         client.sendto(class_to_json(data_to_send), remote_address)
-        received_buffer = client.recvfrom(2048)[0]
-        print(len(received_buffer))
+        received_buffer = client.recvfrom(8192)[0]
+        # print(len(received_buffer))
         
         json_string: str = received_buffer.decode('utf-8')
         data: NetData = json_to_class(json_string)
@@ -203,7 +201,7 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         else:
             game.handle_received_data(data)
             
-        # time.sleep(0.01)
+        time.sleep(0.015)
               
     
     print("closing connection")

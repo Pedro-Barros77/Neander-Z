@@ -88,9 +88,6 @@ def app_loop():
         
         playing = current_page.name == "Game"
             
-            
-        
-        
         # update
         current_page.update(events = _events)
         popup_group.update()

@@ -12,7 +12,7 @@ class Wave_1(Wave):
         
         self.roger_data = {
             "movement_speed": 0.12,
-            "id": self.get_id()
+            "health": 30
         }
 
     def update(self, **kwargs):
@@ -21,9 +21,11 @@ class Wave_1(Wave):
 
     def start(self):
         self.spawn()
-        # if self.game.client_type != enums.ClientType.GUEST:
-        #     self.set_schedule(500, self.spawn)
+        if self.game.client_type != enums.ClientType.GUEST:
+            self.set_schedule(500, self.spawn)
         
     def spawn(self):
         if len(self.enemies_group.sprites()) < self.max_enemies:
-            self.spawn_enemy( ZRoger((random.randint(0, self.game.map.rect.width - 50),self.game.map.rect.bottom - (self.game.map.floor_y + 10) - 100), enums.Enemies.Z_ROGER, **self.roger_data))
+            radx = random.randint(0, self.game.map.rect.width - 50)
+            y = self.game.map.rect.bottom - (self.game.map.floor_y + 10) - 100
+            self.spawn_enemy( ZRoger((200,y), enums.Enemies.Z_ROGER, **self.roger_data, id = self.get_id()))

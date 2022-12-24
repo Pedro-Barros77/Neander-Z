@@ -220,16 +220,26 @@ class Game(Page):
             for e_data in data.enemies:
                 enemy = [x for x in self.current_wave.enemies_group.sprites() if x.id == e_data['id']]
                 if len(enemy) > 0:
+                    print(f"my: {enemy[0].health}, new: {e_data['health']}")
                     enemy[0].load_netdata(e_data)
                 else:
                     if len(current_enemy_ids) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
                         self.create_netdata_enemy(e_data)
 
-        current_bullets_ids = [x.id for x in self.bullets_group.sprites()]
+        current_bullets_ids = [x.id for x in self.bullets_group.sprites() if x.owner != self.player.net_id]
+        new_bullets_ids = [x['id'] for x in data.bullets]
+        
+        # kill extra bullets
+        if len(current_bullets_ids) > len(data.bullets):
+            extra_bullets = [b for b in self.bullets_group.sprites() if b.owner != self.player.net_id and b.id not in new_bullets_ids]
+            print(f'faltante: {[x.id for x in extra_bullets]}')
+            for b in extra_bullets:
+                b.kill()
+                
         for b_data in data.bullets:
             # if it's not p1 bullet
             if b_data['owner'] != self.player.net_id:
-                # if bullet already exists here
+                # if bullet already exists here, update
                 if b_data['id'] in current_bullets_ids:
                     bullet = [b for b in self.bullets_group.sprites() if b.id == b_data['id']]
                     if len(bullet) > 0:
@@ -237,6 +247,7 @@ class Game(Page):
                 else:
                     if len(current_bullets_ids) < len(data.bullets) and b_data['id'] not in current_bullets_ids:
                         self.create_netdata_bullet(b_data)
+        
             
         
         self.player.player2_rect = self.player2.rect
@@ -247,6 +258,7 @@ class Game(Page):
             case str(enums.Enemies.Z_ROGER.name):
                 e = ZRoger((0,0), enums.Enemies.Z_ROGER)
                 e.load_netdata(data)
+                
         
         if e != None:
             self.current_wave.spawn_enemy(e)
@@ -261,95 +273,7 @@ class Game(Page):
         if b != None:
             game.bullets_group.add(b)
             
-    def player_movement(self):
-        """Handles the movement of player 1.
-        """        
-        self.player.last_rect = self.player.rect.copy()
-        self.player.acceleration.x = 0
-            
-        pressing_right = pygame.K_d in self.pressed_keys
-        pressing_left = pygame.K_a in self.pressed_keys
-        was_pressing_right = pygame.K_d in self.last_pressed_keys
-        was_pressing_left = pygame.K_a in self.last_pressed_keys
-            
-        # Move right
-        if pressing_right:
-            # pressing right but not left
-            if not pressing_left:
-                self.player.acceleration.x = self.player.movement_speed
-                # was pressing both left and right, but released left
-                if was_pressing_left and was_pressing_right:
-                    self.player.running = False
-                    self.player.turning_dir = 1
-            # started to press right
-            if not was_pressing_right:
-                self.player.turning_dir = 1
-            # started to press left and right
-            if pressing_left:
-                self.player.running = False
-                self.player.turning_dir = -1
-        elif was_pressing_right:
-                self.player.running = 0
-                self.player.turning_dir = -1
-            
-        # Move left
-        if pressing_left:
-            # pressing left but not right
-            if not pressing_right:
-                self.player.acceleration.x = -self.player.movement_speed
-                # was pressing both left and right, but released right
-                if was_pressing_left and was_pressing_right:
-                    self.player.running = False
-                    self.player.turning_dir = 1
-            # started to press left
-            if not was_pressing_left:
-                self.player.turning_dir = 1
-            # pressing left and right
-            if pressing_right:
-                self.player.running = False
-                self.player.turning_dir = -1
-        elif was_pressing_left and not pressing_right:
-                self.player.running = 0
-                self.player.turning_dir = -1
-            
-        if pygame.K_UP in self.pressed_keys:
-            self.player.get_health(20)
-            self.pressed_keys.remove(pygame.K_UP)
-            
-        if pygame.K_DOWN in self.pressed_keys:
-            self.player.take_damage(20)
-            self.pressed_keys.remove(pygame.K_DOWN)
-            
-        # Movement
-        self.player.acceleration.x += self.player.speed.x * self.friction
-        self.player.speed.x += self.player.acceleration.x
-        self.player.pos.x += self.player.speed.x + 0.5 * self.player.acceleration.x
-        
-        # Gravity
-        self.apply_gravity(self.player)
-        self.player.update_rect()
-        
-        # jump
-        _was_grounded = self.player.grounded
-        _old_pos = self.player.pos.y
-        self.player.grounded = self.player_collision(self.jumpable_group, enums.Orientation.VERTICAL)
-        if not _was_grounded and self.player.grounded and abs(_old_pos - self.player.pos.y) > 2 :
-            self.player.jumping = False
-            self.player.falling_ground = True
-            if pressing_left != pressing_right:
-                self.player.running = True
-        
-        if pygame.K_SPACE in self.pressed_keys and self.player.grounded:
-            self.player.speed.y = -self.player.jump_force
-            if pressing_left != pressing_right:
-                self.player.falling_ground = False
-                self.player.running = False
-                self.player.jumping = True
-           
-            self.pressed_keys.remove(pygame.K_SPACE)
     
-        # solid collision
-        self.player_collision(self.collision_group, enums.Orientation.HORIZONTAL)
     
     
     def apply_gravity(self, target: IGravitable):
@@ -375,20 +299,6 @@ class Game(Page):
                 obstacles = pygame.sprite.spritecollide(obj, self.collision_group, False)
                 self.collision(obj, obstacles, enums.Orientation.VERTICAL)
     
-    def player_collision(self, targets: pygame.sprite.Group, direction: enums.Orientation):
-        """Handles collision between the player and collidable objects.
-
-        Args:
-            targets (pygame.sprite.Group | list[pygame.sprite.Sprite])
-            direction (enums.Orientation): The direction that the player was moving.
-        """
-        collision_objs = pygame.sprite.spritecollide(self.player, targets, False)
-        if collision_objs:
-            self.collision(self.player, collision_objs, direction)
-            return True
-        return False
-    
-    
     def collision(self, obj: pygame.sprite.Sprite, obstacles: list[pygame.sprite.Sprite], direction: enums.Orientation):
         """Calculates the collision between an object and a group of obstacles. Updates the position of the object to prevent overlapping.
 
@@ -398,7 +308,6 @@ class Game(Page):
             direction (enums.Orientation): The direction that the obj was moving (vertical or horizontal).
         """   
         
-  
         for o in obstacles:
             match direction:
                 case enums.Orientation.HORIZONTAL:
@@ -451,22 +360,27 @@ class Game(Page):
             time.sleep(0.1)
             game_controller.restart_game(self)
             
-        self.player.update()
+        self.player.update(game = self)
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2.update()
+            self.player2.update(game = self)
         self.current_wave.update()
         self.collision_group.update(group_name = "collision")
         self.jumpable_group.update(group_name = "jumpable")
     
         self.process_gravitables()    
             
-        self.player_movement()
         
         self.bullets_group.update(offset = self.player.offset_camera)
         
-        self.player_collision(self.collision_group, enums.Orientation.VERTICAL)
-        
         self.center_camera()
+        
+        #debug
+        if pygame.K_UP in self.pressed_keys:
+            self.get_health(20)
+            self.pressed_keys.remove(pygame.K_UP)
+        if pygame.K_DOWN in self.pressed_keys:
+            self.take_damage(20)
+            self.pressed_keys.remove(pygame.K_DOWN)
     
     def draw(self):
         # Map

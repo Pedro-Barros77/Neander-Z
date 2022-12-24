@@ -6,7 +6,7 @@ from domain.services import game_controller
 from domain.models.enemy import Enemy
 
 class SmallBullet(pygame.sprite.Sprite):
-    def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:str, id: int):
+    def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:int, id: int):
         super().__init__()
         
         self.id = id
@@ -39,8 +39,6 @@ class SmallBullet(pygame.sprite.Sprite):
             _new_pos.y > game_controller.map_size.y or _new_pos.y < 0:
             self.kill()
         
-        offset = kwargs.pop("offset", vec(0,0))
-        
         # movement
         self.rect.topleft = _new_pos
         collided = self.bullet_collision()
@@ -57,6 +55,7 @@ class SmallBullet(pygame.sprite.Sprite):
             collisions = pygame.sprite.spritecollide(self, group, False)
             for c in collisions:
                 if isinstance(c, Enemy):
+                    print("fodendo o roger")
                     c.take_damage(self.damage)
                 return True
         return False
