@@ -45,7 +45,7 @@ class NewGame(Page):
         
         self.txt_ip_input = TextInput(
             pygame.Rect((self.buttons[0].rect.left, self.line_divider_rect.top + 20), (self.buttons[0].rect.width*0.6,30)),
-            font = pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 22),
+            font = pygame.font.Font(constants.PIXEL_FONT, 22),
             font_color = colors.BLACK,
             background_color = colors.WHITE,
             border_color = colors.LIGHT_GRAY,

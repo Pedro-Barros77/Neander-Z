@@ -130,7 +130,9 @@ class Game(Page):
         self.player.health = self.player.max_health
         self.player.health_bar.value = self.player.max_health
         self.player.health_bar.target_value = self.player.max_health
-        
+        self.player.score = 0
+        self.player.money = 0
+
         self.player.load_state(menu_controller.player_state)
         
         if self.client_type != enums.ClientType.SINGLE:
@@ -145,6 +147,9 @@ class Game(Page):
             self.player2.health = self.player2.max_health
             self.player2.health_bar.value = self.player2.max_health
             self.player2.health_bar.target_value = self.player2.max_health
+            self.player2.score = 0        
+            self.player2.money = 0
+
         
         
         if self.client_type != enums.ClientType.GUEST:
@@ -161,12 +166,23 @@ class Game(Page):
             self.player2.score += result[_p2].score
             self.player2.money += result[_p2].money
 
-        print(self.player.money)
     
     def draw_ui(self):
-        pass
-    
-                
+        _money_logo = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
+        _money_logo_rect = pygame.Rect(vec(self.player.health_bar.rect.topright) + vec(10,0), _money_logo.get_size())
+
+        _text_money = menu_controller.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _text_money_rect = pygame.Rect(vec(_money_logo_rect.topright) + vec(5,0), _text_money.get_size())
+
+        _text_score = menu_controller.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+
+        self.screen.blit(_money_logo, _money_logo_rect)
+
+        self.screen.blit(_text_money, _text_money_rect) 
+
+        self.screen.blit(_text_score, vec(_text_money_rect.topright) + vec(30,0))
+
+        
     
             
     def get_net_data(self):
@@ -395,6 +411,9 @@ class Game(Page):
         if pygame.K_DOWN in self.pressed_keys:
             self.player.take_damage(20)
             self.pressed_keys.remove(pygame.K_DOWN)
+        if pygame.K_DELETE in self.pressed_keys:
+            self.current_wave.kill_all()
+            self.pressed_keys.remove(pygame.K_DELETE)
     
        
     def draw(self):
@@ -415,6 +434,8 @@ class Game(Page):
         # self.blit_debug()
         
         self.last_pressed_keys = self.pressed_keys.copy()
+
+        self.draw_ui()
         
     def blit_debug(self):
         """Draws objects that are invisible to the player. For debugging only.

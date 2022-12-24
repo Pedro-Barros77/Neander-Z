@@ -30,9 +30,10 @@ class Player(pygame.sprite.Sprite):
         """The maximum health of the player."""
 
         self.score = 0
-        """The ammount of points of the player""" 
+        """The amount of points of the player""" 
 
         self.money = 0
+        """The amount of money of the player""" 
         
         self.name = kwargs.pop("name", "player")
         """The name of this object, for debugging."""
