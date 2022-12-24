@@ -16,6 +16,7 @@ enemy_target_groups = []
 enemies_count = 0
 bullets_count = 0
 
+
 def get_enemy_id():
     global enemies_count
     enemies_count += 1
@@ -25,6 +26,7 @@ def get_bullet_id():
     global bullets_count
     bullets_count += 1
     return bullets_count
+
 
 def handle_events(game, events: list[pygame.event.Event]):
     """Iterates through each event and call it's appropriate function.

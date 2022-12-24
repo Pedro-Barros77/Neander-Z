@@ -149,7 +149,23 @@ class Game(Page):
         
         if self.client_type != enums.ClientType.GUEST:
             self.current_wave.start()
-            
+
+    def end_wave(self, result):
+        _p1 = self.player.net_id if self.player.net_id != 3 else 1
+        self.player.score += result[_p1].score
+        self.player.money += result[_p1].money
+
+        if self.client_type != enums.ClientType.SINGLE:
+                
+            _p2 = self.player2.net_id             
+            self.player2.score += result[_p2].score
+            self.player2.money += result[_p2].money
+
+        print(self.player.money)
+    
+    def draw_ui(self):
+        pass
+    
                 
     
             
@@ -220,7 +236,6 @@ class Game(Page):
             for e_data in data.enemies:
                 enemy = [x for x in self.current_wave.enemies_group.sprites() if x.id == e_data['id']]
                 if len(enemy) > 0:
-                    print(f"my: {enemy[0].health}, new: {e_data['health']}")
                     enemy[0].load_netdata(e_data)
                 else:
                     if len(current_enemy_ids) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
@@ -232,7 +247,6 @@ class Game(Page):
         # kill extra bullets
         if len(current_bullets_ids) > len(data.bullets):
             extra_bullets = [b for b in self.bullets_group.sprites() if b.owner != self.player.net_id and b.id not in new_bullets_ids]
-            print(f'faltante: {[x.id for x in extra_bullets]}')
             for b in extra_bullets:
                 b.kill()
                 
@@ -376,12 +390,13 @@ class Game(Page):
         
         #debug
         if pygame.K_UP in self.pressed_keys:
-            self.get_health(20)
+            self.player.get_health(20)
             self.pressed_keys.remove(pygame.K_UP)
         if pygame.K_DOWN in self.pressed_keys:
-            self.take_damage(20)
+            self.player.take_damage(20)
             self.pressed_keys.remove(pygame.K_DOWN)
     
+       
     def draw(self):
         # Map
         self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)

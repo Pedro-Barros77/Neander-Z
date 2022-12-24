@@ -9,11 +9,12 @@ from domain.models.ui.popup_text import Popup
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, enemy_name: enums.Enemies, **kwargs):
+    def __init__(self, pos, enemy_name: enums.Enemies, wave, **kwargs):
         super().__init__()
         
         self.id = kwargs.pop("id", 0)
         self.name = "enemy"
+        self.wave = wave
         self.jump_force = 12
         self.damage = 1
         self.enemy_name = enemy_name
@@ -172,8 +173,12 @@ class Enemy(pygame.sprite.Sprite):
         self.player_offset = offset
 
         
-    def kill(self):
+    def kill(self, attacker):
+        self.wave.handle_score(self.enemy_name, attacker)
+        self.wave.enemies_count -= 1
+        self.wave.current_wave_step += 1
         super().kill()
+        
     
     def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation):
         """Handles collision between the enemy and collidable objects.
@@ -189,7 +194,9 @@ class Enemy(pygame.sprite.Sprite):
         return False
         
         
-    def take_damage(self, value: float):
+    def take_damage(self, value: float, attacker = None):
+        # if attacker != None:
+            
         if value < 0:
             return
         self.health_bar.remove_value(value)
@@ -198,7 +205,10 @@ class Enemy(pygame.sprite.Sprite):
         
         if self.health_bar.target_value <= 0:
             self.is_alive = False
+            self.kill(attacker)
+        
         menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["damage"]))
+        return not self.is_alive
 
 
     def get_health(self, value: float):

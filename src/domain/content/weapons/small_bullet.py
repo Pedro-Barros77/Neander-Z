@@ -6,7 +6,7 @@ from domain.services import game_controller
 from domain.models.enemy import Enemy
 
 class SmallBullet(pygame.sprite.Sprite):
-    def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:int, id: int):
+    def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:int, id: int, **kwargs):
         super().__init__()
         
         self.id = id
@@ -21,6 +21,7 @@ class SmallBullet(pygame.sprite.Sprite):
         self.bullet_name = enums.Bullets.SMALL_BULLET
         self.owner_offset = vec(0,0)
         self.is_alive = True
+        
         
     
     def draw(self, screen: pygame.Surface, offset: vec):
@@ -55,8 +56,7 @@ class SmallBullet(pygame.sprite.Sprite):
             collisions = pygame.sprite.spritecollide(self, group, False)
             for c in collisions:
                 if isinstance(c, Enemy):
-                    print("fodendo o roger")
-                    c.take_damage(self.damage)
+                    c.take_damage(self.damage, self.owner)
                 return True
         return False
     

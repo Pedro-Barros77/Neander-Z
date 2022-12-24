@@ -28,6 +28,11 @@ class Player(pygame.sprite.Sprite):
         """The current health of the player."""
         self.max_health = self.health
         """The maximum health of the player."""
+
+        self.score = 0
+        """The ammount of points of the player""" 
+
+        self.money = 0
         
         self.name = kwargs.pop("name", "player")
         """The name of this object, for debugging."""
@@ -191,6 +196,7 @@ class Player(pygame.sprite.Sprite):
             
         #endregion Animation Triggers
         
+
         return
         
     def draw(self, surface: pygame.Surface, offset: vec):
@@ -304,7 +310,9 @@ class Player(pygame.sprite.Sprite):
         _bullet_pos = game_controller.point_to_angle_distance(self.weapon_anchor + self.rect.topleft, self.rect.width/2 + 5, -maths.radians(self.weapon_aim_angle))
         
         return SmallBullet(_bullet_pos, self.weapon_aim_angle, 30, self.current_weapon.damage, self.net_id, game_controller.get_bullet_id())
-        
+    
+    
+                    
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)
         
