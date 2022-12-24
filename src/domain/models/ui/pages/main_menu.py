@@ -20,7 +20,7 @@ class MainMenu(Page):
 
         
         btn_dict = {
-            "text_font": pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 30),
+            "text_font": pygame.font.Font(constants.PIXEL_FONT, 30),
             "text_color": colors.BLACK
         }
         

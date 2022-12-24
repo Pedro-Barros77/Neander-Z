@@ -46,12 +46,12 @@ class Wave():
         self.players_scores[1].money = (self.players_scores[1].score / 4) * self.money_multiplier
         self.players_scores[2].money = (self.players_scores[2].score / 4) * self.money_multiplier
 
-        
-        print("acabou otario")
         self.game.end_wave(self.players_scores)
         self.finished = True
         
-        
+    def kill_all(self):
+        for e in self.enemies_group.sprites():
+            e.kill(1)
 
     def handle_score(self, enemy_type: enums.Enemies, attacker):
         if attacker == 3:
@@ -59,7 +59,13 @@ class Wave():
         match enemy_type:
             case enums.Enemies.Z_ROGER:
                 self.players_scores[attacker].score += 53
-                # dinheiro dividi por 4     
+                # dinheiro dividi por 4    
+
+        self.game.player.score = self.players_scores[1].score 
+
+        if self.game.client_type != enums.ClientType.SINGLE:
+            self.game.player2.score = self.players_scores[2].score 
+
 
 
     def update(self, **kwargs):
@@ -67,7 +73,8 @@ class Wave():
             return
         self.enemies_count = len(self.enemies_group.sprites())
         self.enemies_group.update(group_name = "enemies", game = self.game, client_type = self.game.client_type)
-        print(self.players_scores[1].score)
+    
+       
         # print(self.spawn_count)
     
     def draw(self, screen: pygame.Surface, offset: vec):

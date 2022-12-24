@@ -8,6 +8,7 @@ ROOT_PATH = f'{os.getcwd()}\\'
 
 IMAGES_PATH = "src\\domain\\resources\\images\\"
 FONTS_PATH = "src\\domain\\resources\\fonts\\"
+PIXEL_FONT = f'{FONTS_PATH}runescape_uf.ttf'
 
 SAVE_PATH = f'{ROOT_PATH}src\\saves\\'
 
