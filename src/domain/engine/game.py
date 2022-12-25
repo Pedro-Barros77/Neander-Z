@@ -3,7 +3,7 @@ from datetime import datetime
 from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, menu_controller
-from domain.utils import colors, recyclables, enums, constants
+from domain.utils import colors, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
 from domain.models.network_data import Data as NetData
@@ -11,6 +11,7 @@ from domain.models.map import Map
 from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.ui.pages.page import Page
+from domain.models.ui.pages.modals.wave_summary import WaveSummary
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.wave_1 import Wave_1
 from domain.content.weapons.small_bullet import SmallBullet
@@ -68,6 +69,8 @@ class Game(Page):
         self.test_objects = []
 
         self.current_wave = None
+        
+        self.wave_summary = None
     
     def setup(self):
         """Starts the game.
@@ -78,10 +81,11 @@ class Game(Page):
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.screen_size = vec(self.screen.get_size())
         
-        self.player = Player((20, 0), enums.Characters.CARLOS, net_id = int(self.client_type), name = "P1", screen_size = self.screen.get_size())
+        _p1_net_id = int(self.client_type)
+        self.player = Player((20, 0), enums.Characters.CARLOS if _p1_net_id != 2 else enums.Characters.CLEITON, net_id = _p1_net_id, name = "P1", screen_size = self.screen.get_size())
         
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2 = Player((80, 0), enums.Characters.CLEITON, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
+            self.player2 = Player((80, 0), enums.Characters.CARLOS if _p1_net_id == 2 else enums.Characters.CLEITON, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
         self.players_group =  pygame.sprite.Group([self.player])
@@ -97,6 +101,7 @@ class Game(Page):
     def reset_game(self):
         """Resets all players attributes to default values.
         """
+        self.wave_summary = None
         self.current_wave = Wave_1(self)
         game_controller.screen_size = vec(self.screen.get_size())
         game_controller.map_size = vec(self.map.rect.size)
@@ -161,10 +166,11 @@ class Game(Page):
         self.player.money += result[_p1].money
 
         if self.client_type != enums.ClientType.SINGLE:
-                
             _p2 = self.player2.net_id             
             self.player2.score += result[_p2].score
             self.player2.money += result[_p2].money
+        
+        self.wave_summary = WaveSummary((result[1], result[2] if self.client_type != enums.ClientType.SINGLE else None), start_time = datetime.now())
 
     
     def draw_ui(self):
@@ -192,6 +198,9 @@ class Game(Page):
                 player_last_rect = (self.player.last_rect.left, self.player.last_rect.top, self.player.last_rect.width, self.player.last_rect.height),
                 player_speed = (self.player.speed.x, self.player.speed.y),
                 player_health = self.player.health,
+                
+                player2_score = self.player2.score,
+                
                 player_acceleration = (self.player.acceleration.x, self.player.acceleration.y),
                 command_id = self.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
@@ -200,16 +209,19 @@ class Game(Page):
                 player_running = self.player.running,
                 player_jumping = self.player.jumping,
                 player_turning_dir = self.player.turning_dir,
-                player_firing = self.player.firing,
-                
+                player_firing = self.player.firing
             )
         
         _bullets = [b.get_netdata() for b in self.bullets_group.sprites() if b.owner == self.player.net_id]
         data.bullets = _bullets
+        if self.wave_summary != None:
+            data.player_wave_ready = self.wave_summary.p1_ready
+        
         if self.client_type == enums.ClientType.HOST:
             _enemies = [e.get_netdata() for e in self.current_wave.enemies_group.sprites()]
             data.enemies = _enemies
             
+            data.wave_results = None if self.wave_summary == None else (self.wave_summary.P2_RESULT, self.wave_summary.P1_RESULT)
         return data
     
         
@@ -221,6 +233,12 @@ class Game(Page):
         """
         if data.command_id == int(enums.Command.RESTART_GAME):
             game_controller.restart_game(self)
+        
+        if self.client_type == enums.ClientType.GUEST:
+            self.player.score = data.player2_score
+            
+        if self.wave_summary != None:
+            self.wave_summary.p2_ready = data.player_wave_ready
         
         self.player2.rect = pygame.Rect(data.player_rect)
         self.player2.last_rect = pygame.Rect(data.player_last_rect)
@@ -278,15 +296,15 @@ class Game(Page):
                     if len(current_bullets_ids) < len(data.bullets) and b_data['id'] not in current_bullets_ids:
                         self.create_netdata_bullet(b_data)
         
-            
-        
+        if data.wave_results != None and self.wave_summary == None:
+            self.wave_summary = WaveSummary(data.wave_results)
         self.player.player2_rect = self.player2.rect
     
     def create_netdata_enemy(self, data: dict):
         e = None
         match data["enemy_name"]:
             case str(enums.Enemies.Z_ROGER.name):
-                e = ZRoger((0,0), enums.Enemies.Z_ROGER)
+                e = ZRoger((0,0), enums.Enemies.Z_ROGER, self.current_wave)
                 e.load_netdata(data)
                 
         
@@ -377,29 +395,50 @@ class Game(Page):
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.player2_offset = self.player.offset_camera
 
+    def send_restart(self):
+        self.command_id = int(enums.Command.RESTART_GAME)
+        print("restartando")
+            
+        import time
+        time.sleep(0.1)
+        game_controller.restart_game(self)
+        print("iih passou")
+
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
+        
+        if self.wave_summary != None:
+            self.wave_summary.update()
+            # if wave interval is out or p1 is ready and is singleplayer or both players are ready
+            if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
+                print("acabou")
+                
+                
+                self.send_restart()
+            return
         
         game_controller.handle_events(self, events)
         
         if pygame.K_r in self.pressed_keys and \
-            (self.client_type == enums.ClientType.HOST or self.client_type == enums.ClientType.SINGLE):
-            self.command_id = int(enums.Command.RESTART_GAME)
+            (self.client_type != enums.ClientType.GUEST):
+                
+            self.send_restart()
             
-            import time
-            time.sleep(0.1)
-            game_controller.restart_game(self)
-            
+        # p1
         self.player.update(game = self)
+        # p2
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.update(game = self)
+        # wave logic
         self.current_wave.update()
+        # enemies
+        self.current_wave.update_enemies()
+        
         self.collision_group.update(group_name = "collision")
         self.jumpable_group.update(group_name = "jumpable")
     
         self.process_gravitables()    
             
-        
         self.bullets_group.update(offset = self.player.offset_camera)
         
         self.center_camera()
@@ -419,6 +458,11 @@ class Game(Page):
     def draw(self):
         # Map
         self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
+        
+        if self.wave_summary != None:
+            self.wave_summary.draw(self.screen)
+            return
+        
         # Wave
         self.current_wave.draw(self.screen, self.player.offset_camera)
         # P1
@@ -430,7 +474,7 @@ class Game(Page):
         # bullets
         for b in self.bullets_group:
             b.draw(self.screen, self.player.offset_camera)
-        
+            
         # self.blit_debug()
         
         self.last_pressed_keys = self.pressed_keys.copy()

@@ -7,10 +7,9 @@ from domain.services import game_controller, menu_controller
 #button class
 class Button(pygame.sprite.Sprite):
     def __init__(self, pos: vec, image: str, **kwargs):
-        self.image = pygame.image.load(image)
-        scale = kwargs.pop("scale", 1)
-        if scale != 1:
-            self.image = game_controller.scale_image(self.image, scale)
+        self.image = None
+        self.scale = kwargs.pop("scale", 1)
+        self.set_image(image)
             
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
@@ -33,8 +32,42 @@ class Button(pygame.sprite.Sprite):
         self.on_hover: function = kwargs.pop("on_hover", self.default_on_hover)
         self.on_click: function = kwargs.pop("on_click", lambda: print('clicked ' + self.text))
         
+        self.enabled = kwargs.pop("enabled", True)
+        if not self.enabled:
+            self.enable(False)
         self.clicked = False
         self.hovered = False
+        
+    def set_image(self, file_path: str):
+        self.image = pygame.image.load(file_path)
+        if self.scale != 1:
+            self.image = game_controller.scale_image(self.image, self.scale)
+        self.start_image = self.image.copy()
+    
+    def set_text(self, txt: str):
+        self.text = txt
+        self.text_surface = menu_controller.get_text_surface(self.text, self.text_color, self.text_font)
+        self.start_text = self.text_surface.copy()
+        
+    def enable(self, enabled: bool):
+        self.enabled = enabled
+        self.default_enable()
+        
+    def default_enable(self):
+        _darkness = 100
+        
+        if not self.enabled:
+            self.image = self.start_image.copy()
+            self.image.fill(colors.set_alpha(colors.BLACK, _darkness), special_flags=pygame.BLEND_RGBA_SUB)
+            self.text_surface = self.start_text
+            self.rect = self.image.get_rect()
+            self.rect.center = self.center
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        else:
+            self.image = self.start_image.copy()
+            self.text_surface = self.start_text
+            self.rect = self.image.get_rect()
+            self.rect.center = self.center
         
     def default_on_hover(self):
         _brightness = 30
@@ -57,6 +90,9 @@ class Button(pygame.sprite.Sprite):
             
     def update(self, **kwargs):
         action = False
+
+        if not self.enabled:
+            return
 
         mouse_pos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()[0] == 1

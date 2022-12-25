@@ -55,11 +55,6 @@ class Enemy(pygame.sprite.Sprite):
         self.image_flip_margin = 10
         self.player_offset = vec(0,0)
         
-        #debug
-        self.damage_request_count = 0
-        self.damage_request_limit = 5
-        
-        
         self.last_rect = self.rect.copy()
         
         self.health_bar = ProgressBar(self.health, pygame.Rect(self.pos - vec(0,-15), (self.rect.width * 1.3, 7)), 
@@ -261,10 +256,7 @@ class Enemy(pygame.sprite.Sprite):
         _health_diff = self.health - _health
         
         if _health_diff > 0:
-            self.damage_request_count += 1
-            if self.damage_request_count > self.damage_request_limit:
-                self.take_damage(_health_diff)  
-                self.damage_request_count = 0
+            self.take_damage(_health_diff)
         elif _health_diff < 0:
             self.get_health(-_health_diff)
         

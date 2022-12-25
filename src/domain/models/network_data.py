@@ -6,6 +6,9 @@ class Data:
         self.player_last_rect = kwargs.pop("player_last_rect", self.player_rect)
         self.player_health = kwargs.pop("player_health", 0)
         
+        self.player2_score = kwargs.pop("player2_score", 0)
+        self.player_wave_ready = kwargs.pop("player_wave_ready", False)
+        
         #animation
         self.player_turning_dir = kwargs.pop("player_turning_dir", 0)
         self.player_jumping = kwargs.pop("player_jumping", False)
@@ -21,5 +24,7 @@ class Data:
         
         self.enemies = []
         self.bullets = []
+        
+        self.wave_results = kwargs.pop("wave_results", None)
         
         self._json_size_ = ""

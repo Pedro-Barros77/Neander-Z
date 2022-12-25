@@ -8,9 +8,6 @@ from domain.models.ui.popup_text import Popup
 from domain.utils import constants, colors, enums
 from domain.services import menu_controller, game_controller
 from domain.engine.game import Game
-#debug
-from domain.models.ui.pages.modals.wave_summary import WaveSummary
-from domain.models.wave_result import WaveResult
 
 class NewGame(Page):
     def __init__(self, screen: pygame.Surface, **kwargs) -> None:
@@ -27,7 +24,7 @@ class NewGame(Page):
             Button(vec(0,250), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Single Player", on_click = lambda: self.start_game(enums.ClientType.SINGLE),**btn_dict),
             Button(vec(0,395), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Host Game", on_click = lambda: self.start_game(enums.ClientType.HOST),**btn_dict),
             Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
-            Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
+            # Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
         ])
 
         
@@ -71,24 +68,9 @@ class NewGame(Page):
         
         self.set_background(f'{constants.IMAGES_PATH}ui\\bg_main_menu.png')
         
-        #debug
-        self.summary = None
     
     def teste(self):
-        p1_result = WaveResult(
-            player_character = enums.Characters.CARLOS,
-            score = 2500,
-            money = 1125,
-            kills_count = 27
-            )
-        p2_result = WaveResult(
-            player_character = enums.Characters.CLEITON,
-            score = 780,
-            money = 430.5,
-            kills_count = 12
-            )
-        
-        self.summary = WaveSummary((p1_result, p2_result))
+        print('teste')
         
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
@@ -96,6 +78,8 @@ class NewGame(Page):
         self.logo_anim(0.1)
         self.txt_ip_input.update(events)
         self.txt_port_input.update(events)
+        
+        
     
         return super().update(**kwargs)
     
@@ -122,9 +106,6 @@ class NewGame(Page):
         
         super().draw()
         
-        #debug
-        if self.summary != None:
-            self.summary.draw(self.screen)
         
         
     def start_game(self, client_type: enums.ClientType):

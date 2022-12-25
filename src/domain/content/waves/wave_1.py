@@ -12,6 +12,7 @@ class Wave_1(Wave):
         self.wave_step = 3
         self.total_enemies = 10   
         self.current_wave_step = self.wave_step
+        self.wave_interval_s = 60
           
         self.roger_data = {
             "movement_speed": 0.12,
@@ -26,7 +27,7 @@ class Wave_1(Wave):
 
         if self.spawn_count >= self.total_enemies:
             if self.enemies_count == 0:
-                self.end_wave()
+                self.delay_end_wave(1500)
         
         elif self.current_wave_step >= self.wave_step:
             self.current_wave_step = 0
