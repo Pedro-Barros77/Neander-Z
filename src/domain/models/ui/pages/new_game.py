@@ -29,6 +29,7 @@ class NewGame(Page):
             Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
             Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
         ])
+
         
         for b in self.buttons:
             b.rect.centerx = self.screen.get_rect().centerx
