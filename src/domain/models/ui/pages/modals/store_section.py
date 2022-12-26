@@ -8,7 +8,7 @@ from domain.models.ui.button import Button
 from domain.models.ui.pages.modals.modal import Modal
 
 class Store:
-    def __init__(self, player: Player, **kwargs):
+    def __init__(self, player, **kwargs):
         
         self.player = player
 

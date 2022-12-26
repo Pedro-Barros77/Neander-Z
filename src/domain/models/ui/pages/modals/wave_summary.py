@@ -18,7 +18,7 @@ class WaveSummary(Modal):
         self.p2_ready = False
         self.timed_out = False
         self.tab_index = 0
-        self.store_section = Store(self.P1_RESULT.player)
+        self.store_section = Store(None)
         self.start_time = kwargs.pop("start_time", datetime.datetime.now())
         
         btn_dict = {
@@ -77,12 +77,12 @@ class WaveSummary(Modal):
         _player_panels_margin = vec(30, 0)
        
         wave_title = menu_controller.get_text_surface(f'Survived Wave {self.P1_RESULT.wave_number}', colors.RED, self.font(80))
-        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player.character.value}\\head_icon.png'), 4)
-        p1_title = menu_controller.get_text_surface(self.P1_RESULT.player.character.value, colors.WHITE, self.font(60))
+        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player_character.value}\\head_icon.png'), 4)
+        p1_title = menu_controller.get_text_surface(self.P1_RESULT.player_character.value, colors.WHITE, self.font(60))
         
         if self.P2_RESULT != None:
-            p2_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player.character.value}\\head_icon.png'), 4)
-            p2_title = menu_controller.get_text_surface(self.P2_RESULT.player.character.value, colors.WHITE, self.font(60))
+            p2_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player_character.value}\\head_icon.png'), 4)
+            p2_title = menu_controller.get_text_surface(self.P2_RESULT.player_character.value, colors.WHITE, self.font(60))
 
         lbl_score = menu_controller.get_text_surface("wave score:", colors.WHITE, self.font(28))
         lbl_money = menu_controller.get_text_surface("earned money:", colors.WHITE, self.font(28))
@@ -174,6 +174,8 @@ class WaveSummary(Modal):
         
         for b in self.buttons:
             if b.text == "P2":
+                if self.P2_RESULT == None:
+                    continue
                 b.rect.left = self.buttons[2].rect.right
                 b.rect.centery = self.buttons[2].rect.centery
                 if self.p2_ready:

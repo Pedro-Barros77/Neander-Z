@@ -12,6 +12,7 @@ from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.ui.pages.page import Page
 from domain.models.ui.pages.modals.wave_summary import WaveSummary
+from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.wave_1 import Wave_1
 from domain.content.weapons.small_bullet import SmallBullet
@@ -199,8 +200,6 @@ class Game(Page):
                 player_speed = (self.player.speed.x, self.player.speed.y),
                 player_health = self.player.health,
                 
-                player2_score = self.player2.score,
-                
                 player_acceleration = (self.player.acceleration.x, self.player.acceleration.y),
                 command_id = self.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
@@ -218,10 +217,13 @@ class Game(Page):
             data.player_wave_ready = self.wave_summary.p1_ready
         
         if self.client_type == enums.ClientType.HOST:
+            data.player2_score = self.player2.score
+            
             _enemies = [e.get_netdata() for e in self.current_wave.enemies_group.sprites()]
             data.enemies = _enemies
             
-            data.wave_results = None if self.wave_summary == None else (self.wave_summary.P2_RESULT, self.wave_summary.P1_RESULT)
+            data.wave_results = [] if self.wave_summary == None else [self.wave_summary.P2_RESULT.get_netdata(), self.wave_summary.P1_RESULT.get_netdata()]
+        
         return data
     
         
@@ -236,6 +238,8 @@ class Game(Page):
         
         if self.client_type == enums.ClientType.GUEST:
             self.player.score = data.player2_score
+            if len(data.wave_results) > 0 and self.wave_summary == None:
+                self.wave_summary = WaveSummary((WaveResult().load_netdata(data.wave_results[0]),WaveResult().load_netdata(data.wave_results[1])))
             
         if self.wave_summary != None:
             self.wave_summary.p2_ready = data.player_wave_ready
@@ -295,9 +299,7 @@ class Game(Page):
                 else:
                     if len(current_bullets_ids) < len(data.bullets) and b_data['id'] not in current_bullets_ids:
                         self.create_netdata_bullet(b_data)
-        
-        if data.wave_results != None and self.wave_summary == None:
-            self.wave_summary = WaveSummary(data.wave_results)
+                     
         self.player.player2_rect = self.player2.rect
     
     def create_netdata_enemy(self, data: dict):
@@ -397,12 +399,10 @@ class Game(Page):
 
     def send_restart(self):
         self.command_id = int(enums.Command.RESTART_GAME)
-        print("restartando")
             
         import time
-        time.sleep(0.1)
+        time.sleep(0.5)
         game_controller.restart_game(self)
-        print("iih passou")
 
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
@@ -411,10 +411,11 @@ class Game(Page):
             self.wave_summary.update()
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
-                print("acabou")
-                
-                
-                self.send_restart()
+                self.wave_summary = None
+                if self.client_type == enums.ClientType.SINGLE:
+                    game_controller.restart_game(self)
+                else:
+                    self.send_restart()
             return
         
         game_controller.handle_events(self, events)
@@ -453,6 +454,12 @@ class Game(Page):
         if pygame.K_DELETE in self.pressed_keys:
             self.current_wave.kill_all()
             self.pressed_keys.remove(pygame.K_DELETE)
+        if pygame.K_t in self.pressed_keys:
+            data = self.get_net_data()
+            buff = data._get_buffer()
+            data2 = NetData()
+            data2._load_buffer(buff)
+            self.pressed_keys.remove(pygame.K_t)
     
        
     def draw(self):

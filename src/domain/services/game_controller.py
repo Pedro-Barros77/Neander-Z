@@ -3,7 +3,6 @@ from pygame.math import Vector2 as vec
 import math
 import os
 
-from domain.models.network_data import Data as NetData
 from domain.utils import constants, enums
 from domain.services import menu_controller
 
@@ -16,6 +15,9 @@ enemy_target_groups = []
 enemies_count = 0
 bullets_count = 0
 
+_enemy_netdata_keys = None
+_bullet_netdata_keys = None
+_waveresult_netdata_keys = None
 
 def get_enemy_id():
     global enemies_count
@@ -117,7 +119,6 @@ def rotate_to_angle(image: pygame.Surface, pos:vec, angle: float):
 
 def rotate_image(image: pygame.Surface, angle: float):
     rotated_image = pygame.transform.rotate(image, angle)
-    # new_rect = rotated_image.get_rect(center = image.get_rect().center)
     return rotated_image
 
 def point_to_angle_distance(pos: vec,distance: float, angle_in_radians: float):
@@ -157,6 +158,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         port (int): The port number of the server.
     """   
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client.settimeout(timeout)
     # trying to connect to host
     client.sendto('CONNECT'.encode('utf-8'), (host, port))
     
@@ -172,7 +174,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         else:
             client.close()
             return False
-    except ConnectionResetError:
+    except (ConnectionResetError, TimeoutError):
         client.close()
         return False
 
@@ -189,21 +191,18 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
     """ 
     while menu_controller.playing:
         
-        data_to_send = game.get_net_data()
+        net_data = game.get_net_data()
+        data_to_send = net_data._get_buffer()
         
-        client.sendto(class_to_json(data_to_send), remote_address)
-        received_buffer = client.recvfrom(8192)[0]
-        # print(len(received_buffer))
+        client.sendto(data_to_send, remote_address)
+        received_buffer = client.recvfrom(4096)[0]
         
-        json_string: str = received_buffer.decode('utf-8')
-        data: NetData = json_to_class(json_string)
+        net_data._load_buffer(received_buffer)
+        print(len(received_buffer))
         
-        if not data:
-            continue
-        else:
-            game.handle_received_data(data)
+        game.handle_received_data(net_data)
             
-        time.sleep(0.015)
+        time.sleep(0.01)
               
     
     print("closing connection")

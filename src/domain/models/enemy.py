@@ -126,10 +126,10 @@ class Enemy(pygame.sprite.Sprite):
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        # if not self.attacking:
-        #     self.acceleration.x += self.speed.x * game.friction
-        #     self.speed.x += self.acceleration.x
-        #     self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        if not self.attacking:
+            self.acceleration.x += self.speed.x * game.friction
+            self.speed.x += self.acceleration.x
+            self.pos.x += self.speed.x + 0.5 * self.acceleration.x
         
         # Gravity
         game.apply_gravity(self)

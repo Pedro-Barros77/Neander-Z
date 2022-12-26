@@ -50,9 +50,10 @@ class Wave():
 
     def end_wave(self):
         self.players_scores[1].money = (self.players_scores[1].score / 4) * self.money_multiplier
-        self.players_scores[1].player = self.game.player
+        self.players_scores[1].player_character = self.game.player.character
         self.players_scores[2].money = (self.players_scores[2].score / 4) * self.money_multiplier
-        self.players_scores[2].player = self.game.player2
+        if self.game.client_type != enums.ClientType.SINGLE:
+            self.players_scores[2].player_character = self.game.player2.character
         
         self.players_scores[1].wave_interval_s = self.wave_interval_s
         self.players_scores[2].wave_interval_s = self.wave_interval_s
@@ -88,7 +89,6 @@ class Wave():
     
         if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:
             self.end_wave()
-        # print(self.spawn_count)
     
     def draw(self, screen: pygame.Surface, offset: vec):
         for e in self.enemies_group.sprites():
