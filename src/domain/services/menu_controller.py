@@ -1,8 +1,8 @@
-import pygame, sys
+import pygame, sys, datetime
 from pygame.math import Vector2 as vec
 
 from domain.services.save_manager import SaveManager
-from domain.utils import constants, enums
+from domain.utils import constants, enums, math_utillity as math, colors
 from domain.models.ui.popup_text import Popup
 
 pages_history: list = []
@@ -72,6 +72,37 @@ def start_page(page):
     pygame.key.set_repeat(200, 25)
     pages_history.append(page)
     app_loop()
+
+def fade_out_color(color: tuple[int,int,int], start_alpha: int, start_time: datetime.datetime, end_time: datetime.datetime):
+        
+        now = datetime.datetime.now().timestamp()
+        start = start_time.timestamp()
+        end = end_time.timestamp()
+        
+        if start > now:
+            return colors.alpha_or_default(color, start_alpha)
+        
+        percentage = ((now - start) / (end - start)) * 100
+        percentage = math.clamp(percentage, 0, 100)
+        alpha = (start_alpha*(100-percentage))/100
+        alpha = math.clamp(alpha, 0, start_alpha)
+        return colors.set_alpha(color, int(alpha))
+
+def fade_in_color(color: tuple[int,int,int], target_alpha: int, start_time: datetime.datetime, end_time: datetime.datetime):
+        
+        now = datetime.datetime.now().timestamp()
+        start = start_time.timestamp()
+        end = end_time.timestamp()
+        
+        if start > now:
+            return colors.alpha_or_default(color, 0)
+        
+        percentage = ((now - start) / (end - start)) * 100
+        percentage = math.clamp(percentage, 0, 100)
+        alpha = (target_alpha*percentage)/100
+        alpha = math.clamp(alpha, 0, target_alpha)
+        return colors.set_alpha(color, int(alpha))
+        
 
 def app_loop():
     global pages_history, playing

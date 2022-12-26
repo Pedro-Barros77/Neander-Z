@@ -36,6 +36,7 @@ class AnimActions(Enum):
     FALL_GROUND = "fall_ground"
     IDLE = "idle"
     ATTACK = "attack"
+    DEATH = "death"
     
 class Command(Enum):
     RESTART_GAME = 1

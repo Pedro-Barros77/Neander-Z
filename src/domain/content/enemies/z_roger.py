@@ -1,4 +1,4 @@
-import pygame
+import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums
@@ -32,11 +32,16 @@ class ZRoger(Enemy):
     def update(self, **kwargs):
         super().update(**kwargs)
         
-        if self.running:
+        if self.running and self.death_time == None:
             self.run_anim(abs(self.speed.x / 5))
-        
-        if self.attacking:
+                    
+        if self.attacking and self.death_time == None:
             self.attcking_anim(0.2)
+        
+        if self.dying and self.death_time == None:
+            self.dying_anim(0.2)
+            
+
 
     def attack(self):
         self.hiting = True
@@ -49,6 +54,7 @@ class ZRoger(Enemy):
             
         
     def run_anim(self, speed: float):
+       
         self.run_frame += speed
         if self.run_frame > len(self.run_frames)-1:
             self.run_frame = 0
@@ -68,7 +74,16 @@ class ZRoger(Enemy):
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
+    def dying_anim(self, speed: float):
+        self.death_frame += speed
+        if self.death_frame > len(self.death_frames)-1:
+            self.death_time = datetime.datetime.now()
+            self.death_frame = 0
+        else:
+            self.image = game_controller.scale_image(self.death_frames[int(self.death_frame)], self.image_scale)
+        if self.acceleration.x > 0 and self.death_time == None:
+            self.image = pygame.transform.flip(self.image, True, False)
     
-    def draw(self, surface: pygame.Surface, offset: vec):
+    def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
         

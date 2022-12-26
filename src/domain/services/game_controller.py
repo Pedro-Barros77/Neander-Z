@@ -157,6 +157,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         port (int): The port number of the server.
     """   
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client.settimeout(timeout)
     # trying to connect to host
     client.sendto('CONNECT'.encode('utf-8'), (host, port))
     
@@ -172,9 +173,10 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
         else:
             client.close()
             return False
-    except ConnectionResetError:
+    except (ConnectionResetError, TimeoutError):
         client.close()
         return False
+       
 
 send_count = 0
 receive_count = 0
@@ -192,8 +194,8 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         data_to_send = game.get_net_data()
         
         client.sendto(class_to_json(data_to_send), remote_address)
-        received_buffer = client.recvfrom(8192)[0]
-        # print(len(received_buffer))
+        received_buffer = client.recvfrom(32768)[0]
+        print(len(received_buffer))
         
         json_string: str = received_buffer.decode('utf-8')
         data: NetData = json_to_class(json_string)

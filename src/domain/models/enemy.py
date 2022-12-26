@@ -1,4 +1,4 @@
-import pygame
+import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
@@ -23,6 +23,11 @@ class Enemy(pygame.sprite.Sprite):
         self.health = kwargs.pop("health", 30)
         self.attack_targets = game_controller.enemy_target_groups
         self.client_type = enums.ClientType.UNDEFINED
+
+        self.killer = 0
+        self.death_time: datetime.datetime = None
+        self.fade_out_ms = 1000
+        self.image_alpha = 255
         
         
         
@@ -46,8 +51,13 @@ class Enemy(pygame.sprite.Sprite):
         self.attack_frame = 0
         attack_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.ATTACK)
         self.attack_frames = game_controller.load_sprites(attack_folder)
+
+        self.dying = False
+        self.death_frame = 0
+        death_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.DEATH)
+        self.death_frames = game_controller.load_sprites(death_folder)
         
-        self.image = game_controller.scale_image(self.run_frames[0], self.image_scale)
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale)
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()
@@ -75,8 +85,8 @@ class Enemy(pygame.sprite.Sprite):
         return closest
     
     def client_update(self, **kwargs):
-        if not self.is_alive:
-            self.kill()
+        if not self.is_alive or self.dying:
+            return
             
         game = kwargs.pop("game", None)
         player = self.get_closest_player(game.player, game.player2)
@@ -93,11 +103,11 @@ class Enemy(pygame.sprite.Sprite):
         if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
             self.attacking = True
         
-        self.health_bar.update()
+        
             
     def host_update(self, **kwargs):
-        if not self.is_alive:
-            self.kill()
+        if not self.is_alive or self.dying or self.death_time != None:
+            return
             
         game = kwargs.pop("game", None)
         player = self.get_closest_player(game.player, game.player2)
@@ -126,10 +136,10 @@ class Enemy(pygame.sprite.Sprite):
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        # if not self.attacking:
-        #     self.acceleration.x += self.speed.x * game.friction
-        #     self.speed.x += self.acceleration.x
-        #     self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        if not self.attacking and not self.dying:
+            self.acceleration.x += self.speed.x * game.friction
+            self.speed.x += self.acceleration.x
+            self.pos.x += self.speed.x + 0.5 * self.acceleration.x
         
         # Gravity
         game.apply_gravity(self)
@@ -146,13 +156,16 @@ class Enemy(pygame.sprite.Sprite):
         if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
             self.attacking = True
 
-        self.health_bar.update()
+        
     
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
     
     def update(self, **kwargs):
         self.client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)
+        self.health_bar.update()
+        if not self.is_alive and self.death_time != None:
+            self.fade_out_anim()
         if self.client_type == enums.ClientType.GUEST:
             self.client_update(**kwargs)
         else:
@@ -162,11 +175,29 @@ class Enemy(pygame.sprite.Sprite):
 
        
     def draw(self, surface: pygame.Surface, offset: vec):
+        _result = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
+        _result.blit(self.image, (0,0))
+        _result.set_alpha(self.image_alpha)
+        surface.blit(_result, self.pos - offset)
+
+
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset
-        surface.blit(self.image, self.pos - offset)
+        _result_health_bar = pygame.Surface(self.health_bar.image.get_size(), pygame.SRCALPHA)
+        _result_health_bar.blit(self.health_bar.image, (0,0))
+        self.health_bar.image = _result_health_bar
+        self.health_bar.image.set_alpha(self.image_alpha)
         self.health_bar.draw(surface, vec(0,0))
+        
         self.player_offset = offset
 
+    def fade_out_anim(self):
+        anim_end = (self.death_time + datetime.timedelta(milliseconds=self.fade_out_ms))
+        
+        self.image_alpha = menu_controller.fade_out_color(colors.WHITE, 255, self.death_time, anim_end)[3]
+
+        if self.image_alpha <= 0:
+            self.kill(self.killer)
+        
         
     def kill(self, attacker):
         self.wave.handle_score(self.enemy_name, attacker)
@@ -192,15 +223,22 @@ class Enemy(pygame.sprite.Sprite):
     def take_damage(self, value: float, attacker = None):
         # if attacker != None:
             
-        if value < 0:
+        if value < 0 or self.dying:
             return
         self.health_bar.remove_value(value)
         
         self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
         
         if self.health_bar.target_value <= 0:
-            self.is_alive = False
-            self.kill(attacker)
+            if not self.dying:
+                self.killer = attacker
+                self.is_alive = False
+                self.running = False
+                self.attacking = False
+                
+            self.dying = True
+            
+                
         
         menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["damage"]))
         return not self.is_alive
@@ -239,7 +277,8 @@ class Enemy(pygame.sprite.Sprite):
             # animation states
             "running": self.running,
             "attacking": self.attacking,
-            "grounded": self.grounded
+            "grounded": self.grounded,
+            "dying": self.dying
         }
         return values
     

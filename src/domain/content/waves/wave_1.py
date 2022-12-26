@@ -10,7 +10,7 @@ class Wave_1(Wave):
         super().__init__(game, **kwargs)
         self.max_alive_enemies = 5
         self.wave_step = 3
-        self.total_enemies = 10   
+        self.total_enemies = 50
         self.current_wave_step = self.wave_step
         self.wave_interval_s = 60
           

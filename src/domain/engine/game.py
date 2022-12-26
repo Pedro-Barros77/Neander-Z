@@ -232,6 +232,7 @@ class Game(Page):
             data (NetData): An object containing the transfered data.
         """
         if data.command_id == int(enums.Command.RESTART_GAME):
+            self.wave_summary = None
             game_controller.restart_game(self)
         
         if self.client_type == enums.ClientType.GUEST:
@@ -397,12 +398,11 @@ class Game(Page):
 
     def send_restart(self):
         self.command_id = int(enums.Command.RESTART_GAME)
-        print("restartando")
-            
+                    
         import time
         time.sleep(0.1)
         game_controller.restart_game(self)
-        print("iih passou")
+
 
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
@@ -411,8 +411,7 @@ class Game(Page):
             self.wave_summary.update()
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
-                print("acabou")
-                
+            
                 
                 self.send_restart()
             return
