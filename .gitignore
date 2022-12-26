@@ -1,11 +1,13 @@
 /.vscode
 .save
+/Neander-Z_Game
 
 # Pygame build process: config.py setup.py
 /Setup
 *.pyc
 /build/
 /src_py/version.py
+*.spec
 
 # Windows prebuilt external libraries
 /prebuilt-x??

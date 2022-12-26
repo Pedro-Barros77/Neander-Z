@@ -4,13 +4,31 @@ from pygame.math import Vector2 as vec
 from domain.utils import enums
 from domain.utils import colors
 
+DEV_ENV = True
+
+SRC_DOMAIN = "src\\domain\\"
+
+
+if not DEV_ENV:
+    SRC_DOMAIN = ""
+
+
 ROOT_PATH = f'{os.getcwd()}\\'
 
-IMAGES_PATH = "src\\domain\\resources\\images\\"
-FONTS_PATH = "src\\domain\\resources\\fonts\\"
+IMAGES_PATH = f"{SRC_DOMAIN}resources\\images\\"
+
+
+FONTS_PATH = f"{ROOT_PATH}{SRC_DOMAIN}resources\\fonts\\"
 PIXEL_FONT = f'{FONTS_PATH}runescape_uf.ttf'
 
-SAVE_PATH = f'{ROOT_PATH}src\\saves\\'
+if DEV_ENV:
+    SAVE_PATH = f'{ROOT_PATH}src\\saves\\'
+else:
+    SAVE_PATH = f'{ROOT_PATH}saves\\'
+
+
+
+
 
 GRAVEYARD_MAP = f"{IMAGES_PATH}map_graveyard.png"
 
@@ -18,7 +36,6 @@ ZOMBIE_1 = f"{IMAGES_PATH}enemies\\zombie_1.png"
 
 PISTOL_FOLDER = f"{IMAGES_PATH}weapons\\pistol\\"
 SMALL_BULLET = f"{IMAGES_PATH}weapons\\small_bullet\\01.png"
-
 
 def get_character_frames(charac_name: enums.Characters, action: enums.AnimActions):
     if action == enums.AnimActions.IDLE:

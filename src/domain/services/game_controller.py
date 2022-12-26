@@ -1,4 +1,4 @@
-import pygame, socket, threading, time, jsonpickle, importlib
+import pygame, socket, threading, time
 from pygame.math import Vector2 as vec
 import math
 import os
@@ -211,26 +211,3 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
     print("closing connection")
     client.close()
     
-    
-def class_to_json(data):
-    """Encodes the class object to a json object.
-
-    Args:
-        data (class): The object to be converted.
-
-    Returns:
-        list[byte]: A array of bytes containing a json string version of the class.
-    """    
-    return jsonpickle.encode(data).encode('utf-8')
-
-def json_to_class(data):
-    """Decodes the json string to a class object.
-
-    Args:
-        data (list[byte]): A array of bytes containing a json string version of the class.
-
-    Returns:
-        class: The converted class object.
-    """  
-
-    return jsonpickle.decode(data)

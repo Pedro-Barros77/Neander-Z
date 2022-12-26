@@ -53,7 +53,7 @@ class TextInput:
         self.tab_callback = kwargs.pop("tab_callback", self._process_tab)
         """The function to be called when pressing the tab key. The default is to add 4 spaces."""
         
-        self._font_object = kwargs.pop("font", pygame.font.Font(pygame.font.get_default_font(), 25))
+        self._font_object = kwargs.pop("font", pygame.font.SysFont('arial', 25))
         self._antialias = kwargs.pop("antialias", True)
         self._font_color = kwargs.pop("font_color", colors.BLACK)
         
