@@ -461,6 +461,13 @@ class Game(Page):
             data2 = NetData()
             data2._load_buffer(buff)
             self.pressed_keys.remove(pygame.K_t)
+            
+        if self.player.pos.y > self.map.rect.height:
+            self.player.pos.y = 0
+            self.player.update_rect()
+        if self.client_type != enums.ClientType.SINGLE and self.player2.pos.y > self.map.rect.height:
+            self.player2.pos.y = 0
+            self.player2.update_rect()
     
        
     def draw(self):

@@ -190,16 +190,18 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         client (socket.socket): The client object.
         player_id (int): The ID of the player executing this function.
     """ 
+    client.settimeout(2)
     while menu_controller.playing:
         
+        #sending
         net_data = game.get_net_data()
         data_to_send = net_data._get_buffer()
-        
         client.sendto(data_to_send, remote_address)
-        received_buffer = client.recvfrom(4096)[0]
         
+        #receiving
+        received_buffer = client.recvfrom(4096)[0]
         net_data._load_buffer(received_buffer)
-        print(len(received_buffer))
+        # print(len(received_buffer))
         
         game.handle_received_data(net_data)
             
