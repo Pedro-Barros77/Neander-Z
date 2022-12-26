@@ -177,6 +177,7 @@ def try_enter_game(game, host: str, port: int, timeout = 2):
     except (ConnectionResetError, TimeoutError):
         client.close()
         return False
+       
 
 send_count = 0
 receive_count = 0

@@ -234,6 +234,7 @@ class Game(Page):
             data (NetData): An object containing the transfered data.
         """
         if data.command_id == int(enums.Command.RESTART_GAME):
+            self.wave_summary = None
             game_controller.restart_game(self)
         
         if self.client_type == enums.ClientType.GUEST:

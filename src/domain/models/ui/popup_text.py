@@ -2,6 +2,7 @@ import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, math_utillity as math
+from domain.services import menu_controller
 
 class Popup(pygame.sprite.Sprite):
     def __init__(self, text: str, pos: vec, **kwargs) -> None:
@@ -92,21 +93,21 @@ class Popup(pygame.sprite.Sprite):
     def _fade_in_anim(self):
         anim_end = (self._show_time + datetime.timedelta(milliseconds=self.fade_in_ms))
         
-        self._current_text_color = self._fade_in_color(self.text_color, colors.alpha_or_default(self.text_color, 255)[3], self._show_time, anim_end)
+        self._current_text_color = menu_controller.fade_in_color(self.text_color, colors.alpha_or_default(self.text_color, 255)[3], self._show_time, anim_end)
         if self.background_color != None:
-            self._current_background_color = self._fade_in_color(self.background_color, colors.alpha_or_default(self.background_color, 255)[3], self._show_time, anim_end)
+            self._current_background_color = menu_controller.fade_in_color(self.background_color, colors.alpha_or_default(self.background_color, 255)[3], self._show_time, anim_end)
         if self.border_color != None:
-            self._current_border_color = self._fade_in_color(self.border_color, colors.alpha_or_default(self.border_color, 255)[3], self._show_time, anim_end)
+            self._current_border_color = menu_controller.fade_in_color(self.border_color, colors.alpha_or_default(self.border_color, 255)[3], self._show_time, anim_end)
     
     
     def _fade_out_anim(self):
         anim_end = (self._hide_time + datetime.timedelta(milliseconds=self.fade_out_ms))
         
-        self._current_text_color = self._fade_out_color(self.text_color, colors.alpha_or_default(self.text_color, 255)[3], self._hide_time, anim_end)
+        self._current_text_color = menu_controller.fade_out_color(self.text_color, colors.alpha_or_default(self.text_color, 255)[3], self._hide_time, anim_end)
         if self.background_color != None:
-            self._current_background_color = self._fade_out_color(self.background_color, colors.alpha_or_default(self.background_color, 255)[3], self._hide_time, anim_end)
+            self._current_background_color = menu_controller.fade_out_color(self.background_color, colors.alpha_or_default(self.background_color, 255)[3], self._hide_time, anim_end)
         if self.border_color != None:
-            self._current_border_color = self._fade_out_color(self.border_color, colors.alpha_or_default(self.border_color, 255)[3], self._hide_time, anim_end)
+            self._current_border_color = menu_controller.fade_out_color(self.border_color, colors.alpha_or_default(self.border_color, 255)[3], self._hide_time, anim_end)
     
     def update(self, **kwargs):
         """Updates the popup. Can be called from sprite group.update()."""
@@ -146,33 +147,6 @@ class Popup(pygame.sprite.Sprite):
         self.image = self.rerender()
         screen.blit(self.image, self.rect)
         
-    def _fade_out_color(self, color: tuple[int,int,int], start_alpha: int, start_time: datetime.datetime, end_time: datetime.datetime):
-        
-        now = datetime.datetime.now().timestamp()
-        start = start_time.timestamp()
-        end = end_time.timestamp()
-        
-        if start > now:
-            return colors.alpha_or_default(color, start_alpha)
-        
-        percentage = ((now - start) / (end - start)) * 100
-        percentage = math.clamp(percentage, 0, 100)
-        alpha = (start_alpha*(100-percentage))/100
-        alpha = math.clamp(alpha, 0, start_alpha)
-        return colors.set_alpha(color, int(alpha))
     
-    def _fade_in_color(self, color: tuple[int,int,int], target_alpha: int, start_time: datetime.datetime, end_time: datetime.datetime):
-        
-        now = datetime.datetime.now().timestamp()
-        start = start_time.timestamp()
-        end = end_time.timestamp()
-        
-        if start > now:
-            return colors.alpha_or_default(color, 0)
-        
-        percentage = ((now - start) / (end - start)) * 100
-        percentage = math.clamp(percentage, 0, 100)
-        alpha = (target_alpha*percentage)/100
-        alpha = math.clamp(alpha, 0, target_alpha)
-        return colors.set_alpha(color, int(alpha))
-        
+    
+    
