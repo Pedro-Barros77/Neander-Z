@@ -75,8 +75,10 @@ def restart_game(game):
     Args:
         game (domain.engine.game): The game to be restarted.
     """
+    pygame.mixer.music.stop()
+    if game.client_type != enums.ClientType.GUEST:
+        game.command_id = 0
     game.pressed_keys = []
-    game.command_id = 0
     game.map.rect.left = 0
     game.reset_game()
     
@@ -203,7 +205,7 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         #receiving
         received_buffer = client.recvfrom(4096)[0]
         net_data._load_buffer(received_buffer)
-        print(len(received_buffer))
+        # print(len(received_buffer))
         
         game.handle_received_data(net_data)
             

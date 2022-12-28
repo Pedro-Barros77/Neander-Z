@@ -11,7 +11,7 @@ class SmallBullet(pygame.sprite.Sprite):
         
         self.id = id
         self.owner = owner
-        self.image = pygame.image.load(constants.SMALL_BULLET)
+        self.image = pygame.image.load(constants.SMALL_BULLET).convert()
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.angle = angle

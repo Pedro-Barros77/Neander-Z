@@ -57,7 +57,7 @@ class Enemy(pygame.sprite.Sprite):
         death_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.DEATH)
         self.death_frames = game_controller.load_sprites(death_folder)
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale)
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale).convert()
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()

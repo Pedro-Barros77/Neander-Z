@@ -12,7 +12,7 @@ class Map(pygame.sprite.Sprite):
         self.floor_y = kwargs.pop("floor_y", 20)
         """The vertical distance from the bottom of the screen to the map floor.""" 
         
-        self.image = game_controller.scale_image(pygame.image.load(image), 1.5)
+        self.image = game_controller.scale_image(pygame.image.load(image), 1.5).convert()
         """The map image/surface.""" 
         
         self.size = self.image.get_size()

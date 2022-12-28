@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, time
 from datetime import datetime
 from pygame.math import Vector2 as vec
 
@@ -97,13 +97,12 @@ class Game(Page):
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.bullets_group = pygame.sprite.Group()
 
-        
-        
         self.reset_game()
         
         # exec(recyclables.create_box)
         if self.client_type != enums.ClientType.SINGLE:
             self.jumpable_group.add(self.player2)
+            
             
     def reset_game(self):
         """Resets all players attributes to default values.
@@ -115,7 +114,6 @@ class Game(Page):
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_group]
         game_controller.enemy_target_groups = [self.players_group]
-        menu_controller.play_music(constants.WAVE_1, 0.1, -1)
         self.gravity_accelaration = 0.5
         self.friction = -0.12
         
@@ -167,6 +165,7 @@ class Game(Page):
         
         if self.client_type != enums.ClientType.GUEST:
             self.current_wave.start()
+            
 
     def end_wave(self, result):
         _p1 = self.player.net_id if self.player.net_id != 3 else 1
@@ -241,7 +240,7 @@ class Game(Page):
                 player_running = self.player.running,
                 player_jumping = self.player.jumping,
                 player_turning_dir = self.player.turning_dir,
-                player_firing = self.player.firing
+                player_firing = self.player.current_weapon.firing
             )
         
         _bullets = [b.get_netdata() for b in self.bullets_group.sprites() if b.owner == self.player.net_id]
@@ -434,12 +433,14 @@ class Game(Page):
     def send_restart(self):
         self.command_id = int(enums.Command.RESTART_GAME)
             
-        import time
         time.sleep(0.5)
         game_controller.restart_game(self)
 
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
+        
+        if not pygame.mixer.music.get_busy():
+            menu_controller.play_music(constants.WAVE_1, 0.1, -1)
         
         if self.wave_summary != None:
             self.wave_summary.update()
@@ -448,16 +449,17 @@ class Game(Page):
                 self.wave_summary = None
                 if self.client_type == enums.ClientType.SINGLE:
                     game_controller.restart_game(self)
-                else:
+                elif self.client_type == enums.ClientType.HOST:
                     self.send_restart()
             return
         
         game_controller.handle_events(self, events)
         
-        if pygame.K_r in self.pressed_keys and \
-            (self.client_type != enums.ClientType.GUEST):
-                
-            self.send_restart()
+        if pygame.K_r in self.pressed_keys:
+            if self.client_type == enums.ClientType.SINGLE:
+                game_controller.restart_game(self)
+            elif self.client_type == enums.ClientType.HOST:
+                self.send_restart()
             
         # p1
         self.player.update(game = self)
@@ -503,6 +505,7 @@ class Game(Page):
         if self.client_type != enums.ClientType.SINGLE and self.player2.pos.y > self.map.rect.height:
             self.player2.pos.y = 0
             self.player2.update_rect()
+        
     
        
     def draw(self):

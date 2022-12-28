@@ -131,6 +131,7 @@ class NewGame(Page):
                 menu_controller.playing = True
                 game_controller.host_game(game, ip, int(port))
                 
+                
             case enums.ClientType.GUEST:
                 menu_controller.playing = True
                 succeeded = game_controller.try_enter_game(game, ip, int(port), timeout=0.3)
@@ -142,8 +143,8 @@ class NewGame(Page):
                     menu_controller.playing = False
                     return
         
+        pygame.mixer.music.stop()
         menu_controller.pages_history.append(game)
-        menu_controller.play_music(constants.WAVE_1, 0.1, -1)
 
         
                 

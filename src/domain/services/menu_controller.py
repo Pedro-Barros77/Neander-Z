@@ -1,4 +1,5 @@
 import pygame, sys, datetime
+from pygame import locals as ls
 from pygame.math import Vector2 as vec
 
 from domain.services.save_manager import SaveManager
@@ -110,11 +111,12 @@ def play_music(music_name, volume: float, repeat_count: int = -1 ):
     pygame.mixer.music.play(repeat_count)
     
         
-
 clock = pygame.time.Clock()
 def app_loop():
+    
+    pygame.event.set_allowed([ls.QUIT, ls.KEYDOWN, ls.KEYUP, ls.MOUSEMOTION, ls.MOUSEBUTTONDOWN, ls.MOUSEBUTTONUP, ls.USEREVENT])
     global clock, pages_history, playing
-    while True:
+    while 1:
         _events = pygame.event.get()
         for event in _events:
             if event.type == pygame.QUIT:

@@ -49,7 +49,7 @@ class Player(pygame.sprite.Sprite):
         self.image_scale = 2
         """How much the image will be scaled from original file."""
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale)
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale).convert()
         """The surface of the player."""
         	
         self.rect = self.image.get_rect()
