@@ -111,7 +111,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_sounds = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\jump\\{self.character.value}\\jump.mp3')
         self.fall_sound = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\fall_ground\\{self.character.value}\\fall_ground.mp3')
 
-        
+        self.reload_popup: Popup = None
         
         if self.is_player1:
             self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
@@ -201,6 +201,21 @@ class Player(pygame.sprite.Sprite):
         _target_offset = offset if not self.is_player1 else vec(0,0)
         
         surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft) - _target_offset)
+
+        #popup
+        if self.current_weapon.magazine_bullets == 0:
+            if self.reload_popup == None:
+                self.reload_popup = Popup("Reload: R", vec(self.rect.centerx, self.rect.top - 50) - _target_offset, name="Reload: R", unique= True, **constants.POPUPS["blink"])
+                menu_controller.popup(self.reload_popup)
+            else:
+                self.reload_popup.rect.centerx = self.rect.centerx - self.offset_camera.x
+                self.reload_popup.rect.bottom = self.rect.top - 10 - self.offset_camera.y
+                if self.current_weapon.total_ammo == 0:
+                    self.reload_popup.text = "No ammo!"
+        elif self.reload_popup != None:
+           self.reload_popup.destroy()
+           self.reload_popup = None
+        
         if not self.is_player1:
             self.health_bar.draw(surface, _target_offset)
         

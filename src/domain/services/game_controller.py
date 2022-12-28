@@ -38,7 +38,7 @@ def handle_events(game, events: list[pygame.event.Event]):
     for event in events:
         if event.type == pygame.QUIT:
              menu_controller.quit_app()
-        elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+        elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] and game.focused:
             _bullet = game.player.shoot()
             if _bullet != None:
                 game.bullets_group.add(_bullet)
