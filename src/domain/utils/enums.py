@@ -57,15 +57,22 @@ class SFXType(Enum):
     UI = "ui"
     WEAPONS = "weapons"
     SFX_PLAYER = "sfx_player"
+
 class SFXActions(Enum):
     SHOOT = "shoot"
     RELOAD = "reload"
     CLICKED = "clicked"
     JUMP = "jump"
+    HOVER = "hover"
+    EMPTY_M = "empty"
 
 class SFXName(Enum):
     P_1911 = "1911.mp3"
+    RELOAD_1911 = "reload_1911.mp3"
+    EMPTY_1911 = "empty_1911.mp3"
     BTN_CLICK = "btn_click.mp3"
+    BTN_HOVER = "btn_hover.mp3"
+    
 
 
 

@@ -149,6 +149,8 @@ class Game(Page):
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
         self.player.money = 0
+        self.player.current_weapon.magazine_bullets = self.player.current_weapon.magazine_size
+        self.player.current_weapon.total_ammo = self.player.current_weapon.start_total_ammo
 
         self.player.load_state(menu_controller.player_state)
         
@@ -166,6 +168,8 @@ class Game(Page):
             self.player2.health_bar.target_value = self.player2.max_health
             self.player2.score = 0        
             self.player2.money = 0
+            self.player2.current_weapon.magazine_bullets = self.player2.current_weapon.magazine_size
+            self.player2.current_weapon.total_ammo = self.player2.current_weapon.start_total_ammo
 
         
         

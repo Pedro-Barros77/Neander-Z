@@ -13,3 +13,7 @@ Jumps Sound Effect from <a href="https://pixabay.com/?utm_source=link-attributio
 
 
 Button click Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=97915">Pixabay</a>
+
+Empty firing https://www.storyblocks.com/audio/stock/gun-staple-gun-empty-firing-rxhqlqa3ivrk0wxwv17.html
+
+Empty clip https://www.storyblocks.com/audio/stock/staple-gun-load-empty-clip-rgbz2222lwhk0wxupnw.html

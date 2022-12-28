@@ -25,6 +25,9 @@ class Weapon(pygame.sprite.Sprite):
         """The number of bullets currently in the magazine."""
         self.total_ammo = self.magazine_size
         """The number of extra bullets."""
+
+        self.start_total_ammo = self.total_ammo 
+        """The start number of extra bullets."""
         
         self.fire_rate_ratio = 1000
         
@@ -66,6 +69,10 @@ class Weapon(pygame.sprite.Sprite):
         self.weapon_aim_angle: float = 0
         """The angle that the container is rotated along with the weapon."""
 
+        self.shoot_sound: pygame.mixer.Sound = None
+        self.empty_sound: pygame.mixer.Sound = None
+        self.reload_sound: pygame.mixer.Sound = None
+
     def shoot(self, bullet_pos: vec, player_net_id: int):
         self.firing = True
         self.magazine_bullets -= 1
@@ -74,20 +81,28 @@ class Weapon(pygame.sprite.Sprite):
        pass
    
     def reload(self):
+        if self.total_ammo <= 0:
+            return
         to_load = self.magazine_size - self.magazine_bullets
         diff = self.total_ammo - to_load
         
+        if self.reload_sound != None:
+            self.reload_sound.play() 
+    
         if diff >= 0:
             self.magazine_bullets += to_load
             self.total_ammo = diff
+
         else:
             self.magazine_bullets += self.total_ammo
             self.total_ammo = 0
-            
+  
             
     def can_shoot(self):
         
         if self.magazine_bullets <= 0:
+            if self.empty_sound != None:
+                self.empty_sound.play() 
             return False
         
         _now = datetime.datetime.now()

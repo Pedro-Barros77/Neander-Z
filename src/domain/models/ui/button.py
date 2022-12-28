@@ -22,6 +22,7 @@ class Button(pygame.sprite.Sprite):
         
         self.last_clicked = True
         self.sound_clicked = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.UI,enums.SFXActions.CLICKED, enums.SFXName.BTN_CLICK))
+        self.sound_hover = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.UI,enums.SFXActions.HOVER, enums.SFXName.BTN_HOVER))
         
         
         if len(self.text) > 0:
@@ -81,6 +82,7 @@ class Button(pygame.sprite.Sprite):
             self.text_surface = game_controller.scale_image(self.text_surface, _scale)
             self.rect = self.image.get_rect()
             self.rect.center = self.center
+            self.sound_hover.play()
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else: #hover out
             self.image = self.start_image.copy()

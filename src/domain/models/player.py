@@ -108,7 +108,8 @@ class Player(pygame.sprite.Sprite):
         self.player2_offset = vec(0,0)
         
         self.is_player1 = self.name == "P1"
-        self.jump_sounds: list[pygame.mixer.Sound ] = [pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\jump\\{self.character.value}\\0{i}.mp3') for i in range(1,4)]
+        self.jump_sounds = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\jump\\{self.character.value}\\jump.mp3')
+        self.fall_sound = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\fall_ground\\{self.character.value}\\fall_ground.mp3')
 
         
         
@@ -273,12 +274,13 @@ class Player(pygame.sprite.Sprite):
         if not _was_grounded and self.grounded and abs(_old_pos - self.pos.y) > 2 :
             self.jumping = False
             self.falling_ground = True
+            self.fall_sound.play()
             if pressing_left != pressing_right:
                 self.running = True
         
         if pygame.K_SPACE in game.pressed_keys and self.grounded:
             self.speed.y = -self.jump_force
-            self.jump_sounds[random.randint(0,2)].play()
+            self.jump_sounds.play()
             if pressing_left != pressing_right:
                 self.falling_ground = False
                 self.running = False

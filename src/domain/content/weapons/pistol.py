@@ -17,6 +17,7 @@ class Pistol(Weapon):
         self.magazine_size = 7
         self.magazine_bullets = self.magazine_size
         self.total_ammo = 30
+        self.start_total_ammo = self.total_ammo 
         
         self.reload_frames = []
         """The animation frames of this weapon when reloading."""
@@ -24,8 +25,12 @@ class Pistol(Weapon):
         self.barrel_offset = vec(0, 7)
         
         self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
-       
+        self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
+        self.reload_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RELOAD_1911))
+   
         self.shoot_sound.set_volume(0.1)
+        self.empty_sound.set_volume(0.1)
+        self.reload_sound.set_volume(0.5)
         
     
     def fire_anim(self):
