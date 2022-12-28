@@ -21,7 +21,6 @@ class MainMenu(Page):
         
         self.monitor_size: vec = vec(900, 600)
         self.screen: pygame.Surface = pygame.display.set_mode(self.monitor_size)
-        menu_controller.play_music(constants.get_music(enums.Music.MUSIC_MENU), 0.2, -1)
 
         btn_dict = {
             "text_font": pygame.font.Font(constants.PIXEL_FONT, 30),
@@ -54,6 +53,9 @@ class MainMenu(Page):
         menu_controller.pages_history.append(new_game)
         
     def update(self, **kwargs):
+        if not pygame.mixer.music.get_busy():
+            menu_controller.play_music(constants.get_music(enums.Music.MUSIC_MENU), 0.2, -1)
+            
         self.logo_anim(0.1)
     
         return super().update(**kwargs)

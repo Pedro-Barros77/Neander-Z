@@ -12,6 +12,7 @@ from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.ui.pages.page import Page
 from domain.models.ui.pages.modals.wave_summary import WaveSummary
+from domain.models.ui.pages.modals.pause import Pause
 from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.wave_1 import Wave_1
@@ -71,7 +72,11 @@ class Game(Page):
 
         self.current_wave = None
         
+        self.pause_screen: Pause = None
+        
         self.wave_summary = None
+        
+        self.focused = True
         
         
         #ui
@@ -90,6 +95,7 @@ class Game(Page):
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.screen_size = vec(self.screen.get_size())
+        self.pause_screen = Pause(self)
         
         
         _p1_net_id = int(self.client_type)
@@ -460,32 +466,42 @@ class Game(Page):
             
         time.sleep(0.5)
         game_controller.restart_game(self)
+        
+        
+    def restart_game(self):
+        self.wave_summary = None
+        self.pause_screen.hide()
+        if self.client_type == enums.ClientType.SINGLE:
+            game_controller.restart_game(self)
+        elif self.client_type == enums.ClientType.HOST:
+            self.send_restart()
 
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
         
-        if not pygame.mixer.music.get_busy():
-            menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
+        game_controller.handle_events(self, events)
         
         if self.wave_summary != None:
+            self.focused = False
             self.wave_summary.update()
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
-                self.wave_summary = None
-                if self.client_type == enums.ClientType.SINGLE:
-                    game_controller.restart_game(self)
-                elif self.client_type == enums.ClientType.HOST:
-                    self.send_restart()
+                self.restart_game()
+            return
+        elif self.pause_screen != None and self.pause_screen.active:
+            self.focused = False
+            if self.player.reload_popup != None:
+                self.player.reload_popup.destroy()
+                self.player.reload_popup = None
+            self.pause_screen.update()
             return
         
-        game_controller.handle_events(self, events)
-        
+        self.focused = True
+        if not pygame.mixer.music.get_busy():
+            menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
+                
         if pygame.K_l in self.pressed_keys:
-            if self.client_type == enums.ClientType.SINGLE:
-                game_controller.restart_game(self)
-            elif self.client_type == enums.ClientType.HOST:
-                self.send_restart()
-            
+            self.restart_game()
         # p1
         self.player.update(game = self)
         # p2
@@ -518,6 +534,12 @@ class Game(Page):
         if pygame.K_r in self.pressed_keys:
             self.player.reload_weapon()
             self.pressed_keys.remove(pygame.K_r)
+        if pygame.K_p in self.pressed_keys:
+            self.pause_screen.show()
+            self.pressed_keys.remove(pygame.K_p)
+        if pygame.K_ESCAPE in self.pressed_keys:
+            self.pause_screen.show()
+            self.pressed_keys.remove(pygame.K_ESCAPE)
         
 
         if self.player.pos.y > self.map.rect.height:
@@ -536,6 +558,9 @@ class Game(Page):
         
         if self.wave_summary != None:
             self.wave_summary.draw(self.screen)
+            return
+        elif self.pause_screen != None and self.pause_screen.active:
+            self.pause_screen.draw(self.screen)
             return
         
         # Wave
