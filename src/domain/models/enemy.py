@@ -5,6 +5,7 @@ from domain.utils import colors, enums, constants, math_utillity as math
 from domain.services import game_controller, menu_controller
 from domain.models.progress_bar import ProgressBar
 from domain.models.ui.popup_text import Popup
+from domain.models.rectangle_sprite import Rectangle
 
 
 
@@ -21,6 +22,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image_scale = 2
         self.movement_speed = kwargs.pop("movement_speed", 5)
         self.health = kwargs.pop("health", 30)
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.attack_targets = game_controller.enemy_target_groups
         self.client_type = enums.ClientType.UNDEFINED
 
@@ -28,8 +30,6 @@ class Enemy(pygame.sprite.Sprite):
         self.death_time: datetime.datetime = None
         self.fade_out_ms = 1000
         self.image_alpha = 255
-        
-        
         
         self.pos: vec = vec((pos))
         self.speed = vec(0,0)
@@ -67,10 +67,16 @@ class Enemy(pygame.sprite.Sprite):
         
         self.last_rect = self.rect.copy()
         
+        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft)
+        self.hitbox_head: Rectangle = None
+        
         self.health_bar = ProgressBar(self.health, pygame.Rect(self.pos - vec(0,-15), (self.rect.width * 1.3, 7)), 
                 border_width = 1, 
                 border_color = colors.LIGHT_GRAY, 
                 value_anim_speed = 0.2)
+        
+        #debug
+        self.blit_debug = False
         
     def calculate_distance(self, d1: vec, d2: vec):
         distance = d1 - d2
@@ -164,6 +170,14 @@ class Enemy(pygame.sprite.Sprite):
     def update(self, **kwargs):
         self.client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)
         self.health_bar.update()
+        
+        if self.hitbox_head != None:
+            self.hitbox_head.rect.topleft = self.pos
+            self.hitbox_head.update_pos()
+        if self.hitbox_body != None:
+            self.hitbox_body.rect.topleft = self.pos if self.hitbox_head == None else self.hitbox_head.rect.bottomleft
+            self.hitbox_body.update_pos()
+        
         if not self.is_alive and self.death_time != None:
             self.fade_out_anim()
         if self.client_type == enums.ClientType.GUEST:
@@ -188,6 +202,12 @@ class Enemy(pygame.sprite.Sprite):
         self.health_bar.image.set_alpha(self.image_alpha)
         self.health_bar.draw(surface, vec(0,0))
         
+        if self.blit_debug:
+            if self.hitbox_body != None:
+                self.hitbox_body.draw(surface, offset)
+            if self.hitbox_head != None:
+                self.hitbox_head.draw(surface, offset)
+        
         self.player_offset = offset
 
     def fade_out_anim(self):
@@ -203,6 +223,10 @@ class Enemy(pygame.sprite.Sprite):
         self.wave.handle_score(self.enemy_name, attacker)
         self.wave.enemies_count -= 1
         self.wave.current_wave_step += 1
+        if self.hitbox_head != None:
+            self.hitbox_head.kill()
+        if self.hitbox_body != None:
+            self.hitbox_body.kill()
         super().kill()
         
     
@@ -220,11 +244,15 @@ class Enemy(pygame.sprite.Sprite):
         return False
         
         
-    def take_damage(self, value: float, attacker = None):
+    def take_damage(self, value: float, attacker = None, head_shot = False):
         # if attacker != None:
             
         if value < 0 or self.dying:
             return
+        
+        if head_shot:
+            value *= self.head_shot_multiplier
+            
         self.health_bar.remove_value(value)
         
         self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
@@ -235,12 +263,19 @@ class Enemy(pygame.sprite.Sprite):
                 self.is_alive = False
                 self.running = False
                 self.attacking = False
+                self.hitbox_head.kill()
+                self.hitbox_body.kill()
+                self.hitbox_head = None
+                self.hitbox_body = None
                 
             self.dying = True
             
                 
-        
-        menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["damage"]))
+        _popup_args = constants.POPUPS["damage"].copy()
+        if head_shot:
+            _popup_args["text_color"] = colors.YELLOW
+            
+        menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
         return not self.is_alive
 
 

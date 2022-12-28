@@ -112,7 +112,7 @@ class Game(Page):
         self.current_wave = Wave_1(self)
         game_controller.screen_size = vec(self.screen.get_size())
         game_controller.map_size = vec(self.map.rect.size)
-        game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_group]
+        game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
         game_controller.enemy_target_groups = [self.players_group]
         self.gravity_accelaration = 0.5
         self.friction = -0.12

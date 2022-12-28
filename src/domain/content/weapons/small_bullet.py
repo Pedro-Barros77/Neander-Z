@@ -4,6 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.utils import colors, enums, constants
 from domain.services import game_controller
 from domain.models.enemy import Enemy
+from domain.models.rectangle_sprite import Rectangle
 
 class SmallBullet(pygame.sprite.Sprite):
     def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:int, id: int, **kwargs):
@@ -55,7 +56,7 @@ class SmallBullet(pygame.sprite.Sprite):
         for group in self.collision_groups:
             collisions = pygame.sprite.spritecollide(self, group, False)
             for c in collisions:
-                if isinstance(c, Enemy):
+                if isinstance(c, Enemy) or isinstance(c, Rectangle):
                     c.take_damage(self.damage, self.owner)
                 return True
         return False

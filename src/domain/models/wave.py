@@ -13,6 +13,7 @@ class Wave():
         self.game = game
         self.enemies_current_id = 0
         self.enemies_group = pygame.sprite.Group()
+        self.enemies_hitbox_group = pygame.sprite.Group()
         self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
         self.total_enemies = kwargs.pop("total_enemies", 10)
         self.wave_step = kwargs.pop("wave_step", 1)
@@ -38,6 +39,10 @@ class Wave():
 
     def spawn_enemy(self, enemy: Enemy):
         self.enemies_group.add(enemy)
+        if enemy.hitbox_head != None:
+            self.enemies_hitbox_group.add(enemy.hitbox_head)
+        if enemy.hitbox_body != None:
+            self.enemies_hitbox_group.add(enemy.hitbox_body)
         
     def start(self):
         if self.game.client_type == enums.ClientType.SINGLE:
