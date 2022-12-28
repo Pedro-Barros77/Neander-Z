@@ -109,7 +109,7 @@ def play_music(music_name, volume: float, repeat_count: int = -1 ):
     pygame.mixer.music.load(music_name)
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(repeat_count)
-    
+
         
 clock = pygame.time.Clock()
 def app_loop():

@@ -440,7 +440,7 @@ class Game(Page):
         events = kwargs.pop("events", None)
         
         if not pygame.mixer.music.get_busy():
-            menu_controller.play_music(constants.WAVE_1, 0.1, -1)
+            menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
         
         if self.wave_summary != None:
             self.wave_summary.update()

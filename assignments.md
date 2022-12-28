@@ -7,3 +7,9 @@ Mysterious Celesta Music by <a href="https://pixabay.com/pt/users/ashot-danielya
 
 
 Caves of Dawn Music by <a href="https://pixabay.com/pt/users/guilhermebernardes-24203804/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=10376">GuilhermeBernardes</a> from <a href="https://pixabay.com//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=10376">Pixabay</a>
+
+
+Jumps Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=65494">Pixabay</a>
+
+
+Button click Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=97915">Pixabay</a>

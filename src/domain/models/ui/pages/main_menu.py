@@ -6,6 +6,7 @@ from domain.models.ui.pages.new_game import NewGame
 from domain.models.ui.button import Button
 from domain.utils import constants, colors
 from domain.services import menu_controller, game_controller
+from domain.utils import enums
 
 class MainMenu(Page):
     def __init__(self, **kwargs) -> None:
@@ -15,10 +16,12 @@ class MainMenu(Page):
         pygame.mixer.pre_init(44100, -16, 2, 500)
         pygame.mixer.init()
         pygame.init()
+
+        
         
         self.monitor_size: vec = vec(900, 600)
         self.screen: pygame.Surface = pygame.display.set_mode(self.monitor_size)
-        menu_controller.play_music(constants.MENU_MUSIC, 0.2, -1)
+        menu_controller.play_music(constants.get_music(enums.Music.MUSIC_MENU), 0.2, -1)
 
         btn_dict = {
             "text_font": pygame.font.Font(constants.PIXEL_FONT, 30),

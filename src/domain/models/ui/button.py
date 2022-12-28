@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vec
 
-from domain.utils import colors
+from domain.utils import colors, constants, enums
 from domain.services import game_controller, menu_controller
 
 #button class
@@ -21,6 +21,8 @@ class Button(pygame.sprite.Sprite):
         self.text_surface: pygame.Surface = None
         
         self.last_clicked = True
+        self.sound_clicked = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.UI,enums.SFXActions.CLICKED, enums.SFXName.BTN_CLICK))
+        
         
         if len(self.text) > 0:
             self.text_surface = menu_controller.get_text_surface(self.text, self.text_color, self.text_font)
@@ -103,8 +105,10 @@ class Button(pygame.sprite.Sprite):
             if not _was_hovered:
                 self.on_hover()
             if clicked and not self.clicked and not self.last_clicked:
+                self.sound_clicked.play()
                 self.clicked = True
                 self.on_click()
+                
         elif _was_hovered:
             self.on_hover()
             

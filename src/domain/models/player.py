@@ -1,4 +1,4 @@
-import pygame, math as maths
+import pygame, math as maths, random 
 
 from pygame.math import Vector2 as vec
 
@@ -108,6 +108,9 @@ class Player(pygame.sprite.Sprite):
         self.player2_offset = vec(0,0)
         
         self.is_player1 = self.name == "P1"
+        self.jump_sounds: list[pygame.mixer.Sound ] = [pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\jump\\{self.character.value}\\0{i}.mp3') for i in range(1,4)]
+
+        
         
         if self.is_player1:
             self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
@@ -275,10 +278,12 @@ class Player(pygame.sprite.Sprite):
         
         if pygame.K_SPACE in game.pressed_keys and self.grounded:
             self.speed.y = -self.jump_force
+            self.jump_sounds[random.randint(0,2)].play()
             if pressing_left != pressing_right:
                 self.falling_ground = False
                 self.running = False
                 self.jumping = True
+                
            
             game.pressed_keys.remove(pygame.K_SPACE)
     

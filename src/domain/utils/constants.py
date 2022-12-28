@@ -30,9 +30,6 @@ else:
     SAVE_PATH = f'{ROOT_PATH}saves\\'
 
 
-
-
-
 GRAVEYARD_MAP = f"{IMAGES_PATH}map_graveyard.png"
 
 ZOMBIE_1 = f"{IMAGES_PATH}enemies\\zombie_1.png"
@@ -52,9 +49,13 @@ def get_zombie_frames(z_name: enums.Enemies, action: enums.AnimActions):
 
     return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}\\'
 
-# def get_music(music_name: enums.Music, action: enums.PlayMusic):
-#     if action == enums.PlayMusic.PLAY:
-#         return pygame.mixer.music.load()
+def get_music(music_name: enums.Music):
+    return f'{SOUNDS_PATH}bg_music\\{str(music_name.value)}'
+
+def get_sfx(sfx_type: enums.SFXType, sfx_action: enums.SFXActions, sfx_name: enums.SFXName):
+    
+    return f'{SOUNDS_PATH}sound_effects\\{str(sfx_type.value)}\\{str(sfx_action.value)}\\{str(sfx_name.value)}'
+
 
 #     return f'{IMAGES_PATH}enemies\\{str(music_name.value)}\\{str(action.value)}\\'
     

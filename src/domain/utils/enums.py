@@ -49,11 +49,26 @@ class Command(Enum):
     def __int__(self):
         return self.value
 
-# class Music(Enum):
-#     MUSIC_MENU = "Caves of Dawn"
-#     ...
+class Music(Enum):
+    MUSIC_MENU = "menu_caves_of_dawn.mp3"
+    WAVE_1 = "wave1_mysterious_celesta.mp3"
 
-# class PlayMusic(Enum):
-#     PLAY = 1
-#     STOP = 0
-#     PLAY_LOOP = -1
+class SFXType(Enum):
+    UI = "ui"
+    WEAPONS = "weapons"
+    SFX_PLAYER = "sfx_player"
+class SFXActions(Enum):
+    SHOOT = "shoot"
+    RELOAD = "reload"
+    CLICKED = "clicked"
+    JUMP = "jump"
+
+class SFXName(Enum):
+    P_1911 = "1911.mp3"
+    BTN_CLICK = "btn_click.mp3"
+
+
+
+
+
+

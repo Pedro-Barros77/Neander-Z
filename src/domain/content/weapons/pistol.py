@@ -2,9 +2,10 @@ import pygame, math, datetime
 from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
-from domain.utils import constants
+from domain.utils import constants, enums
 from domain.content.weapons.small_bullet import SmallBullet
 from domain.services import game_controller
+
 class Pistol(Weapon):
     def __init__(self, pos, **kwargs):
         super().__init__(pos, **kwargs)
@@ -19,7 +20,8 @@ class Pistol(Weapon):
         
         self.barrel_offset = vec(0, 7)
         
-        self.shoot_sound = pygame.mixer.Sound(f'{constants.SOUNDS_PATH}sound_effects\\1911.mp3')
+        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
+       
         self.shoot_sound.set_volume(0.1)
         
     
