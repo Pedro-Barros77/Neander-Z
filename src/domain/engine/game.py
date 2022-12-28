@@ -233,7 +233,7 @@ class Game(Page):
         _txt_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_ammo_rect.left = _ammo_icon_rect.right + _horizontal_margin
         
-        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.current_weapon.magazine_size}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.current_weapon.total_ammo}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_total_ammo_rect = _txt_total_ammo.get_rect()
         _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
@@ -517,6 +517,7 @@ class Game(Page):
             self.pressed_keys.remove(pygame.K_DELETE)
         if pygame.K_r in self.pressed_keys:
             self.player.reload_weapon()
+            self.pressed_keys.remove(pygame.K_r)
         
 
         if self.player.pos.y > self.map.rect.height:

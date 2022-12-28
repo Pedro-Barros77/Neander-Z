@@ -15,6 +15,7 @@ class Pistol(Weapon):
         self.last_shot_time = None
         self.magazine_size = 7
         self.magazine_bullets = self.magazine_size
+        self.total_ammo = 30
         
         self.reload_frames = []
         """The animation frames of this weapon when reloading."""

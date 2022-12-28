@@ -23,6 +23,8 @@ class Weapon(pygame.sprite.Sprite):
         """The magazine capacity of the weapon."""
         self.magazine_bullets = self.magazine_size
         """The number of bullets currently in the magazine."""
+        self.total_ammo = self.magazine_size
+        """The number of extra bullets."""
         
         self.fire_rate_ratio = 1000
         
@@ -72,8 +74,17 @@ class Weapon(pygame.sprite.Sprite):
        pass
    
     def reload(self):
-        self.magazine_bullets = self.magazine_size
-   
+        to_load = self.magazine_size - self.magazine_bullets
+        diff = self.total_ammo - to_load
+        
+        if diff >= 0:
+            self.magazine_bullets += to_load
+            self.total_ammo = diff
+        else:
+            self.magazine_bullets += self.total_ammo
+            self.total_ammo = 0
+            
+            
     def can_shoot(self):
         
         if self.magazine_bullets <= 0:
