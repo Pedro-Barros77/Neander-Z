@@ -3,8 +3,8 @@ from pygame.math import Vector2 as vec
 
 
 from domain.utils import colors, constants
-from domain.services import game_controller
-from domain.models.igravitable import IGravitable
+from domain.services import game_controller, menu_controller
+from domain.models.ui.popup_text import Popup
 
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, pos, **kwargs):
@@ -71,8 +71,10 @@ class Weapon(pygame.sprite.Sprite):
         self.magazine_bullets -= 1
 
     def update(self, **kwargs):
-       pass
-   
+        pass
+           
+           
+           
     def reload(self):
         to_load = self.magazine_size - self.magazine_bullets
         diff = self.total_ammo - to_load

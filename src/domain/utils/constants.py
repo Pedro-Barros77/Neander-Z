@@ -87,5 +87,12 @@ POPUPS = {
         "text_color": colors.GREEN,
         "float_anim_distance": 20,
         "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 20)
+    },
+    "blink":{
+        "use_blink_anim": True,
+        "fade_in_ms": 300,
+        "fade_out_ms": 300,
+        "text_color": colors.RED,
+        "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 20)
     }
 }

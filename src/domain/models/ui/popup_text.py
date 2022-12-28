@@ -37,6 +37,8 @@ class Popup(pygame.sprite.Sprite):
         """The time in milliseconds to animate the fade out effect. Defaults to 0."""
         self.float_anim_distance = kwargs.pop("float_anim_distance", 0)
         """The distance to float up with fade out animation. Defaults to 0."""
+        self.use_blink_anim = kwargs.pop("use_blink_anim", False)
+        """The speed to animate the blink effect."""
         self.show_on_init = kwargs.pop("show_on_init", True)
         """If the method show() should be called after initialization. Defaults to True."""
         self.rect = pygame.Rect(pos, self.font.render(self.text, True, colors.WHITE).get_size())
@@ -78,16 +80,18 @@ class Popup(pygame.sprite.Sprite):
        
     def destroy(self):
         """Kills itself, no longer being processed."""
+        self.use_blink_anim = False
         self.kill()
         
-    def show(self):
+    def show(self, override = False):
         """Shows the popup, animating the fade in if enabled."""
-        if self._show_time == None:
+        self._hide_time = None
+        if self._show_time == None or override:
             self._show_time = datetime.datetime.now()
         
-    def hide(self):
+    def hide(self, override = False):
         """Hides and kills the popup, animating the fade out if enabled."""
-        if self._hide_time == None:
+        if self._hide_time == None or override:
             self._hide_time = datetime.datetime.now()
             
     def _fade_in_anim(self):
@@ -121,16 +125,21 @@ class Popup(pygame.sprite.Sprite):
                 self._hide_time = datetime.datetime.now()
         
         # If has fade in animation and it's not done yet, start fading in
-        if self.fade_in_ms > 0 and colors.alpha_or_default(self._current_text_color, 0)[3] < colors.alpha_or_default(self.text_color, 255)[3] and self._hide_time == None:
-            self._fade_in_anim()
+        if self.fade_in_ms > 0:
+            if colors.alpha_or_default(self._current_text_color, 0)[3] < colors.alpha_or_default(self.text_color, 255)[3] and self._hide_time == None:
+                self._fade_in_anim()
+            elif self.use_blink_anim and self._hide_time == None:
+                self.hide(True)
             
         if self._hide_time != None:
-            if self.fade_out_ms > 0 and colors.alpha_or_default(self._current_text_color, 255)[3] > 0:
-                self._fade_out_anim()
-                if self.float_anim_distance > 0:
-                    offset_y = colors.alpha_or_default(self._current_text_color, 255)[3] * self.float_anim_distance / 255
-                    self.rect.top = self.start_pos.y - (self.float_anim_distance - offset_y)
-            
+            if self.fade_out_ms > 0:
+                if colors.alpha_or_default(self._current_text_color, 255)[3] > 0:
+                    self._fade_out_anim()
+                    if self.float_anim_distance > 0:
+                        offset_y = colors.alpha_or_default(self._current_text_color, 255)[3] * self.float_anim_distance / 255
+                        self.rect.top = self.start_pos.y - (self.float_anim_distance - offset_y)
+                elif self.use_blink_anim:
+                    self.show(True)
             else:
                 self.destroy()
                 
