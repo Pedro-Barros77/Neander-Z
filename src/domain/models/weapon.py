@@ -19,6 +19,10 @@ class Weapon(pygame.sprite.Sprite):
         """The speed of the weapon's bullet."""
         self.fire_rate = kwargs.pop("fire_rate", 1)
         """The speed of the weapon's bullet."""
+        self.magazine_size = 7
+        """The magazine capacity of the weapon."""
+        self.magazine_bullets = self.magazine_size
+        """The number of bullets currently in the magazine."""
         
         self.fire_rate_ratio = 1000
         
@@ -62,11 +66,19 @@ class Weapon(pygame.sprite.Sprite):
 
     def shoot(self, bullet_pos: vec, player_net_id: int):
         self.firing = True
+        self.magazine_bullets -= 1
 
     def update(self, **kwargs):
        pass
    
+    def reload(self):
+        self.magazine_bullets = self.magazine_size
+   
     def can_shoot(self):
+        
+        if self.magazine_bullets <= 0:
+            return False
+        
         _now = datetime.datetime.now()
         
         if self.last_shot_time == None:
