@@ -111,9 +111,9 @@ def play_music(music_name, volume: float, repeat_count: int = -1 ):
     
         
 
+clock = pygame.time.Clock()
 def app_loop():
-    global pages_history, playing
-    clock = pygame.time.Clock()
+    global clock, pages_history, playing
     while True:
         _events = pygame.event.get()
         for event in _events:

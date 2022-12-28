@@ -188,34 +188,40 @@ class Game(Page):
         
         _player_head = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3)
         _head_rect = _player_head.get_rect()
-        _head_rect.top = _horizontal_margin
+        _head_rect.top = _top_margin
         _head_rect.left = _horizontal_margin
         
         _health_rect = self.player.health_bar.draw(self.screen, -vec(_head_rect.topright))
         
-        _money_logo = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
-        _money_logo_rect = _money_logo.get_rect()
-        _money_logo_rect.centery = _head_rect.centery
-        _money_logo_rect.left = _health_rect.right + _horizontal_margin
+        _money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
+        _money_icon_rect = _money_icon.get_rect()
+        _money_icon_rect.centery = _head_rect.centery
+        _money_icon_rect.left = _health_rect.right + _horizontal_margin
 
-        _text_money = menu_controller.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
-        _text_money_rect = _text_money.get_rect()
-        _text_money_rect.centery = _head_rect.centery
-        _text_money_rect.left = _money_logo_rect.right + _horizontal_margin
+        _txt_money = menu_controller.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_money_rect = _txt_money.get_rect()
+        _txt_money_rect.centery = _head_rect.centery
+        _txt_money_rect.left = _money_icon_rect.right + _horizontal_margin
 
-        _text_score = menu_controller.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
-        _text_score_rect = _text_score.get_rect()
-        _text_score_rect.centery = _head_rect.centery
-        _text_score_rect.left = _text_money_rect.right + _horizontal_margin*2
+        _txt_score = menu_controller.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_score_rect = _txt_score.get_rect()
+        _txt_score_rect.centery = _head_rect.centery
+        _txt_score_rect.left = _txt_money_rect.right + _horizontal_margin*2
+        
+        _txt_fps = menu_controller.get_text_surface(f'fps: {menu_controller.clock.get_fps():.0f}', colors.LIGHT_GRAY, pygame.font.SysFont('calibri', 20))
+        _txt_fps_rect = _txt_fps.get_rect()
+        _txt_fps_rect.centery = _head_rect.centery
+        _txt_fps_rect.right = self.screen.get_width() - _horizontal_margin
 
         self.screen.blit(_player_head, _head_rect)
 
-        self.screen.blit(_money_logo, _money_logo_rect)
+        self.screen.blit(_money_icon, _money_icon_rect)
 
-        self.screen.blit(_text_money, _text_money_rect) 
+        self.screen.blit(_txt_money, _txt_money_rect) 
 
-        self.screen.blit(_text_score, _text_score_rect)
+        self.screen.blit(_txt_score, _txt_score_rect)
 
+        self.screen.blit(_txt_fps, _txt_fps_rect)
         
     
             
