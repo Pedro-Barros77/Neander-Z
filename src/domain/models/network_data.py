@@ -90,6 +90,11 @@ class Data:
         self.bullets = []
         self.wave_results = []
             
+            
+        self.enemies = []
+        self.bullets = []
+        self.wave_results = []
+            
         for i, enemy in enumerate(array[0]):
             self.enemies.append({})
             for v, en_val in enumerate(enemy):

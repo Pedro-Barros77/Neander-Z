@@ -1,4 +1,4 @@
-import pygame, socket, threading, time, jsonpickle, importlib
+import pygame, socket, threading, time
 from pygame.math import Vector2 as vec
 import math
 import os
@@ -192,15 +192,18 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         player_id (int): The ID of the player executing this function.
     """ 
     client.settimeout(2)
+    
     while menu_controller.playing:
         
+        #sending
         net_data = game.get_net_data()
         data_to_send = net_data._get_buffer()
-        
         client.sendto(data_to_send, remote_address)
-        received_buffer = client.recvfrom(4096)[0]
         
+        #receiving
+        received_buffer = client.recvfrom(4096)[0]
         net_data._load_buffer(received_buffer)
+        print(len(received_buffer))
         
         game.handle_received_data(net_data)
             
@@ -210,26 +213,3 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
     print("closing connection")
     client.close()
     
-    
-def class_to_json(data):
-    """Encodes the class object to a json object.
-
-    Args:
-        data (class): The object to be converted.
-
-    Returns:
-        list[byte]: A array of bytes containing a json string version of the class.
-    """    
-    return jsonpickle.encode(data).encode('utf-8')
-
-def json_to_class(data):
-    """Decodes the json string to a class object.
-
-    Args:
-        data (list[byte]): A array of bytes containing a json string version of the class.
-
-    Returns:
-        class: The converted class object.
-    """  
-
-    return jsonpickle.decode(data)
