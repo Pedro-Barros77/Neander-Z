@@ -85,6 +85,10 @@ class Data:
         for i, att in enumerate(attributes):
             if type(getattr(self, att)) != list:
                 setattr(self, att, array[i])
+        
+        self.enemies = []
+        self.bullets = []
+        self.wave_results = []
             
         for i, enemy in enumerate(array[0]):
             self.enemies.append({})

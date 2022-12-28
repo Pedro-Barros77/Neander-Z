@@ -8,7 +8,7 @@ from domain.content.enemies.z_roger import ZRoger
 class Wave_1(Wave):
     def __init__(self, game, **kwargs):
         super().__init__(game, **kwargs)
-        self.max_alive_enemies = 10
+        self.max_alive_enemies = 5
         self.wave_step = 3
         self.total_enemies = 10
         self.current_wave_step = self.wave_step

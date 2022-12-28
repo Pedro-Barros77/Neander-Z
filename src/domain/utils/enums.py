@@ -48,3 +48,12 @@ class Command(Enum):
 
     def __int__(self):
         return self.value
+
+# class Music(Enum):
+#     MUSIC_MENU = "Caves of Dawn"
+#     ...
+
+# class PlayMusic(Enum):
+#     PLAY = 1
+#     STOP = 0
+#     PLAY_LOOP = -1

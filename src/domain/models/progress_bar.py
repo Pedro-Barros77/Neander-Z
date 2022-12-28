@@ -61,7 +61,10 @@ class ProgressBar(pygame.sprite.Sprite):
         """        
         if self.hide_on_full and self.value == self.max_value:
             return
-        screen.blit(self.image, vec(self.rect.topleft) - offset)
+        _rect = self.rect.copy()
+        _rect.topleft = vec(self.rect.topleft) - offset
+        screen.blit(self.image, _rect.topleft)
+        return _rect
         
     def update(self):
         """Updates the bar animation.

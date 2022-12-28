@@ -12,7 +12,7 @@ player_state = {
     "state_name": "player",
     "character": enums.Characters.CARLOS,
     "movement_speed": 0.5,
-    "jump_force": 12,
+    "jump_force": 9,
     "max_health": 100
 }
 config_state = {
@@ -102,6 +102,13 @@ def fade_in_color(color: tuple[int,int,int], target_alpha: int, start_time: date
         alpha = (target_alpha*percentage)/100
         alpha = math.clamp(alpha, 0, target_alpha)
         return colors.set_alpha(color, int(alpha))
+
+def play_music(music_name, volume: float, repeat_count: int = -1 ):
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(music_name)
+    pygame.mixer.music.set_volume(volume)
+    pygame.mixer.music.play(repeat_count)
+    
         
 
 def app_loop():

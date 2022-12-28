@@ -72,15 +72,19 @@ class Game(Page):
         self.current_wave = None
         
         self.wave_summary = None
+
+       
     
     def setup(self):
         """Starts the game.
         """
         
+        
         self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.screen_size = vec(self.screen.get_size())
+        
         
         _p1_net_id = int(self.client_type)
         self.player = Player((20, 0), enums.Characters.CARLOS if _p1_net_id != 2 else enums.Characters.CLEITON, net_id = _p1_net_id, name = "P1", screen_size = self.screen.get_size())
@@ -92,6 +96,8 @@ class Game(Page):
         self.players_group =  pygame.sprite.Group([self.player])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.bullets_group = pygame.sprite.Group()
+
+        
         
         self.reset_game()
         
@@ -102,13 +108,14 @@ class Game(Page):
     def reset_game(self):
         """Resets all players attributes to default values.
         """
+        
         self.wave_summary = None
         self.current_wave = Wave_1(self)
         game_controller.screen_size = vec(self.screen.get_size())
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_group]
         game_controller.enemy_target_groups = [self.players_group]
-        
+        menu_controller.play_music(constants.WAVE_1, 0.1, -1)
         self.gravity_accelaration = 0.5
         self.friction = -0.12
         
@@ -175,19 +182,39 @@ class Game(Page):
 
     
     def draw_ui(self):
+        
+        _top_margin = 10
+        _horizontal_margin = 10
+        
+        _player_head = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3)
+        _head_rect = _player_head.get_rect()
+        _head_rect.top = _horizontal_margin
+        _head_rect.left = _horizontal_margin
+        
+        _health_rect = self.player.health_bar.draw(self.screen, -vec(_head_rect.topright))
+        
         _money_logo = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
-        _money_logo_rect = pygame.Rect(vec(self.player.health_bar.rect.topright) + vec(10,0), _money_logo.get_size())
+        _money_logo_rect = _money_logo.get_rect()
+        _money_logo_rect.centery = _head_rect.centery
+        _money_logo_rect.left = _health_rect.right + _horizontal_margin
 
         _text_money = menu_controller.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
-        _text_money_rect = pygame.Rect(vec(_money_logo_rect.topright) + vec(5,0), _text_money.get_size())
+        _text_money_rect = _text_money.get_rect()
+        _text_money_rect.centery = _head_rect.centery
+        _text_money_rect.left = _money_logo_rect.right + _horizontal_margin
 
         _text_score = menu_controller.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _text_score_rect = _text_score.get_rect()
+        _text_score_rect.centery = _head_rect.centery
+        _text_score_rect.left = _text_money_rect.right + _horizontal_margin*2
+
+        self.screen.blit(_player_head, _head_rect)
 
         self.screen.blit(_money_logo, _money_logo_rect)
 
         self.screen.blit(_text_money, _text_money_rect) 
 
-        self.screen.blit(_text_score, vec(_text_money_rect.topright) + vec(30,0))
+        self.screen.blit(_text_score, _text_score_rect)
 
         
     
@@ -203,7 +230,7 @@ class Game(Page):
                 player_acceleration = (self.player.acceleration.x, self.player.acceleration.y),
                 command_id = self.command_id,
                 player_mouse_pos = pygame.mouse.get_pos(),
-                player_aim_angle = self.player.weapon_aim_angle,
+                player_aim_angle = self.player.current_weapon.weapon_aim_angle,
                 player_falling_ground = self.player.falling_ground,
                 player_running = self.player.running,
                 player_jumping = self.player.jumping,
@@ -259,7 +286,7 @@ class Game(Page):
         self.player2.acceleration = vec(data.player_acceleration)
         self.player2.player2_mouse_pos = vec(data.player_mouse_pos)
         self.player.player2_mouse_pos = vec(data.player_mouse_pos)
-        self.player2.weapon_aim_angle = data.player_aim_angle
+        self.player2.current_weapon.weapon_aim_angle = data.player_aim_angle
         
         self.player2.falling_ground = data.player_falling_ground
         self.player2.running = data.player_running
@@ -279,7 +306,7 @@ class Game(Page):
                 else:
                     if len(current_enemy_ids) < len(data.enemies) and e_data['id'] not in current_enemy_ids:
                         self.create_netdata_enemy(e_data)
-
+       
         current_bullets_ids = [x.id for x in self.bullets_group.sprites() if x.owner != self.player.net_id]
         new_bullets_ids = [x['id'] for x in data.bullets]
         
@@ -461,6 +488,15 @@ class Game(Page):
             data2 = NetData()
             data2._load_buffer(buff)
             self.pressed_keys.remove(pygame.K_t)
+        
+
+        if self.player.pos.y > self.map.rect.height:
+            self.player.pos.y = 0
+            self.player.update_rect()
+            
+        if self.client_type != enums.ClientType.SINGLE and self.player2.pos.y > self.map.rect.height:
+            self.player2.pos.y = 0
+            self.player2.update_rect()
     
        
     def draw(self):

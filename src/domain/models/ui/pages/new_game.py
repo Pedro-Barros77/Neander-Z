@@ -141,7 +141,10 @@ class NewGame(Page):
                         ), center=True)
                     menu_controller.playing = False
                     return
+        
         menu_controller.pages_history.append(game)
+        menu_controller.play_music(constants.WAVE_1, 0.1, -1)
+
         
                 
         

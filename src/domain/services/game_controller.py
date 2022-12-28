@@ -40,7 +40,8 @@ def handle_events(game, events: list[pygame.event.Event]):
              menu_controller.quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             _bullet = game.player.shoot()
-            game.bullets_group.add(_bullet)
+            if _bullet != None:
+                game.bullets_group.add(_bullet)
         elif event.type == pygame.KEYDOWN:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP:
@@ -190,6 +191,7 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         client (socket.socket): The client object.
         player_id (int): The ID of the player executing this function.
     """ 
+    client.settimeout(2)
     while menu_controller.playing:
         
         net_data = game.get_net_data()
@@ -199,7 +201,6 @@ def handle_connection(game, client: socket.socket, remote_address: tuple[str, in
         received_buffer = client.recvfrom(4096)[0]
         
         net_data._load_buffer(received_buffer)
-        print(len(received_buffer))
         
         game.handle_received_data(net_data)
             

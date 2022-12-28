@@ -1,6 +1,4 @@
-import pygame
-import os
-from os import path
+import pygame,datetime
 from pygame.math import Vector2 as vec
 
 
@@ -14,6 +12,16 @@ class Weapon(pygame.sprite.Sprite):
         
         # The name of the object, for debugging.
         self.name = kwargs.pop("name", "weapon")
+        
+        self.damage = kwargs.pop("damage", 0)
+        """The damage of the weapon's bullet."""
+        self.bullet_speed = kwargs.pop("bullet_speed", 30)
+        """The speed of the weapon's bullet."""
+        self.fire_rate = kwargs.pop("fire_rate", 1)
+        """The speed of the weapon's bullet."""
+        
+        self.fire_rate_ratio = 1000
+        
         
         self.dir: int = 0
         """The direction that this weapon is pointing to (left: -1, right: 1)."""
@@ -35,11 +43,39 @@ class Weapon(pygame.sprite.Sprite):
         self.current_frame = self.idle_frame
         """The image of the current animation frame, without rotating."""
         
-        self.damage = kwargs.pop("damage", 0)
-        
+
         self.rect = self.image.get_rect()
         """The rect of this weapon."""
         self.rect.topleft = pos
         
         self.firing_frame = 0
         """The current frame of firing animation."""
+        
+        self.firing = False
+        """If the weapon firing animation is running."""
+        
+        self.weapon_anchor = kwargs.pop("weapon_anchor", vec(0,0))
+        """The anchor point of the weapon (the center of the circle it orbits around), relative to the player position"""
+
+        self.weapon_aim_angle: float = 0
+        """The angle that the container is rotated along with the weapon."""
+
+    def shoot(self, bullet_pos: vec, player_net_id: int):
+        self.firing = True
+
+    def update(self, **kwargs):
+       pass
+   
+    def can_shoot(self):
+        _now = datetime.datetime.now()
+        
+        if self.last_shot_time == None:
+            self.last_shot_time = _now
+            return True
+        
+        if _now - datetime.timedelta(milliseconds= self.fire_rate_ratio/self.fire_rate) >  self.last_shot_time:
+            return True
+        
+        return False
+
+    

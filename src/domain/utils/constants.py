@@ -9,6 +9,9 @@ ROOT_PATH = f'{os.getcwd()}\\'
 IMAGES_PATH = "src\\domain\\resources\\images\\"
 FONTS_PATH = "src\\domain\\resources\\fonts\\"
 PIXEL_FONT = f'{FONTS_PATH}runescape_uf.ttf'
+SOUNDS_PATH = "src\\domain\\resources\\sounds\\"
+MENU_MUSIC = f"{SOUNDS_PATH}bg_music\\menu_caves_of_dawn.mp3"
+WAVE_1 = f"{SOUNDS_PATH}bg_music\\wave1_mysterious_celesta.mp3"
 
 SAVE_PATH = f'{ROOT_PATH}src\\saves\\'
 
@@ -31,6 +34,12 @@ def get_zombie_frames(z_name: enums.Enemies, action: enums.AnimActions):
         return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}.png'
 
     return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}\\'
+
+# def get_music(music_name: enums.Music, action: enums.PlayMusic):
+#     if action == enums.PlayMusic.PLAY:
+#         return pygame.mixer.music.load()
+
+#     return f'{IMAGES_PATH}enemies\\{str(music_name.value)}\\{str(action.value)}\\'
     
 
 pygame.font.init()

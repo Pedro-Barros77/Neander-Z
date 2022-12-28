@@ -66,6 +66,8 @@ class Wave():
             e.kill(1)
 
     def handle_score(self, enemy_type: enums.Enemies, attacker):
+        if attacker == None:
+            return
         if attacker == 3:
             attacker = 1
         match enemy_type:
