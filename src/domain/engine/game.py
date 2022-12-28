@@ -72,8 +72,14 @@ class Game(Page):
         self.current_wave = None
         
         self.wave_summary = None
-
-       
+        
+        
+        #ui
+        
+        self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
+        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\ammo_icon.png'), 3)
+        
+        
     
     def setup(self):
         """Starts the game.
@@ -192,8 +198,7 @@ class Game(Page):
         
         _health_rect = self.player.health_bar.draw(self.screen, -vec(_head_rect.topright))
         
-        _money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
-        _money_icon_rect = _money_icon.get_rect()
+        _money_icon_rect = self._money_icon.get_rect()
         _money_icon_rect.centery = _head_rect.centery
         _money_icon_rect.left = _health_rect.right + _horizontal_margin
 
@@ -211,16 +216,36 @@ class Game(Page):
         _txt_fps_rect = _txt_fps.get_rect()
         _txt_fps_rect.centery = _head_rect.centery
         _txt_fps_rect.right = self.screen.get_width() - _horizontal_margin
-
+        
+        _ammo_icon_rect = self._ammo_icon.get_rect()
+        _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
+        _ammo_icon_rect.left = _horizontal_margin
+        
+        _bullets_color = None
+        if self.player.current_weapon.magazine_bullets <= 0:
+            _bullets_color = colors.RED
+        elif self.player.current_weapon.magazine_bullets >= self.player.current_weapon.magazine_size * 0.3:
+            _bullets_color = colors.WHITE
+        else:
+            _bullets_color = colors.YELLOW
+        _txt_ammo = menu_controller.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_ammo_rect = _txt_ammo.get_rect()
+        _txt_ammo_rect.centery = _ammo_icon_rect.centery
+        _txt_ammo_rect.left = _ammo_icon_rect.right + _horizontal_margin
+        
+        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.current_weapon.total_ammo}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_total_ammo_rect = _txt_total_ammo.get_rect()
+        _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
+        _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
+        
         self.screen.blit(_player_head, _head_rect)
-
-        self.screen.blit(_money_icon, _money_icon_rect)
-
+        self.screen.blit(self._money_icon, _money_icon_rect)
         self.screen.blit(_txt_money, _txt_money_rect) 
-
         self.screen.blit(_txt_score, _txt_score_rect)
-
         self.screen.blit(_txt_fps, _txt_fps_rect)
+        self.screen.blit(self._ammo_icon, _ammo_icon_rect)
+        self.screen.blit(_txt_ammo, _txt_ammo_rect)
+        self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
         
     
             
@@ -455,7 +480,7 @@ class Game(Page):
         
         game_controller.handle_events(self, events)
         
-        if pygame.K_r in self.pressed_keys:
+        if pygame.K_l in self.pressed_keys:
             if self.client_type == enums.ClientType.SINGLE:
                 game_controller.restart_game(self)
             elif self.client_type == enums.ClientType.HOST:
@@ -490,12 +515,9 @@ class Game(Page):
         if pygame.K_DELETE in self.pressed_keys:
             self.current_wave.kill_all()
             self.pressed_keys.remove(pygame.K_DELETE)
-        if pygame.K_t in self.pressed_keys:
-            data = self.get_net_data()
-            buff = data._get_buffer()
-            data2 = NetData()
-            data2._load_buffer(buff)
-            self.pressed_keys.remove(pygame.K_t)
+        if pygame.K_r in self.pressed_keys:
+            self.player.reload_weapon()
+            self.pressed_keys.remove(pygame.K_r)
         
 
         if self.player.pos.y > self.map.rect.height:

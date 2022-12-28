@@ -307,6 +307,9 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         _bullet_pos = game_controller.point_to_angle_distance(self.current_weapon.weapon_anchor + self.rect.topleft, self.rect.width/2 + 5, -maths.radians(self.current_weapon.weapon_aim_angle))
         return self.current_weapon.shoot(_bullet_pos, self.net_id)
+    
+    def reload_weapon(self):
+        return self.current_weapon.reload()
    
                     
     def turn_anim(self, speed: float):
