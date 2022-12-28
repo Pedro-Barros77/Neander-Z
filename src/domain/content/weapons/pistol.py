@@ -13,6 +13,7 @@ class Pistol(Weapon):
         self.damage = 5
         self.bullet_speed = 30
         self.fire_rate = 5.5
+        self.reload_delay_ms = 1000
         self.last_shot_time = None
         self.magazine_size = 7
         self.magazine_bullets = self.magazine_size

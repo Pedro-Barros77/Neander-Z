@@ -30,6 +30,10 @@ class Weapon(pygame.sprite.Sprite):
         """The start number of extra bullets."""
         
         self.fire_rate_ratio = 1000
+        self.reload_delay_ms = 1000
+        
+        self.last_shot_time = None
+        self.reload_start_time = None
         
         
         self.dir: int = 0
@@ -83,8 +87,24 @@ class Weapon(pygame.sprite.Sprite):
            
            
     def reload(self):
+        now = datetime.datetime.now()
+        
+        # if ran out of ammo
         if self.total_ammo <= 0:
             return
+        # if magazine is full
+        if self.magazine_bullets >= self.magazine_size:
+            return
+        # if is still reloading
+        if self.reload_start_time != None and now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time:
+            return
+        # if is still firing
+        if self.firing:
+            return
+        
+        self.reload_start_time = now
+        
+        
         to_load = self.magazine_size - self.magazine_bullets
         diff = self.total_ammo - to_load
         
@@ -102,12 +122,17 @@ class Weapon(pygame.sprite.Sprite):
             
     def can_shoot(self):
         
+        # if ran out of ammo
         if self.magazine_bullets <= 0:
             if self.empty_sound != None:
                 self.empty_sound.play() 
             return False
         
         _now = datetime.datetime.now()
+        
+        # if is still reloading
+        if self.reload_start_time != None and _now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time:
+            return
         
         if self.last_shot_time == None:
             self.last_shot_time = _now
