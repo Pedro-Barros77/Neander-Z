@@ -47,7 +47,7 @@ class Store:
         
         store_title = menu_controller.get_text_surface("Store", colors.WHITE, self.font(50))     
         
-        [self.image.blit(store_title, (110, (110* i) + self.store_v_scrollbar.scroll_offset.y)) for i in range(1,10)]
+        [self.image.blit(store_title, (110, (110* i) + self.store_v_scrollbar.scroll_offset.y*2)) for i in range(1,10)]
         self.store_v_scrollbar.draw(screen)
         self.weapons_h_scrollbar.draw(screen)
         

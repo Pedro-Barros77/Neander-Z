@@ -158,7 +158,7 @@ class ScrollBar(object):
             elif self.bar_rect.bottom > (self.rail_rect.height - self.arrow1_rect.height + self.rail_rect.top):
                 self.bar_rect.bottom = self.rail_rect.height - self.arrow1_rect.height + self.rail_rect.top
             
-            self.scroll_offset.y = int(height_diff / (scroll_length * 1.0) * (self.bar_rect.centery - bar_half_lenght) * -1)
+            self.scroll_offset.y = int(height_diff / (scroll_length * 1.0) * (self.bar_rect.centery - bar_half_lenght - self.rail_rect.top) * -1)
         else:
             self.bar_rect.centery =  scroll_length / (height_diff * 1.0) * (self.scroll_offset.y * -1) + bar_half_lenght + self.rail_rect.top
 
@@ -181,7 +181,7 @@ class ScrollBar(object):
             elif self.bar_rect.right > (self.rail_rect.width - self.arrow1_rect.width + self.rail_rect.left):
                 self.bar_rect.right = self.rail_rect.width - self.arrow1_rect.width + self.rail_rect.left
             
-            self.scroll_offset.x = int(width_diff / (scroll_length * 1.0) * (self.bar_rect.centerx - bar_half_lenght) * -1)
+            self.scroll_offset.x = int(width_diff / (scroll_length * 1.0) * (self.bar_rect.centerx - bar_half_lenght - self.rail_rect.left) * -1)
         else:
             self.bar_rect.centerx =  scroll_length / (width_diff * 1.0) * (self.scroll_offset.x * -1) + bar_half_lenght + self.rail_rect.left
         
@@ -203,7 +203,7 @@ class ScrollBar(object):
         is_vertical = self.orientation == enums.Orientation.VERTICAL
         i = 1 if is_vertical else 0
         
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             
             if self.bar_rect.collidepoint(pos):
