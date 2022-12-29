@@ -15,6 +15,7 @@ class Button(pygame.sprite.Sprite):
         self.rect.topleft = pos
         self.center = self.rect.center
         
+        self.name = kwargs.pop("name", "")
         self.text = kwargs.pop("text", "")
         self.text_color = kwargs.pop("text_color", colors.WHITE)
         self.text_font: pygame.font.Font = kwargs.pop("text_font", pygame.font.SysFont('arial', 30))

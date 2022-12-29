@@ -199,6 +199,23 @@ class ScrollBar(object):
         
         self.scroll_change = vec(0,0)
         
+    def move_forward(self, step = None):
+        _step = step if step != None else self.step
+        
+        if self.orientation == enums.Orientation.VERTICAL:
+            self.scroll_change.y = _step
+        else:
+            self.scroll_change.x = _step
+            
+    def move_backward(self, step = None):
+        _step = step if step != None else self.step
+        
+        if self.orientation == enums.Orientation.VERTICAL:
+            self.scroll_change.y = -_step
+        else:
+            self.scroll_change.x = -_step
+            
+        
     def event_handler(self,event):
         is_vertical = self.orientation == enums.Orientation.VERTICAL
         i = 1 if is_vertical else 0
@@ -206,7 +223,7 @@ class ScrollBar(object):
         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             
-            if self.bar_rect.collidepoint(pos):
+            if self.bar_rect.collidepoint(pos) and self.visible:
                 self.focus()
                 if is_vertical:
                     self.mouse_diff.y = pos[1] - self.bar_rect.y
@@ -221,7 +238,7 @@ class ScrollBar(object):
                 self.scroll_change[i] = -self.step
                 
         if event.type == pygame.MOUSEBUTTONUP and self.focused:
-            self.scroll_change[i] = 0
+            # self.scroll_change[i] = 0
             self.holding_bar = False
             
         if event.type == pygame.MOUSEWHEEL and self.focused:

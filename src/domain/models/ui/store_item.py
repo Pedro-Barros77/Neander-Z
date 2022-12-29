@@ -57,10 +57,14 @@ class StoreItem:
         self.selected_scale = kwargs.pop("selected_scale", 1.2)
         self.card_hovered_border_color = kwargs.pop("card_hovered_border_color", colors.WHITE)
 
+    def set_pos(self, pos: vec):
+        self.rect.topleft = pos
+        self.icon_rect.centerx = self.rect.centerx
+        self.icon_rect.top = self.rect.top - (self.icon_rect.height * 0.3)
+        
 
     def default_on_hover(self):
         _brightness = 30
-        _scale = 1.1
         
         if self.hovered: #hover in
             self.card_background_color = colors.add(self.card_background_color, (_brightness, _brightness, _brightness))
@@ -133,7 +137,7 @@ class StoreItem:
         #title
         title = menu_controller.get_text_surface(self.title, self.title_color, self.title_font)
         title_padding = vec(10,5)
-        title_pos = vec(_rect.centerx - title.get_width()/2, _rect.bottom - title.get_height() - title_padding.y*2)
+        title_pos = vec(_rect.centerx - title.get_width()/2, _rect.bottom - title.get_height() - title_padding.y)
         title_box = pygame.Surface(title.get_size() + title_padding*2, pygame.SRCALPHA)
         pygame.draw.rect(title_box, self.title_background_color, ((0,0),title_box.get_size()), border_radius= self.title_border_radius)
         screen.blit(title_box, title_pos - title_padding)
