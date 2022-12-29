@@ -154,21 +154,22 @@ class Player(pygame.sprite.Sprite):
             self.current_weapon.current_frame = pygame.transform.flip(self.current_weapon.current_frame, False, True)
             self.current_weapon.last_dir = self.current_weapon.dir
             
-        if _mouse_target.x < self.rect.centerx - _offset_camera_target.x:
-            self.current_weapon.dir = -1
-            if self.current_weapon.last_dir > self.current_weapon.dir:
-                flip()
-        elif _mouse_target.x > self.rect.centerx- _offset_camera_target.x:
-            self.current_weapon.dir = 1
-            if self.current_weapon.last_dir < self.current_weapon.dir:
-                flip()
-        else:
-            self.current_weapon.dir = 0
+        if game.focused:
+            if _mouse_target.x < self.rect.centerx - _offset_camera_target.x:
+                self.current_weapon.dir = -1
+                if self.current_weapon.last_dir > self.current_weapon.dir:
+                    flip()
+            elif _mouse_target.x > self.rect.centerx- _offset_camera_target.x:
+                self.current_weapon.dir = 1
+                if self.current_weapon.last_dir < self.current_weapon.dir:
+                    flip()
+            else:
+                self.current_weapon.dir = 0
         
         
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
         
-        if self.is_player1:
+        if self.is_player1 and game.focused:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
         
         # The distance from the weapon anchor to position the weapon

@@ -263,8 +263,10 @@ class Enemy(pygame.sprite.Sprite):
                 self.is_alive = False
                 self.running = False
                 self.attacking = False
-                self.hitbox_head.kill()
-                self.hitbox_body.kill()
+                if self.hitbox_head != None:
+                    self.hitbox_head.kill()
+                if self.hitbox_body != None:
+                    self.hitbox_body.kill()
                 self.hitbox_head = None
                 self.hitbox_body = None
                 

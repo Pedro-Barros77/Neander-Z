@@ -473,6 +473,7 @@ class Game(Page):
         
         
     def restart_game(self):
+        self.focused = True
         self.wave_summary = None
         self.pause_screen.hide()
         if self.client_type == enums.ClientType.SINGLE:
@@ -486,21 +487,13 @@ class Game(Page):
         game_controller.handle_events(self, events)
         
         if self.wave_summary != None:
-            self.focused = False
             self.wave_summary.update()
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
                 self.restart_game()
             return
-        elif self.pause_screen != None and self.pause_screen.active:
-            self.focused = False
-            if self.player.reload_popup != None:
-                self.player.reload_popup.destroy()
-                self.player.reload_popup = None
-            self.pause_screen.update()
-            return
         
-        self.focused = True
+        
         if not pygame.mixer.music.get_busy():
             menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
                 
@@ -553,6 +546,12 @@ class Game(Page):
         if self.client_type != enums.ClientType.SINGLE and self.player2.pos.y > self.map.rect.height:
             self.player2.pos.y = 0
             self.player2.update_rect()
+            
+        if self.pause_screen != None and self.pause_screen.active:
+            if self.player.reload_popup != None:
+                self.player.reload_popup.destroy()
+                self.player.reload_popup = None
+            self.pause_screen.update()
         
     
        
@@ -562,9 +561,6 @@ class Game(Page):
         
         if self.wave_summary != None:
             self.wave_summary.draw(self.screen)
-            return
-        elif self.pause_screen != None and self.pause_screen.active:
-            self.pause_screen.draw(self.screen)
             return
         
         # Wave
@@ -584,6 +580,9 @@ class Game(Page):
         self.last_pressed_keys = self.pressed_keys.copy()
 
         self.draw_ui()
+        
+        if self.pause_screen != None and self.pause_screen.active:
+            self.pause_screen.draw(self.screen)
         
     def blit_debug(self):
         """Draws objects that are invisible to the player. For debugging only.

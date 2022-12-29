@@ -42,9 +42,9 @@ def handle_events(game, events: list[pygame.event.Event]):
             _bullet = game.player.shoot()
             if _bullet != None:
                 game.bullets_group.add(_bullet)
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and game.focused:
             handle_keydown(event.key, game)
-        elif event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP and game.focused:
             handle_keyup(event.key, game)
                 
                 

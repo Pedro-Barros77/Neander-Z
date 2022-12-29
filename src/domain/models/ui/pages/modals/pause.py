@@ -37,11 +37,13 @@ class Pause(Modal):
         menu_controller.pages_history = menu_controller.pages_history[:1]
         
     def show(self):
+        self.game.focused = False
         self.active = True
         pygame.mixer.music.pause()
         
     def hide(self):
         self.active = False
+        self.game.focused = True
         pygame.mixer.music.unpause()
     
     def set_tab(self, i: int):
