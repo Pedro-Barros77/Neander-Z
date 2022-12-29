@@ -82,7 +82,7 @@ class Game(Page):
         #ui
         
         self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
-        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\ammo_icon.png'), 3)
+        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3)
         
         
     

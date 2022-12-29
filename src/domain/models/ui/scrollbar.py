@@ -36,7 +36,7 @@ class ScrollBar(object):
         self.on_unfocus: function = lambda: None
         """Function to be called when the scrollbar gets unfocused."""
         
-        #rail look
+        #rail style
         self.rail_color = kwargs.pop("background_color", colors.WHITE)
         """The background color of the rail (scroll box) of the scrollbar."""
         self.rail_border_color = kwargs.pop("rail_border_color", colors.SCROLL_GRAY)
@@ -46,7 +46,7 @@ class ScrollBar(object):
         self.rail_border_radius = kwargs.pop("rail_border_radius", 8)
         """The border radius of the rail (scroll box) of the scrollbar."""
         
-        #bar look
+        #bar style
         self.bar_color = kwargs.pop("rail_border_color", colors.SCROLL_GRAY)
         """The color of the bar (slider) of the scrollbar."""
         self.bar_border_color = colors.alpha_or_default(kwargs.pop("rail_border_color", colors.SCROLL_GRAY), 0)
@@ -56,7 +56,7 @@ class ScrollBar(object):
         self.bar_width_scale = kwargs.pop("bar_width_scale", 0.6)
         """The width scale of the bar (slider) of the scrollbar. How thick it is in proportion with the rail."""
         
-        #arrows look
+        #arrows style
         self.arrows_color = kwargs.pop("arrows_color", colors.SCROLL_GRAY)
         """The color of the arrows (buttons) of the scrollbar."""
         self.arrows_scale = kwargs.pop("arrows_scale", 0.4)

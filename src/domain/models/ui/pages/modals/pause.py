@@ -1,11 +1,10 @@
-import pygame, datetime
+import pygame
 from pygame.math import Vector2 as vec
 
-from domain.services import menu_controller, game_controller
+from domain.services import menu_controller
 from domain.utils import colors, constants
 from domain.models.ui.button import Button
 from domain.models.ui.pages.modals.modal import Modal
-from domain.models.ui.pages.modals.store_section import Store
 
 class Pause(Modal):
     def __init__(self, game, **kwargs):
