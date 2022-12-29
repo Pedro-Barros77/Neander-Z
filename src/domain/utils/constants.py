@@ -43,6 +43,10 @@ def get_character_frames(charac_name: enums.Characters, action: enums.AnimAction
     
     return f'{IMAGES_PATH}characters\\{str(charac_name.value)}\\{str(action.value)}\\'
 
+def get_weapon_frames(weapon_name: enums.Weapons, action: enums.AnimActions):
+    
+    return f'{IMAGES_PATH}weapons\\{str(weapon_name.value)}\\{str(action.value)}\\'
+
 def get_zombie_frames(z_name: enums.Enemies, action: enums.AnimActions):
     if action == enums.AnimActions.IDLE:
         return f'{IMAGES_PATH}enemies\\{str(z_name.value)}\\{str(action.value)}.png'

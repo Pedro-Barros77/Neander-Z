@@ -63,9 +63,13 @@ class Weapon(pygame.sprite.Sprite):
         
         self.firing_frame = 0
         """The current frame of firing animation."""
-        
         self.firing = False
         """If the weapon firing animation is running."""
+        self.reloading_frame = 0
+        """The current frame of reloading animation."""
+        self.reloading = False
+        """If the weapon reloading animation is running."""
+        
         
         self.weapon_anchor = kwargs.pop("weapon_anchor", vec(0,0))
         """The anchor point of the weapon (the center of the circle it orbits around), relative to the player position"""
@@ -75,7 +79,8 @@ class Weapon(pygame.sprite.Sprite):
 
         self.shoot_sound: pygame.mixer.Sound = None
         self.empty_sound: pygame.mixer.Sound = None
-        self.reload_sound: pygame.mixer.Sound = None
+        self.reload_start_sound: pygame.mixer.Sound = None
+        self.reload_end_sound: pygame.mixer.Sound = None
 
     def shoot(self, bullet_pos: vec, player_net_id: int):
         self.firing = True
@@ -102,14 +107,15 @@ class Weapon(pygame.sprite.Sprite):
         if self.firing:
             return
         
+        self.reloading = True
         self.reload_start_time = now
         
         
         to_load = self.magazine_size - self.magazine_bullets
         diff = self.total_ammo - to_load
         
-        if self.reload_sound != None:
-            self.reload_sound.play() 
+        if self.reload_start_sound != None:
+            self.reload_start_sound.play() 
     
         if diff >= 0:
             self.magazine_bullets += to_load

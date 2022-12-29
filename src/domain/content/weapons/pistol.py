@@ -20,18 +20,27 @@ class Pistol(Weapon):
         self.total_ammo = 30
         self.start_total_ammo = self.total_ammo 
         
-        self.reload_frames = []
+        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT))
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD))
         """The animation frames of this weapon when reloading."""
+        self.reload_end_frame = 6
+        self.playing_reload_end = False
+        
+        self.idle_frame = self.fire_frames[0]
+        self.image = self.idle_frame
+        self.current_frame = self.idle_frame
         
         self.barrel_offset = vec(0, 7)
         
         self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.reload_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RELOAD_1911))
+        self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.START_RELOAD_1911))
+        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.END_RELOAD_1911))
    
         self.shoot_sound.set_volume(0.1)
         self.empty_sound.set_volume(0.1)
-        self.reload_sound.set_volume(0.5)
+        self.reload_start_sound.set_volume(0.5)
+        self.reload_end_sound.set_volume(0.5)
         
     
     def fire_anim(self):
@@ -57,13 +66,34 @@ class Pistol(Weapon):
         self.shoot_sound.play()
         return SmallBullet(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id())
     
-    def reload_anim(self):
-        pass
+    def reload_anim(self, speed):
+        self.reloading_frame += speed
+        
+        if int(self.reloading_frame) == self.reload_end_frame and not self.playing_reload_end:
+            self.reload_end_sound.play()
+            self.playing_reload_end = True
+            
+        is_last_frame = self.reloading_frame > len(self.reload_frames)-1
+        
+        if is_last_frame:
+            self.reloading_frame = 0
+            self.reloading = False
+            self.playing_reload_end = False
+        self.current_frame = self.reload_frames[int(self.reloading_frame)]
+        
+        if is_last_frame:
+            self.current_frame = self.idle_frame
+        
+        if self.dir < 0:
+            self.current_frame = pygame.transform.flip(self.current_frame, False, True)
 
     def update(self, **kwargs):
         super().update(**kwargs)
         
         if self.firing:
             self.firing = self.fire_anim()
+        if self.reloading:
+            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
+            self.reload_anim(speed)
             
     

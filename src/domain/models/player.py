@@ -66,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         """The mouse position of the other player."""
         self.player2_rect: pygame.Rect = pygame.Rect(0,0,1,1)
         
-        self.current_weapon = Pistol((self.rect.width, self.rect.centery), fire_frames_path = constants.PISTOL_FOLDER, weapon_anchor = vec(self.rect.width/2, self.rect.height/3))
+        self.current_weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3))
         """The weapon on player's hand."""
         
         self.turning_dir = 0
