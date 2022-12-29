@@ -17,3 +17,5 @@ Button click Sound Effect from <a href="https://pixabay.com/?utm_source=link-att
 Empty firing https://www.storyblocks.com/audio/stock/gun-staple-gun-empty-firing-rxhqlqa3ivrk0wxwv17.html
 
 Empty clip https://www.storyblocks.com/audio/stock/staple-gun-load-empty-clip-rgbz2222lwhk0wxupnw.html
+
+ScrollBar template: https://github.com/edward344/scrollbar

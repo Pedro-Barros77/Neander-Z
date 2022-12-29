@@ -487,7 +487,8 @@ class Game(Page):
         game_controller.handle_events(self, events)
         
         if self.wave_summary != None:
-            self.wave_summary.update()
+            self.focused = False
+            self.wave_summary.update(events = events)
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
                 self.restart_game()

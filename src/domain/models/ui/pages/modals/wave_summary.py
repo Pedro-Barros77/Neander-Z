@@ -18,7 +18,7 @@ class WaveSummary(Modal):
         self.p2_ready = False
         self.timed_out = False
         self.tab_index = 0
-        self.store_section = Store(None)
+        self.store_section = Store(self.P1_RESULT.player, self.panel_margin)
         self.start_time = kwargs.pop("start_time", datetime.datetime.now())
         
         btn_dict = {
@@ -186,11 +186,12 @@ class WaveSummary(Modal):
             b.draw(screen)
 
 
-    def update(self):
+    def update(self, **kwargs):
         super().update()
+        events = kwargs.pop("events", [])
         
         if self.tab_index == 1:
-            self.store_section.update()
+            self.store_section.update(events = events)
         
         for b in self.buttons:
             b.update()

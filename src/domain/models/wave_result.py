@@ -3,6 +3,7 @@ from domain.models.player import Player
 
 class WaveResult():
     def __init__(self, **kwargs):
+        self.player: Player = kwargs.pop("player", None)
         self.player_character = kwargs.pop("player_character", enums.Characters.CARLOS)
         self.wave_number = kwargs.pop("wave_number", 1)
         self.score = kwargs.pop("score",0)
