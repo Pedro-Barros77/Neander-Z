@@ -16,9 +16,7 @@ class Pistol(Weapon):
         self.reload_delay_ms = 1000
         self.last_shot_time = None
         self.magazine_size = 7
-        self.magazine_bullets = self.magazine_size
-        self.total_ammo = 30
-        self.start_total_ammo = self.total_ammo 
+        
         
         self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT))
         self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD))

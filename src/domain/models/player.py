@@ -7,7 +7,7 @@ from domain.utils import colors, constants, enums, math_utillity as math
 from domain.services import game_controller, menu_controller
 from domain.content.weapons.pistol import Pistol
 from domain.models.progress_bar import ProgressBar
-from domain.content.weapons.small_bullet import SmallBullet
+from domain.models.backpack import BackPack
 from domain.models.ui.popup_text import Popup
 
 
@@ -66,7 +66,10 @@ class Player(pygame.sprite.Sprite):
         """The mouse position of the other player."""
         self.player2_rect: pygame.Rect = pygame.Rect(0,0,1,1)
         
-        self.current_weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3))
+        
+        self.backpack = BackPack()
+        
+        self.current_weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack, start_ammo = self.backpack.pistol_ammo)
         """The weapon on player's hand."""
         
         self.turning_dir = 0
@@ -117,6 +120,7 @@ class Player(pygame.sprite.Sprite):
             self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
         else:
             self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)), border_width = 1)
+    
     
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
@@ -211,7 +215,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.reload_popup.rect.centerx = self.rect.centerx - self.offset_camera.x
                 self.reload_popup.rect.bottom = self.rect.top - 10 - self.offset_camera.y
-                if self.current_weapon.total_ammo == 0:
+                if self.backpack.get_ammo(self.current_weapon.bullet_type) == 0:
                     self.reload_popup.text = "No ammo!"
         elif self.reload_popup != None:
            self.reload_popup.destroy()

@@ -2,9 +2,10 @@ import pygame,datetime
 from pygame.math import Vector2 as vec
 
 
-from domain.utils import colors, constants
+from domain.utils import colors, constants, enums
 from domain.services import game_controller, menu_controller
 from domain.models.ui.popup_text import Popup
+from domain.models.backpack import BackPack
 
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, pos, **kwargs):
@@ -12,6 +13,9 @@ class Weapon(pygame.sprite.Sprite):
         
         # The name of the object, for debugging.
         self.name = kwargs.pop("name", "weapon")
+        
+        self.player_backpack: BackPack = kwargs.pop("backpack", None)
+        self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         
         self.damage = kwargs.pop("damage", 0)
         """The damage of the weapon's bullet."""
@@ -23,10 +27,8 @@ class Weapon(pygame.sprite.Sprite):
         """The magazine capacity of the weapon."""
         self.magazine_bullets = self.magazine_size
         """The number of bullets currently in the magazine."""
-        self.total_ammo = self.magazine_size
-        """The number of extra bullets."""
-
-        self.start_total_ammo = self.total_ammo 
+        
+        self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) 
         """The start number of extra bullets."""
         
         self.fire_rate_ratio = 1000
@@ -89,13 +91,13 @@ class Weapon(pygame.sprite.Sprite):
     def update(self, **kwargs):
         pass
            
-           
+    
            
     def reload(self):
         now = datetime.datetime.now()
         
         # if ran out of ammo
-        if self.total_ammo <= 0:
+        if self.player_backpack.get_ammo(self.bullet_type) <= 0:
             return
         # if magazine is full
         if self.magazine_bullets >= self.magazine_size:
@@ -112,18 +114,18 @@ class Weapon(pygame.sprite.Sprite):
         
         
         to_load = self.magazine_size - self.magazine_bullets
-        diff = self.total_ammo - to_load
+        diff = self.player_backpack.get_ammo(self.bullet_type) - to_load
         
         if self.reload_start_sound != None:
             self.reload_start_sound.play() 
     
         if diff >= 0:
             self.magazine_bullets += to_load
-            self.total_ammo = diff
+            self.player_backpack.set_ammo(diff, self.bullet_type)
 
         else:
-            self.magazine_bullets += self.total_ammo
-            self.total_ammo = 0
+            self.magazine_bullets += self.player_backpack.get_ammo(self.bullet_type)
+            self.player_backpack.set_ammo(0, self.bullet_type)
   
             
     def can_shoot(self):

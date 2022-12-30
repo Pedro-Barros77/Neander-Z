@@ -2,20 +2,22 @@ import pygame
 from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, menu_controller
-from domain.utils import colors, constants
+from domain.utils import colors, constants, enums
 
 class StoreItem:
-    def __init__(self, icon_path: str, card_rect: pygame.Rect, title: str, button_text: str, **kwargs):
+    def __init__(self, icon_path: str, card_rect: pygame.Rect, title: str, **kwargs):
         
         #properties
         self.rect = card_rect
         self.title = title
-        self.button_text = button_text
         self.description = kwargs.pop("description", "")
         self.item_name = kwargs.pop("item_name", self.title)
         self.price = kwargs.pop("price", 0)
         self.count = kwargs.pop("count", 1)
         self.locked = kwargs.pop("locked", False)
+        self.player_money = kwargs.pop("player_money", 0)
+        self.icon_path = icon_path
+        self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", None)
         
         #control
         self.selected = False
@@ -25,8 +27,9 @@ class StoreItem:
         
         self.on_hover:function = kwargs.pop("on_hover", self.default_on_hover)
         self.on_click:function = kwargs.pop("on_click", self.default_on_click)
+        self.on_blur: function = kwargs.pop("on_blur", self.default_on_blur)
         
-        self.icon = pygame.image.load(icon_path)
+        self.icon = pygame.image.load(self.icon_path)
         _icon_ratio = self.rect.width / self.icon.get_width()
         self.icon_scale = kwargs.pop("image_scale", _icon_ratio * 0.7)
         self.icon = game_controller.scale_image(self.icon, self.icon_scale)
@@ -45,15 +48,12 @@ class StoreItem:
         self.title_color = kwargs.pop("title_color", colors.WHITE)
         self.title_background_color = kwargs.pop("title_background_color", colors.set_alpha(colors.BLACK, 150))
         self.title_border_radius = kwargs.pop("title_border_radius", 10)
-        self.title_font = kwargs.pop("title_font", pygame.font.Font(constants.PIXEL_FONT, 30))
+        self.title_font = kwargs.pop("title_font", pygame.font.Font(constants.PIXEL_FONT, 24))
         
-        self.btn_text_color = kwargs.pop("btn_text_color", colors.WHITE)
-        self.btn_background_color = kwargs.pop("btn_background_color", colors.GREEN)
-        self.btn_border_color = kwargs.pop("btn_border_color", colors.WHITE)
-        self.btn_border_radius = kwargs.pop("btn_border_radius", 8)
-        self.btn_border_width = kwargs.pop("btn_border_width", 1)
-        self.btn_font = kwargs.pop("btn_font", pygame.font.Font(constants.PIXEL_FONT, 25))
-
+        
+        self.price_color = kwargs.pop("price_color", colors.GREEN)
+        self.price_font = kwargs.pop("price_font", pygame.font.Font(constants.PIXEL_FONT, 18))
+        
         self.card_selected_border_color = kwargs.pop("card_selected_border_color", colors.GREEN)
         self.selected_scale = kwargs.pop("selected_scale", 1.2)
         self.card_hovered_border_color = kwargs.pop("card_hovered_border_color", colors.WHITE)
@@ -73,15 +73,19 @@ class StoreItem:
         else: #hover out
             self.card_background_color = colors.add(self.card_background_color, (-_brightness, -_brightness, -_brightness))
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+            
+    def default_on_blur(self, card = None):
+        self.selected = False
         
-    def default_on_click(self):
+    def default_on_click(self, card = None):
         if self.locked:
             return
         # print('clicked ' + self.title)
         self.selected = True
         
         
-    def update(self, offset: vec = vec(0,0)):
+    def update(self, offset: vec = vec(0,0), player_money: int = 0):
+        self.player_money = player_money
         mouse_pos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()[0] == 1
         
@@ -94,12 +98,12 @@ class StoreItem:
                 self.on_hover()
             if clicked and not self.clicked and not self.last_clicked:
                 self.clicked = True
-                self.on_click()
+                self.on_click(self)
         elif _was_hovered:
             self.on_hover()
             
         if not self.hovered and clicked:
-            self.selected = False
+            self.on_blur(self)
             
         if not clicked:
             self.clicked = False
@@ -137,26 +141,21 @@ class StoreItem:
         _icon_rect.topleft += offset
         screen.blit(_icon, _icon_rect)
         
+        #price
+        _price_color = colors.RED if self.player_money < self.price else self.price_color
+        price = menu_controller.get_text_surface(f'${self.price:.2f}', _price_color, self.price_font)
+        price_rect = price.get_rect()
+        price_rect.centerx = _rect.centerx
+        price_rect.bottom = _rect.bottom
+        if not self.locked:
+            screen.blit(price, price_rect)
+        
         #title
         title = menu_controller.get_text_surface(self.title, self.title_color, self.title_font)
         title_padding = vec(10,5)
-        title_pos = vec(_rect.centerx - title.get_width()/2, _rect.bottom - title.get_height() - title_padding.y)
+        title_pos = vec(_rect.centerx - title.get_width()/2, price_rect.top - title.get_height() - title_padding.y)
         title_box = pygame.Surface(title.get_size() + title_padding*2, pygame.SRCALPHA)
         pygame.draw.rect(title_box, self.title_background_color, ((0,0),title_box.get_size()), border_radius= self.title_border_radius)
         screen.blit(title_box, title_pos - title_padding)
         screen.blit(title, title_pos)
-
-        # btn_padding = vec(5,5)
-        # btn_text = menu_controller.get_text_surface(self.button_text, self.btn_text_color, self.btn_font)
-        # self.btn_rect.width = btn_text.get_width() + btn_padding.x*2
-        # self.btn_rect.height = btn_text.get_height() + btn_padding.y*2
-        # self.btn_rect.centerx = self.rect.centerx
-        # self.btn_rect.centery = self.rect.bottom
-        # #button bg
-        # pygame.draw.rect(screen, self.btn_background_color, self.btn_rect, border_radius=self.btn_border_radius)
-        # #button border
-        # pygame.draw.rect(screen, self.btn_border_color, self.btn_rect, self.btn_border_width, self.btn_border_radius)
-        # #button text
-        # screen.blit(btn_text, vec(self.btn_rect.centerx - btn_text.get_width()/2, self.btn_rect.centery - btn_text.get_height()/2))
-        
-        # screen.blit(self.image, self.rect)
+    

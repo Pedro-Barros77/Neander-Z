@@ -116,6 +116,14 @@ class Game(Page):
             self.jumpable_group.add(self.player2)
             
             
+    def new_wave(self, wave):
+        self.wave_summary = None
+        self.focused = True
+        self.current_wave = wave
+        
+        game_controller.bullet_target_groups.append(self.current_wave.enemies_hitbox_group)
+        self.current_wave.start()
+            
     def reset_game(self):
         """Resets all players attributes to default values.
         """
@@ -155,8 +163,7 @@ class Game(Page):
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
         self.player.money = 0
-        self.player.current_weapon.magazine_bullets = self.player.current_weapon.magazine_size
-        self.player.current_weapon.total_ammo = self.player.current_weapon.start_total_ammo
+        self.player.backpack.pistol_ammo = 30
 
         self.player.load_state(menu_controller.player_state)
         
@@ -174,8 +181,7 @@ class Game(Page):
             self.player2.health_bar.target_value = self.player2.max_health
             self.player2.score = 0        
             self.player2.money = 0
-            self.player2.current_weapon.magazine_bullets = self.player2.current_weapon.magazine_size
-            self.player2.current_weapon.total_ammo = self.player2.current_weapon.start_total_ammo
+            self.player2.backpack.pistol_ammo = 30
 
         
         
@@ -183,15 +189,20 @@ class Game(Page):
             self.current_wave.start()
             
 
-    def end_wave(self, result):
+    def end_wave(self, result: dict[int, WaveResult]):
         _p1 = self.player.net_id if self.player.net_id != 3 else 1
-        self.player.score += result[_p1].score
         self.player.money += result[_p1].money
 
+        result[_p1].player = self.player
+        
         if self.client_type != enums.ClientType.SINGLE:
             _p2 = self.player2.net_id             
             self.player2.score += result[_p2].score
             self.player2.money += result[_p2].money
+            
+            result[_p2].player = self.player2
+            
+        
         
         self.wave_summary = WaveSummary((result[1], result[2] if self.client_type != enums.ClientType.SINGLE else None), start_time = datetime.now())
 
@@ -243,7 +254,7 @@ class Game(Page):
         _txt_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_ammo_rect.left = _ammo_icon_rect.right + _horizontal_margin
         
-        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.current_weapon.total_ammo}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_total_ammo_rect = _txt_total_ammo.get_rect()
         _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
@@ -307,7 +318,7 @@ class Game(Page):
         if self.client_type == enums.ClientType.GUEST:
             self.player.score = data.player2_score
             if len(data.wave_results) > 0 and self.wave_summary == None:
-                self.wave_summary = WaveSummary((WaveResult().load_netdata(data.wave_results[0]),WaveResult().load_netdata(data.wave_results[1])))
+                self.wave_summary = WaveSummary((WaveResult(player = self.player).load_netdata(data.wave_results[0]),WaveResult().load_netdata(data.wave_results[1])))
             
         if self.wave_summary != None:
             self.wave_summary.p2_ready = data.player_wave_ready
@@ -491,7 +502,8 @@ class Game(Page):
             self.wave_summary.update(events = events)
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
-                self.restart_game()
+                wave = Wave_1(self)
+                self.new_wave(wave)
             return
         
         

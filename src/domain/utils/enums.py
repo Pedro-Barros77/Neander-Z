@@ -79,6 +79,14 @@ class SFXName(Enum):
     BTN_CLICK = "btn_click.mp3"
     BTN_HOVER = "btn_hover.mp3"
     
+class BulletType(Enum):
+    PISTOL = 1
+    SHOTGUN = 2
+    ASSAULT_RIFLE = 3
+    SNIPER = 4
+    ROCKET = 5
+    GRENADE = 6
+    
 
 
 
