@@ -18,8 +18,10 @@ class WaveSummary(Modal):
         self.p2_ready = False
         self.timed_out = False
         self.tab_index = 0
-        self.store_section = Store(self.P1_RESULT.player, self.panel_margin)
         self.start_time = kwargs.pop("start_time", datetime.datetime.now())
+        
+        
+        self.store_section = Store(self.P1_RESULT.player, self.panel_margin, on_return = lambda: self.set_tab(0))
         
         btn_dict = {
             "text_font": self.font(30),
@@ -31,9 +33,8 @@ class WaveSummary(Modal):
         
         self.buttons: list[Button] = []
         self.buttons.extend([
-            Button(_btn_pos, f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Summary", on_click = lambda: self.set_tab(0) ,**btn_dict, enabled = False),
-            Button(vec(_btn_pos + _btn_margin), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Store", on_click = lambda: self.set_tab(1),**btn_dict),
-            Button(vec(_btn_pos + _btn_margin*2), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Ready", on_click = self.check_btn_ready,**btn_dict),
+            Button(vec(_btn_pos), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Store", on_click = lambda: self.set_tab(1),**btn_dict),
+            Button(vec(_btn_pos + _btn_margin), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Ready", on_click = self.check_btn_ready,**btn_dict),
         ]) 
         self.buttons.append(
             Button(vec(self.buttons[-1].rect.topright), f'{constants.IMAGES_PATH}ui\\btn_square.png', scale = 2, text = "P2", on_click = lambda: None, on_hover = lambda: None, enabled = False,**btn_dict)
@@ -43,16 +44,16 @@ class WaveSummary(Modal):
         self.tab_index = i
         match i:
             case 0:
-                self.buttons[0].enable(False)
-                self.buttons[1].enable(True)
+                self.buttons[0].show()
+                self.buttons[1].show()
             case 1:
-                self.buttons[0].enable(True)
-                self.buttons[1].enable(False)
+                self.buttons[0].hide()
+                self.buttons[1].hide()
            
     
     def check_btn_ready(self):
         self.p1_ready = not self.p1_ready
-        btn = self.buttons[2]
+        btn = self.buttons[1]
         if self.p1_ready:
             btn.set_image(f'{constants.IMAGES_PATH}ui\\btn_small_green.png')
             btn.text_surface = btn.start_text
@@ -176,8 +177,8 @@ class WaveSummary(Modal):
             if b.text == "P2":
                 if self.P2_RESULT == None:
                     continue
-                b.rect.left = self.buttons[2].rect.right
-                b.rect.centery = self.buttons[2].rect.centery
+                b.rect.left = self.buttons[1].rect.right
+                b.rect.centery = self.buttons[1].rect.centery
                 if self.p2_ready:
                     b.set_image(f'{constants.IMAGES_PATH}ui\\btn_square_green.png')
                 else:

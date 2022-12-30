@@ -15,6 +15,7 @@ class StoreItem:
         self.item_name = kwargs.pop("item_name", self.title)
         self.price = kwargs.pop("price", 0)
         self.count = kwargs.pop("count", 1)
+        self.locked = kwargs.pop("locked", False)
         
         #control
         self.selected = False
@@ -74,6 +75,8 @@ class StoreItem:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         
     def default_on_click(self):
+        if self.locked:
+            return
         # print('clicked ' + self.title)
         self.selected = True
         

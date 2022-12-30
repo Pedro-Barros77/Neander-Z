@@ -17,6 +17,7 @@ class Button(pygame.sprite.Sprite):
         
         self.name = kwargs.pop("name", "")
         self.text = kwargs.pop("text", "")
+        self.visible = kwargs.pop("visible", True)
         self.text_color = kwargs.pop("text_color", colors.WHITE)
         self.text_font: pygame.font.Font = kwargs.pop("text_font", pygame.font.SysFont('arial', 30))
         self.text_surface: pygame.Surface = None
@@ -56,7 +57,14 @@ class Button(pygame.sprite.Sprite):
     def enable(self, enabled: bool):
         self.enabled = enabled
         self.default_enable()
+    
+    def hide(self):
+        self.visible = False
+    def show(self):
+        self.visible = True
         
+        
+                
     def default_enable(self):
         _darkness = 100
         
@@ -96,7 +104,7 @@ class Button(pygame.sprite.Sprite):
     def update(self, **kwargs):
         action = False
 
-        if not self.enabled:
+        if not self.enabled or not self.visible:
             return
 
         mouse_pos = pygame.mouse.get_pos()
@@ -123,6 +131,9 @@ class Button(pygame.sprite.Sprite):
         
     
     def draw(self, surface: pygame.Surface):
+        if not self.visible:
+            return
+        
         surface.blit(self.image, self.rect)
         
         if self.text_surface != None:

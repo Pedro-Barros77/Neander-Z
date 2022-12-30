@@ -15,6 +15,8 @@ class ScrollBar(object):
         #properties
         self.focused = kwargs.pop("focused", True)
         """If the scrollbar is focused and should respond to input."""
+        self.auto_focus = kwargs.pop("auto_focus", True)
+        """If the scrollbar is focused on click."""
         self.visible = kwargs.pop("visible", True)
         """If the scrollbar is visible on the screen."""
         self.step = kwargs.pop("step", 30)
@@ -186,8 +188,6 @@ class ScrollBar(object):
             self.bar_rect.centerx =  scroll_length / (width_diff * 1.0) * (self.scroll_offset.x * -1) + bar_half_lenght + self.rail_rect.left
         
     def update(self):
-        if not self.focused:
-            return
         
         self.scroll_offset += self.scroll_change
         
@@ -216,28 +216,38 @@ class ScrollBar(object):
             self.scroll_change.x = -_step
             
         
-    def event_handler(self,event):
+    def event_handler(self,event, offset: vec = vec(0,0)):
         is_vertical = self.orientation == enums.Orientation.VERTICAL
         i = 1 if is_vertical else 0
+        _rect = self.bar_rect.copy()
+        _arrow1_rect = self.arrow1_rect.copy()
+        _arrow2_rect = self.arrow2_rect.copy()
+        _rect.topleft += offset
+        _arrow1_rect.topleft += offset
+        _arrow2_rect.topleft += offset
         
         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             pos = pygame.mouse.get_pos()
             
-            if self.bar_rect.collidepoint(pos) and self.visible:
-                self.focus()
+            
+            if _rect.collidepoint(pos) and self.visible:
+                if self.auto_focus:
+                    self.focus()
                 if is_vertical:
                     self.mouse_diff.y = pos[1] - self.bar_rect.y
                 else:
                     self.mouse_diff.x = pos[0] - self.bar_rect.x
                 self.holding_bar = True
-            elif self.arrow1_rect.collidepoint(pos):
-                self.focus()
+            elif _arrow1_rect.collidepoint(pos):
+                if self.auto_focus:
+                    self.focus()
                 self.scroll_change[i] = self.step
-            elif self.arrow2_rect.collidepoint(pos):
-                self.focus()
+            elif _arrow2_rect.collidepoint(pos):
+                if self.auto_focus:
+                    self.focus()
                 self.scroll_change[i] = -self.step
                 
-        if event.type == pygame.MOUSEBUTTONUP and self.focused:
+        if event.type == pygame.MOUSEBUTTONUP:
             # self.scroll_change[i] = 0
             self.holding_bar = False
             
@@ -261,23 +271,23 @@ class ScrollBar(object):
                 if (is_vertical and event.key == pygame.K_UP or event.key == pygame.K_DOWN) or (not is_vertical and event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT):
                     self.scroll_change[i] = 0
                 
-    def draw(self,screen: pygame.Surface):
+    def draw(self,screen: pygame.Surface, offset:vec = vec(0,0)):
         if not self.visible:
             return
         self.draw_arrows()
         is_vertical = self.orientation == enums.Orientation.VERTICAL
         
         #rail background
-        pygame.draw.rect(screen, self.rail_color, self.rail_rect, border_radius=self.rail_border_radius)
+        pygame.draw.rect(screen, self.rail_color, pygame.Rect(self.rail_rect.topleft + offset,self.rail_rect.size), border_radius=self.rail_border_radius)
         #rail border
-        pygame.draw.rect(screen, self.rail_border_color, self.rail_rect, self.rail_border_width, self.rail_border_radius)
+        pygame.draw.rect(screen, self.rail_border_color, pygame.Rect(self.rail_rect.topleft + offset,self.rail_rect.size), self.rail_border_width, self.rail_border_radius)
         #bar
-        pygame.draw.rect(screen,self.bar_color, self.bar_rect, border_radius=self.rail_border_radius)
+        pygame.draw.rect(screen,self.bar_color, pygame.Rect(self.bar_rect.topleft + offset,self.bar_rect.size), border_radius=self.rail_border_radius)
         #bar border
-        pygame.draw.rect(screen,self.bar_color, self.bar_rect, self.bar_border_width, self.rail_border_radius)
+        pygame.draw.rect(screen,self.bar_color, pygame.Rect(self.bar_rect.topleft + offset,self.bar_rect.size), self.bar_border_width, self.rail_border_radius)
         
-        screen.blit(self.arrow1, self.arrow1_rect)
-        screen.blit(self.arrow2, self.arrow2_rect)
+        screen.blit(self.arrow1, pygame.Rect(self.arrow1_rect.topleft + offset,self.arrow1_rect.size))
+        screen.blit(self.arrow2, pygame.Rect(self.arrow2_rect.topleft + offset,self.arrow2_rect.size))
         
     def draw_arrows(self):
         if self.orientation == enums.Orientation.VERTICAL:
