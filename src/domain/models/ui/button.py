@@ -130,13 +130,14 @@ class Button(pygame.sprite.Sprite):
         return action
         
     
-    def draw(self, surface: pygame.Surface):
+    def draw(self, surface: pygame.Surface, offset: vec = vec(0,0)):
         if not self.visible:
             return
         
-        surface.blit(self.image, self.rect)
+        surface.blit(self.image, pygame.Rect(self.rect.topleft + offset, self.rect.size))
         
         if self.text_surface != None:
             _text_rect = self.text_surface.get_rect()
             _text_rect.center = self.rect.center
+            _text_rect.topleft += offset
             surface.blit(self.text_surface, _text_rect)

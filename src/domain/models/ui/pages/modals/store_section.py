@@ -138,35 +138,36 @@ class Store:
         self.items_panel_buttons[1].rect.left = items_panel_rect.right + image_rect.left + 5
         
         if self.ammo_h_scrollbar == None:
-            self.ammo_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.ammos)*2.1,1), pygame.Rect((ammo_panel_rect.left + self.panel_margin.x/2, ammo_panel_scroll_rect.bottom + 27), (ammo_panel_scroll_rect.width, 20)), visible = True, focused = False, auto_focus = False)
+            self.ammo_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.ammos)*2.1,1), pygame.Rect((ammo_panel_rect.left + self.panel_margin.x/2, ammo_panel_scroll_rect.bottom + 27), (ammo_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
             
         if self.items_h_scrollbar == None:
-            self.items_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.items)*2.1,1), pygame.Rect((items_panel_rect.left + self.panel_margin.x/2, items_panel_scroll_rect.bottom + 27), (items_panel_scroll_rect.width, 20)), visible = True, focused = False, auto_focus = False)
+            self.items_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.items)*2.1,1), pygame.Rect((items_panel_rect.left + self.panel_margin.x/2, items_panel_scroll_rect.bottom + 27), (items_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
         
         if self.store_v_scrollbar == None:
-            self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + store_title.get_height()), (20,screen_rect.height - self.panel_margin.y*2 - (store_title.get_height()))), visible = True)
+            self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + store_title.get_height()), (20,screen_rect.height - self.panel_margin.y*2 - (store_title.get_height()))))
             
+            
+            
+        #   --drawing--
+        
+        #panels
         self.image.blit(ammo_panel, ammo_panel_rect)
         self.image.blit(items_panel, items_panel_rect)
-        pygame.draw.rect(self.image, colors.BLACK, ((0,0), (image_rect.width, store_title.get_height() + 10)))
-        self.image.blit(store_title, (image_rect.width/2 - store_title.get_width()/2, 10))
         
-        
+        #scroll bars
         self.ammo_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
         self.items_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
-        self.store_v_scrollbar.draw(self.image)
+        self.store_v_scrollbar.draw(self.image, - self.panel_margin/2)
         
-        screen.blit(self.image, image_rect)
-
+        #buttons
         for b in self.buttons:
-            b.draw(screen)
-    
+            b.draw(self.image, -self.panel_margin/2)
 
-        
-                    
-    def blit_debug(self, screen, **kwargs):
-        pass
-       
+        #store header
+        pygame.draw.rect(self.image, colors.BLACK, ((0,0), (image_rect.width, store_title.get_height() + 10)))
+        self.image.blit(store_title, (image_rect.width/2 - store_title.get_width()/2, 10))
+        self.buttons[0].draw(self.image, -self.panel_margin/2)
             
+        screen.blit(self.image, image_rect)
        
             
