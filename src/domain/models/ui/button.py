@@ -45,7 +45,7 @@ class Button(pygame.sprite.Sprite):
         self.hovered = False
         
     def set_image(self, file_path: str):
-        self.image = pygame.image.load(file_path)
+        self.image = pygame.image.load(file_path).convert_alpha()
         if self.scale != 1:
             self.image = game_controller.scale_image(self.image, self.scale)
         self.start_image = self.image.copy()

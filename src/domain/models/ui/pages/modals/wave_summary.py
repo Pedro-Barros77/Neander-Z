@@ -3,7 +3,7 @@ from pygame.math import Vector2 as vec
 
 from domain.models.wave_result import WaveResult
 from domain.services import menu_controller, game_controller
-from domain.utils import colors, constants
+from domain.utils import colors, constants, enums
 from domain.models.ui.button import Button
 from domain.models.ui.pages.modals.modal import Modal
 from domain.models.ui.pages.modals.store_section import Store
@@ -78,11 +78,11 @@ class WaveSummary(Modal):
         _player_panels_margin = vec(30, 0)
        
         wave_title = menu_controller.get_text_surface(f'Survived Wave {self.P1_RESULT.wave_number}', colors.RED, self.font(80))
-        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player_character.value}\\head_icon.png'), 4)
+        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
         p1_title = menu_controller.get_text_surface(self.P1_RESULT.player_character.value, colors.WHITE, self.font(60))
         
         if self.P2_RESULT != None:
-            p2_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player_character.value}\\head_icon.png'), 4)
+            p2_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
             p2_title = menu_controller.get_text_surface(self.P2_RESULT.player_character.value, colors.WHITE, self.font(60))
 
         lbl_score = menu_controller.get_text_surface("wave score:", colors.WHITE, self.font(28))

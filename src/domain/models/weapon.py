@@ -51,9 +51,6 @@ class Weapon(pygame.sprite.Sprite):
         
         self.fire_frames = [pygame.Surface((1,1))]
         """The animation frames of this weapon when firing/attacking."""
-        _path = kwargs.pop("fire_frames_path", None) 
-        if _path != None:
-            self.fire_frames = game_controller.load_sprites(_path)
             
         self.idle_frame = self.fire_frames[0]
         """The image of this weapon when not animating."""

@@ -61,7 +61,8 @@ class NewGame(Page):
         self.txt_ip_input.set_buffer([menu_controller.config_state['ip']])
         self.txt_port_input.set_buffer([menu_controller.config_state['port']])
         
-        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{constants.IMAGES_PATH}ui\\logo_anim\\')
+        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{constants.IMAGES_PATH}ui\\logo_anim\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
+        
         self.logo_scale = 0.5
         self.logo_frame = 0
         self.logo_image: pygame.Surface = None

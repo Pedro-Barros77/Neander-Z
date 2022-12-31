@@ -101,6 +101,11 @@ class BulletType(Enum):
     ROCKET = 5
     GRENADE = 6
     
+class ConvertType(Enum):
+    NO_CONVERT = 0,
+    CONVERT = 1,
+    CONVERT_ALPHA = 2
+    
 
 
 

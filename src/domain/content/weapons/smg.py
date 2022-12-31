@@ -25,13 +25,13 @@ class SMG(Weapon):
         self.bullet_spawn_offset = vec(self.rect.width/2 + 40, 2)
         self.last_shot_time = None
         
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.SHOOT), 1.2)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.RELOAD), 1.2)
+        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.SHOOT), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.RELOAD), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The animation frames of this weapon when reloading."""
         self.reload_end_frame = 11
         self.playing_reload_end = False
         
-        self.idle_frame = game_controller.scale_image(pygame.image.load(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.IDLE)), 1.2)
+        self.idle_frame = game_controller.scale_image(pygame.image.load(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.IDLE)), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         

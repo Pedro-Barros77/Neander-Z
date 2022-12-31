@@ -29,7 +29,7 @@ class StoreItem:
         self.on_click:function = kwargs.pop("on_click", self.default_on_click)
         self.on_blur: function = kwargs.pop("on_blur", self.default_on_blur)
         
-        self.icon = pygame.image.load(self.icon_path)
+        self.icon = pygame.image.load(self.icon_path).convert_alpha()
         _icon_ratio = self.rect.width / self.icon.get_width()
         self.icon_scale = kwargs.pop("image_scale", _icon_ratio * 0.7)
         self.icon = game_controller.scale_image(self.icon, self.icon_scale)

@@ -15,7 +15,7 @@ class Page:
             b.update()
             
     def set_background(self, image_path: str):
-        self.background_image = pygame.transform.scale(pygame.image.load(image_path), self.screen.get_size()).convert()
+        self.background_image = pygame.transform.scale(pygame.image.load(image_path).convert(), self.screen.get_size())
         
     def draw(self):
         for b in self.buttons:

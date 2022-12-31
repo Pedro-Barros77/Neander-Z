@@ -45,19 +45,19 @@ class Enemy(pygame.sprite.Sprite):
         self.run_frame = 0
         """The current frame index of the running animation."""
         run_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.RUN)
-        self.run_frames = game_controller.load_sprites(run_folder)
+        self.run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.attacking = False
         self.attack_frame = 0
         attack_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.ATTACK)
-        self.attack_frames = game_controller.load_sprites(attack_folder)
+        self.attack_frames = game_controller.load_sprites(attack_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
 
         self.dying = False
         self.death_frame = 0
         death_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.DEATH)
-        self.death_frames = game_controller.load_sprites(death_folder)
+        self.death_frames = game_controller.load_sprites(death_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale).convert()
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()

@@ -27,9 +27,9 @@ class Shotgun(Weapon):
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
         
         _scale = 1.5
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.SHOOT), _scale)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.RELOAD), _scale)
-        self.pump_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.PUMP), _scale)
+        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.SHOOT), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.RELOAD), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.pump_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.PUMP), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.reload_end_frame = 8
         self.playing_reload_end = False

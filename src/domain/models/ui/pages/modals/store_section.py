@@ -233,7 +233,7 @@ class Store:
             self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + _item_description_size.y), (20,screen_rect.height - self.panel_margin.y*2 - _item_description_size.y)))
             
             
-        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 2.5)
+        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 2.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
         p1_icon_rect = p1_icon.get_rect()
         p1_icon_rect.left = txt_store_title_rect.right + 30
         p1_icon_rect.centery = txt_store_title_rect.centery
@@ -281,7 +281,7 @@ class Store:
             _divider_line_left = btn_buy.rect.right - self.panel_margin.x/2 + 10
                 
             #icon
-            icon = game_controller.scale_image(pygame.image.load(self.selected_card.icon_path), 4)
+            icon = game_controller.scale_image(pygame.image.load(self.selected_card.icon_path), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
             icon_rect = icon.get_rect()
             icon_rect.centerx = _description_rect.left + btn_buy.rect.width/2 + 10
             icon_rect.bottom = _description_rect.bottom - btn_buy.rect.height - 20

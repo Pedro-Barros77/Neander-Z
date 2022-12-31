@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.image_scale = 2
         """How much the image will be scaled from original file."""
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale).convert()
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The surface of the player."""
         	
         self.rect = self.image.get_rect()
@@ -71,7 +71,7 @@ class Player(pygame.sprite.Sprite):
         
         self.backpack = BackPack()
         
-        self.current_weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+        self.current_weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
         """The weapon on player's hand."""
         
         self.turning_dir = 0
@@ -79,7 +79,7 @@ class Player(pygame.sprite.Sprite):
         self.turning_frame = 0
         """The current frame index of the turning animation."""
         turn_folder = constants.get_character_frames(self.character, enums.AnimActions.TURN)
-        self.turn_frames = game_controller.load_sprites(turn_folder)
+        self.turn_frames = game_controller.load_sprites(turn_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the turning animation."""
         
         self.jumping = False
@@ -87,7 +87,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping_frame = 0
         """The current frame index of the jumping animation."""
         jump_folder = constants.get_character_frames(self.character, enums.AnimActions.JUMP)
-        self.jump_frames = game_controller.load_sprites(jump_folder)
+        self.jump_frames = game_controller.load_sprites(jump_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the jumping animation."""
         self.jump_frames.append(self.jump_frames[-1])
         
@@ -96,7 +96,7 @@ class Player(pygame.sprite.Sprite):
         self.running_frame = 0
         """The current frame index of the running animation."""
         run_folder = constants.get_character_frames(self.character, enums.AnimActions.RUN)
-        self.run_frames = game_controller.load_sprites(run_folder)
+        self.run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the running animation."""
         
         self.falling_ground = False
@@ -104,7 +104,7 @@ class Player(pygame.sprite.Sprite):
         self.falling_ground_frame = 0
         """The current frame index of the falling ground animation."""
         fall_ground_folder = constants.get_character_frames(self.character, enums.AnimActions.FALL_GROUND)
-        self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder)
+        self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the falling ground animation."""
         
         self.health_bar: ProgressBar = None

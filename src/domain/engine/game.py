@@ -81,8 +81,8 @@ class Game(Page):
         
         #ui
         
-        self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png')
-        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3)
+        self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png').convert_alpha()
+        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         
     
@@ -150,7 +150,7 @@ class Game(Page):
             p1_pos = (80, _y)
             p2_pos = (20, _y)
         
-        self.player.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale)
+        self.player.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.player.pos = vec(p1_pos)
         self.player.rect = self.player.image.get_rect()
         self.player.rect.topleft = self.player.pos
@@ -167,7 +167,7 @@ class Game(Page):
         self.player.load_state(menu_controller.player_state)
         
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale)
+            self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
             self.player2.pos = vec(p2_pos)
             self.player2.rect = self.player2.image.get_rect()
             self.player2.rect.topleft = self.player2.pos
@@ -210,7 +210,7 @@ class Game(Page):
         _top_margin = 10
         _horizontal_margin = 10
         
-        _player_head = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3)
+        _player_head = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         _head_rect = _player_head.get_rect()
         _head_rect.top = _top_margin
         _head_rect.left = _horizontal_margin

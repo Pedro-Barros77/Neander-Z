@@ -2,6 +2,7 @@ import pygame
 
 from domain.services import game_controller
 from domain.models.rectangle_sprite import Rectangle
+from domain.utils import enums
 
 class Map(pygame.sprite.Sprite):
     def __init__(self, screen, image, **kwargs):
@@ -12,7 +13,7 @@ class Map(pygame.sprite.Sprite):
         self.floor_y = kwargs.pop("floor_y", 20)
         """The vertical distance from the bottom of the screen to the map floor.""" 
         
-        self.image = game_controller.scale_image(pygame.image.load(image), 1.5).convert()
+        self.image = game_controller.scale_image(pygame.image.load(image), 1.5, convert_type=enums.ConvertType.CONVERT)
         """The map image/surface.""" 
         
         self.size = self.image.get_size()

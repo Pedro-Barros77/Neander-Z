@@ -26,8 +26,8 @@ class Pistol(Weapon):
         # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
         
         
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT))
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD))
+        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT), convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD), convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The animation frames of this weapon when reloading."""
         self.reload_end_frame = 6
         self.playing_reload_end = False

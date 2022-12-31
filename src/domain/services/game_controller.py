@@ -85,7 +85,7 @@ def restart_game(game):
     game.map.rect.left = 0
     game.reset_game()
     
-def load_sprites(folder_path: str, scale = 1):
+def load_sprites(folder_path: str, scale = 1, convert_type: enums.ConvertType = enums.ConvertType.CONVERT):
     """Loads all png files from the specified folter into a list of pygame.Surface.
 
     Args:
@@ -103,9 +103,15 @@ def load_sprites(folder_path: str, scale = 1):
     else:
         images = [pygame.image.load(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.png')]
     
-    return images
+    match convert_type:
+        case enums.ConvertType.CONVERT:
+            return [x.convert() for x in images]
+        case enums.ConvertType.CONVERT_ALPHA:
+            return [x.convert_alpha() for x in images]
+        case _:
+            return images
     
-def scale_image(image: pygame.Surface, scale: float):
+def scale_image(image: pygame.Surface, scale: float, convert_type: enums.ConvertType = enums.ConvertType.NO_CONVERT):
     """Scales a image to the given float size.
 
     Args:
@@ -116,7 +122,14 @@ def scale_image(image: pygame.Surface, scale: float):
         pygame.Surface: The scaled image.
     """    
     img = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
-    return img
+    
+    match convert_type:
+        case enums.ConvertType.CONVERT:
+            return img.convert()
+        case enums.ConvertType.CONVERT_ALPHA:
+            return img.convert_alpha()
+        case _:
+            return img
 
 def angle_to_mouse(pos: vec, mouse_pos: vec):
     rel_x, rel_y = mouse_pos.x - pos.x, mouse_pos.y - pos.y
