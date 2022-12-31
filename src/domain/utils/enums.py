@@ -31,12 +31,14 @@ class Bullets(Enum):
     
 class Weapons(Enum):
     P_1911 = 'pistols\\1911'
+    SHORT_BARREL = 'shotguns\\short_barrel'
     
 class AnimActions(Enum):
     TURN = "turn"
     JUMP = "jump"
     RUN = "run"
     RELOAD = "reload"
+    PUMP = "pump"
     SHOOT = "shoot"
     FALL_GROUND = "fall_ground"
     IDLE = "idle"
@@ -65,6 +67,7 @@ class SFXType(Enum):
 
 class SFXActions(Enum):
     SHOOT = "shoot"
+    PUMP = "pump"
     RELOAD = "reload"
     CLICKED = "clicked"
     JUMP = "jump"
@@ -73,8 +76,16 @@ class SFXActions(Enum):
 
 class SFXName(Enum):
     P_1911 = "1911.mp3"
+    #shoot
+    SHORT_BARREL = "short_barrel.mp3"
+    PUMP_SHORT_BARREL = "pump_short_barrel.mp3"
+    
+    #reload
     START_RELOAD_1911 = "start_reload_1911.mp3"
     END_RELOAD_1911 = "end_reload_1911.mp3"
+    SHELL_LOAD_SHORT_BARREL = "shell_load_short_barrel.mp3"
+    
+    #others
     EMPTY_1911 = "empty_1911.mp3"
     BTN_CLICK = "btn_click.mp3"
     BTN_HOVER = "btn_hover.mp3"

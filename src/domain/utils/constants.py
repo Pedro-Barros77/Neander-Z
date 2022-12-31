@@ -20,7 +20,7 @@ IMAGES_PATH = f"{SRC_DOMAIN}resources\\images\\"
 
 FONTS_PATH = f"{ROOT_PATH}{SRC_DOMAIN}resources\\fonts\\"
 PIXEL_FONT = f'{FONTS_PATH}runescape_uf.ttf'
-SOUNDS_PATH = "src\\domain\\resources\\sounds\\"
+SOUNDS_PATH = f"{SRC_DOMAIN}resources\\sounds\\"
 MENU_MUSIC = f"{SOUNDS_PATH}bg_music\\menu_caves_of_dawn.mp3"
 WAVE_1 = f"{SOUNDS_PATH}bg_music\\wave1_mysterious_celesta.mp3"
 

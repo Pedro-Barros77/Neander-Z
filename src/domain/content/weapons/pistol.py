@@ -10,12 +10,16 @@ class Pistol(Weapon):
     def __init__(self, pos, **kwargs):
         super().__init__(pos, **kwargs)
         
+        self.bullet_type = enums.BulletType.PISTOL
         self.damage = 5
         self.bullet_speed = 30
         self.fire_rate = 5.5
         self.reload_delay_ms = 1000
         self.last_shot_time = None
         self.magazine_size = 7
+        
+        self.bullet_spawn_offset = vec(self.rect.width/2 + 5,0)
+        # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
         
         
         self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT))

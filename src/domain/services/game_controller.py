@@ -39,9 +39,13 @@ def handle_events(game, events: list[pygame.event.Event]):
         if event.type == pygame.QUIT:
              menu_controller.quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] and game.focused:
-            _bullet = game.player.shoot()
-            if _bullet != None:
-                game.bullets_group.add(_bullet)
+            _bullets = game.player.shoot()
+            if _bullets != None:
+                if type(_bullets) != list:
+                    _bullets = [_bullets]
+                if len(_bullets) > 0:
+                    for b in _bullets:
+                        game.bullets_group.add(b)
         elif event.type == pygame.KEYDOWN and game.focused:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP and game.focused:
@@ -82,7 +86,7 @@ def restart_game(game):
     game.map.rect.left = 0
     game.reset_game()
     
-def load_sprites(folder_path: str):
+def load_sprites(folder_path: str, scale = 1):
     """Loads all png files from the specified folter into a list of pygame.Surface.
 
     Args:
@@ -95,7 +99,11 @@ def load_sprites(folder_path: str):
     if not os.path.exists(_path):
         return
     
-    images = [pygame.image.load(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.png')]
+    if scale != 1:
+        images = [scale_image(pygame.image.load(_path + "\\" + img), scale) for img in os.listdir(_path) if img.endswith('.png')]
+    else:
+        images = [pygame.image.load(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.png')]
+    
     return images
     
 def scale_image(image: pygame.Surface, scale: float):

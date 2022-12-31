@@ -72,6 +72,8 @@ class Weapon(pygame.sprite.Sprite):
         self.reloading = False
         """If the weapon reloading animation is running."""
         
+        self.bullet_spawn_offset: vec = kwargs.pop("bullet_spawn_distance", vec(0,0))
+        """The distance from the weapon anchor to the barrel, where the bullet will spawn"""
         
         self.weapon_anchor = kwargs.pop("weapon_anchor", vec(0,0))
         """The anchor point of the weapon (the center of the circle it orbits around), relative to the player position"""
