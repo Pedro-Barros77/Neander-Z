@@ -23,3 +23,5 @@ ScrollBar template: https://github.com/edward344/scrollbar
 Shotgun firing Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=39753">Pixabay</a>
 Shotgun pump Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=81021">Pixabay</a>
 Shotgun shell load Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6464">Pixabay</a>
+
+Uzi shoot echo Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6349">Pixabay</a>

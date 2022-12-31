@@ -13,7 +13,7 @@ class MainMenu(Page):
         super().__init__("MainMenu", **kwargs)
         
         menu_controller.load_all_states()
-        pygame.mixer.pre_init(44100, -16, 2, 500)
+        pygame.mixer.pre_init(44100, -16, 16, 500)
         pygame.mixer.init()
         pygame.init()
 

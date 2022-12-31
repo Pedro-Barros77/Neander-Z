@@ -19,9 +19,15 @@ class SmallBullet(pygame.sprite.Sprite):
         self.speed = speed
         self.collision_groups = game_controller.bullet_target_groups
         self.damage = damage
+        self.total_damage = damage
         self.bullet_name = enums.Bullets.SMALL_BULLET
         self.owner_offset = vec(0,0)
         self.is_alive = True
+        
+        
+        self.start_pos = pos
+        self.max_range = kwargs.pop("max_range", 0)
+        self.min_range = kwargs.pop("min_range", 0)
         
         
     
@@ -33,6 +39,18 @@ class SmallBullet(pygame.sprite.Sprite):
     def update(self, **kwargs):
         if not self.is_alive:
             return
+        
+        if self.max_range > 0:
+            _distance = vec(self.rect.topleft).distance_to(vec(self.start_pos))
+            if _distance >= self.max_range:
+                self.kill()
+            if self.min_range > 0 and _distance > self.min_range:
+                _diff = _distance - self.min_range
+                _range = self.max_range - self.min_range
+                
+                _percentage = (_diff * 100 / _range) / 100
+                
+                self.damage = self.total_damage - (_percentage * self.total_damage)
         
         _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.speed, -math.radians(self.angle))
         

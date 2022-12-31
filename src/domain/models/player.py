@@ -5,7 +5,9 @@ from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
 from domain.services import game_controller, menu_controller
+from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
+from domain.content.weapons.smg import SMG
 from domain.models.progress_bar import ProgressBar
 from domain.models.backpack import BackPack
 from domain.models.ui.popup_text import Popup
@@ -69,7 +71,7 @@ class Player(pygame.sprite.Sprite):
         
         self.backpack = BackPack()
         
-        self.current_weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack, start_ammo = self.backpack.pistol_ammo)
+        self.current_weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
         """The weapon on player's hand."""
         
         self.turning_dir = 0
@@ -326,9 +328,9 @@ class Player(pygame.sprite.Sprite):
         return False    
     
         
-    def shoot(self):
+    def shoot(self, **kwargs):
         _bullet_pos = game_controller.point_to_angle_distance(self.current_weapon.weapon_anchor + self.rect.topleft + vec(0,self.current_weapon.bullet_spawn_offset.y), self.current_weapon.bullet_spawn_offset.x, -maths.radians(self.current_weapon.weapon_aim_angle))
-        return self.current_weapon.shoot(_bullet_pos, self.net_id)
+        return self.current_weapon.shoot(_bullet_pos, self.net_id, **kwargs)
     
     def reload_weapon(self):
         return self.current_weapon.reload()

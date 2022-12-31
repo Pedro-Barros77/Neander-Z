@@ -163,7 +163,6 @@ class Game(Page):
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
         self.player.money = 0
-        self.player.backpack.pistol_ammo = 30
 
         self.player.load_state(menu_controller.player_state)
         
@@ -181,7 +180,6 @@ class Game(Page):
             self.player2.health_bar.target_value = self.player2.max_health
             self.player2.score = 0        
             self.player2.money = 0
-            self.player2.backpack.pistol_ammo = 30
 
         
         
@@ -491,11 +489,33 @@ class Game(Page):
             game_controller.restart_game(self)
         elif self.client_type == enums.ClientType.HOST:
             self.send_restart()
+            
+    def handle_shooting(self):
+        if "mouse_0" not in self.pressed_keys:
+            return
+        
+        def _auto_fire_callback():
+            self.pressed_keys.append("mouse_0")
+        
+        self.pressed_keys.remove("mouse_0")
+        
+        _bullets = self.player.shoot(auto_fire_callback = _auto_fire_callback)
+        
+        if _bullets == None:
+            return
+        
+        if type(_bullets) != list:
+            _bullets = [_bullets]
+        if len(_bullets) > 0:
+            for b in _bullets:
+                self.bullets_group.add(b)
+    
 
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
         
         game_controller.handle_events(self, events)
+        self.handle_shooting()
         
         if self.wave_summary != None:
             self.focused = False

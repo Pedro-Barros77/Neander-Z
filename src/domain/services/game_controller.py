@@ -39,13 +39,12 @@ def handle_events(game, events: list[pygame.event.Event]):
         if event.type == pygame.QUIT:
              menu_controller.quit_app()
         elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] and game.focused:
-            _bullets = game.player.shoot()
-            if _bullets != None:
-                if type(_bullets) != list:
-                    _bullets = [_bullets]
-                if len(_bullets) > 0:
-                    for b in _bullets:
-                        game.bullets_group.add(b)
+            game.pressed_keys.append("mouse_0")
+            
+        elif event.type == pygame.MOUSEBUTTONUP and not pygame.mouse.get_pressed()[0]:
+            if "mouse_0" in game.pressed_keys:
+                game.pressed_keys.remove("mouse_0")
+                
         elif event.type == pygame.KEYDOWN and game.focused:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP and game.focused:

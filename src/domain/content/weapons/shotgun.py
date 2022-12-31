@@ -8,9 +8,10 @@ from domain.services import game_controller
 
 class Shotgun(Weapon):
     def __init__(self, pos, **kwargs):
-        super().__init__(pos, **kwargs)
         
         self.bullet_type = enums.BulletType.SHOTGUN
+        super().__init__(pos, **kwargs)
+        
         self.damage = 3
         self.bullet_speed = 20
         self.fire_rate = 1.5
@@ -19,6 +20,9 @@ class Shotgun(Weapon):
         self.magazine_size = 5
         self.magazine_bullets = self.magazine_size
         self.dispersion = 50
+        self.bullet_max_range = 300
+        self.bullet_min_range = 200
+        self.ballin_count = 12
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
         
@@ -61,20 +65,20 @@ class Shotgun(Weapon):
         if self.pumping:
             self.pump_anim(speed/2)
     
-    def shoot(self, bullet_pos: vec, player_net_id: int):
+    def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
         if not self.can_shoot() or self.pumping or self.reloading:
             return None
         
-        super().shoot(bullet_pos, player_net_id)
+        super().shoot(bullet_pos, player_net_id, **kwargs)
         
         self.last_shot_time = datetime.datetime.now()
         self.shoot_sound.play()
         
         bullets = []
         
-        for i in range(12):
+        for i in range(self.ballin_count):
             _angle = self.weapon_aim_angle + round(random.uniform(-self.dispersion, self.dispersion), 2)
-            bullets.append(SmallBullet(bullet_pos, _angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id()))
+            bullets.append(SmallBullet(bullet_pos, _angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range))
         
         return bullets
     

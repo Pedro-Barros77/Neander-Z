@@ -23,19 +23,25 @@ class Weapon(pygame.sprite.Sprite):
         """The speed of the weapon's bullet."""
         self.fire_rate = kwargs.pop("fire_rate", 1)
         """The speed of the weapon's bullet."""
-        self.magazine_size = 7
+        self.magazine_size = kwargs.pop("magazine_size", 7)
         """The magazine capacity of the weapon."""
         self.magazine_bullets = self.magazine_size
         """The number of bullets currently in the magazine."""
+        self.auto_fire = kwargs.pop("auto_fire", False)
+        """If this weapon can fire repeatedly while holding the trigger."""
         
         self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) 
         """The start number of extra bullets."""
+        
         
         self.fire_rate_ratio = 1000
         self.reload_delay_ms = 1000
         
         self.last_shot_time = None
         self.reload_start_time = None
+        
+        self.auto_fire_callback = lambda: None
+        """Function to be called after a shot, if this gun has autofire mode."""
         
         
         self.dir: int = 0
@@ -86,9 +92,13 @@ class Weapon(pygame.sprite.Sprite):
         self.reload_start_sound: pygame.mixer.Sound = None
         self.reload_end_sound: pygame.mixer.Sound = None
 
-    def shoot(self, bullet_pos: vec, player_net_id: int):
+    def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
         self.firing = True
         self.magazine_bullets -= 1
+        
+        if self.auto_fire:
+            self.auto_fire_callback = kwargs.pop("auto_fire_callback", lambda: None)
+        
 
     def update(self, **kwargs):
         pass

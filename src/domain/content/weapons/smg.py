@@ -1,4 +1,4 @@
-import pygame, math, datetime
+import pygame, math, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
@@ -6,47 +6,68 @@ from domain.utils import constants, enums
 from domain.content.weapons.small_bullet import SmallBullet
 from domain.services import game_controller
 
-class Pistol(Weapon):
+class SMG(Weapon):
     def __init__(self, pos, **kwargs):
-
+        
         self.bullet_type = enums.BulletType.PISTOL
         super().__init__(pos, **kwargs)
         
-        self.damage = 5
-        self.bullet_speed = 30
-        self.fire_rate = 5.5
-        self.reload_delay_ms = 1000
-        self.last_shot_time = None
-        self.magazine_size = 7
+        self.damage = 4
+        self.bullet_speed = 20
+        self.fire_rate = 10
+        self.reload_delay_ms = 1200
+        self.magazine_size = 25
         self.magazine_bullets = self.magazine_size
         self.bullet_max_range = 600
         self.bullet_min_range = 400
+        self.auto_fire = True
         
-        self.bullet_spawn_offset = vec(self.rect.width/2 + 5,0)
-        # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
+        self.bullet_spawn_offset = vec(self.rect.width/2 + 40, 2)
+        self.last_shot_time = None
         
-        
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.SHOOT))
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD))
+        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.SHOOT), 1.2)
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.RELOAD), 1.2)
         """The animation frames of this weapon when reloading."""
-        self.reload_end_frame = 6
+        self.reload_end_frame = 11
         self.playing_reload_end = False
         
-        self.idle_frame = self.fire_frames[0]
+        self.idle_frame = game_controller.scale_image(pygame.image.load(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.IDLE)), 1.2)
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         
         self.barrel_offset = vec(0, 7)
         
-        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
+        self.shoot_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.UZI_SHOOT).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.START_RELOAD_1911))
-        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.END_RELOAD_1911))
+        self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.UZI_RELOAD))
+        self.reload_end_sound = None
+        
+        self.last_channel = 0
    
-        self.shoot_sound.set_volume(0.1)
+        for s in self.shoot_sounds:
+            s.set_volume(0.5)
+            
+   
         self.empty_sound.set_volume(0.1)
         self.reload_start_sound.set_volume(0.3)
-        self.reload_end_sound.set_volume(0.5)
+        if self.reload_end_sound != None:
+            self.reload_end_sound.set_volume(0.5)
+            
+    
+    def fire_sound(self):
+        sound = self.shoot_sounds[random.randint(0, len(self.shoot_sounds)-1)]
+        
+        
+        pygame.mixer.Channel(self.last_channel).play(sound)
+        self.last_channel += 1
+        
+        prev_chann = self.last_channel - 2
+        if prev_chann >= 0:
+            pygame.mixer.Channel(prev_chann).fadeout(200)
+        
+        if self.last_channel >= 3:
+            self.last_channel = 0
+            
         
     
     def fire_anim(self):
@@ -56,7 +77,13 @@ class Pistol(Weapon):
         if self.firing_frame > len(self.fire_frames)-1:
             self.firing_frame = 0
             _still_firing = False
+            if pygame.mouse.get_pressed()[0] and self.auto_fire:
+                self.auto_fire_callback()
+            
+            
         self.current_frame = self.fire_frames[int(self.firing_frame)]
+        if not _still_firing:
+            self.current_frame = self.idle_frame
         
         if self.dir < 0:
             self.current_frame = pygame.transform.flip(self.current_frame, False, True)
@@ -69,13 +96,14 @@ class Pistol(Weapon):
         super().shoot(bullet_pos, player_net_id, **kwargs)
         
         self.last_shot_time = datetime.datetime.now()
-        self.shoot_sound.play()
+        
+        self.fire_sound()
         return SmallBullet(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range)
     
     def reload_anim(self, speed):
         self.reloading_frame += speed
         
-        if int(self.reloading_frame) == self.reload_end_frame and not self.playing_reload_end:
+        if int(self.reloading_frame) == self.reload_end_frame and not self.playing_reload_end and self.reload_end_sound != None:
             self.reload_end_sound.play()
             self.playing_reload_end = True
             
@@ -99,7 +127,6 @@ class Pistol(Weapon):
         if self.firing:
             self.firing = self.fire_anim()
         if self.reloading:
-            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
+            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*4)
             self.reload_anim(speed)
             
-    

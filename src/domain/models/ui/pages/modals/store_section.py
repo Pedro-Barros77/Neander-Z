@@ -296,7 +296,7 @@ class Store:
             bullet_text = ""
             p = self.player
             
-            bullet_text = f'{p.backpack.get_ammo(p.current_weapon.bullet_type)}/{p.backpack.get_max_ammo(p.current_weapon.bullet_type)}'
+            bullet_text = f'{p.backpack.get_ammo(self.selected_card.bullet_type)}/{p.backpack.get_max_ammo(self.selected_card.bullet_type)}'
             
             if len(bullet_text) > 0:
                 txt_bullets = menu_controller.get_text_surface(bullet_text, colors.WHITE, self.font(20))
