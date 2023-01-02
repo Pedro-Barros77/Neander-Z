@@ -56,6 +56,9 @@ class Button(pygame.sprite.Sprite):
         self.start_text = self.text_surface.copy()
         
     def enable(self, enabled: bool):
+        if self.enabled == enabled:
+            return
+        
         self.enabled = enabled
         self.default_enable()
     

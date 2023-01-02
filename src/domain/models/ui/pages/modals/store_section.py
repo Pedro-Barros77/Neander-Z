@@ -76,9 +76,9 @@ class Store:
         ]
         
         self.weapons:list[StoreItem] = [
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
             StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
@@ -138,16 +138,44 @@ class Store:
         for b in self.buttons:
             b.update()
             
+            
+        
+            
+        bck = self.player.backpack
+        
+        #se algum item da loja ta selecionado
         if self.selected_card != None:
             btn_buy = self.buttons[1]
-            btn_buy.set_text(f'Buy +{self.selected_card.count}')
-            btn_buy_enabled = self.player.money >= self.selected_card.price
-            if btn_buy_enabled and not btn_buy.enabled:
-                btn_buy.enable(True)
-            elif not btn_buy_enabled and btn_buy.enabled:
-                btn_buy.enable(False)
+            btn_text = ""
+            _card_equiped = False
+            #se o jogador já possui o item da loja
+            if self.selected_card.owned:
+                #se o item da loja é uma arma
+                if self.selected_card.weapon_type != None:
+                    weapon = bck.get_weapon(self.selected_card.weapon_type)
+                    #se essa arma existe no inventário do player (só pra confirmar)
+                    if weapon != None:
+                        #se essa arma é a primária ou secundária equipada do player
+                        if bck.equipped_primary == self.selected_card.weapon_type or bck.equipped_secondary == self.selected_card.weapon_type:
+                            btn_text = "Equiped"
+                            _card_equiped = True
+                        else: #senão ela ta só no inventário
+                            btn_text = "Equip " + ("Primary" if weapon.is_primary else "Secondary")
+                else:
+                    btn_text = "Purchased"
+
+            else: #player não possui o item
+                btn_text = f'Buy +{self.selected_card.count}'
+                
+            btn_buy.set_text(btn_text)
+            #desativa o botão se o player não tiver dinheiro suficiente ou o item já estar equipado
+            _has_money = self.player.money >= self.selected_card.price
+            
+            btn_buy.enable((_has_money or self.selected_card.owned) and not _card_equiped)
 
         for card in self.cards_list:
+            if card.weapon_type != None and bck.get_weapon(card.weapon_type) != None:
+                card.owned = True
             card.update(self.panel_margin/2, self.player.money)
 
             
@@ -337,12 +365,14 @@ class Store:
         screen.blit(self.image, image_rect)
        
             
+    def buy_weapon(self, weapon_type: enums.Weapons):
+        return self.player.add_weapon(weapon_type)
             
     def buy_ammo(self, ammo_type: enums.BulletType):
         item = self.selected_card
         b = self.player.backpack
         
-        if not b.can_carry_ammo(item.count, self.player.current_weapon.bullet_type):
+        if not b.can_carry_ammo(item.count, ammo_type):
             return False
         
         b.set_ammo(b.get_ammo(ammo_type) + item.count, ammo_type)
@@ -354,11 +384,20 @@ class Store:
         item = self.selected_card
         bought = False
         
-        if self.player.money < item.price:
+        if self.player.money < item.price and not item.owned:
+            print("nop")
             return
         
         if item.item_name.endswith("ammo"):
+            print("ammo")
             bought = self.buy_ammo(item.bullet_type)
+            print(bought)
+        
+        if item.weapon_type != None:
+            if item.owned:
+                self.player.backpack.equip_weapon(item.weapon_type)
+            else:
+                bought = self.buy_weapon(item.weapon_type)
             
             
             

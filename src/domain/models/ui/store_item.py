@@ -18,6 +18,8 @@ class StoreItem:
         self.player_money = kwargs.pop("player_money", 0)
         self.icon_path = icon_path
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", None)
+        self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", None)
+        self.owned = kwargs.pop("owned", False)
         
         #control
         self.selected = False
@@ -143,8 +145,8 @@ class StoreItem:
         screen.blit(_icon, _icon_rect)
         
         #price
-        _price_color = colors.RED if self.player_money < self.price else self.price_color
-        price = menu_controller.get_text_surface(f'${self.price:.2f}', _price_color, self.price_font)
+        _price_color = colors.RED if self.player_money < self.price and not self.owned else self.price_color
+        price = menu_controller.get_text_surface(f'${self.price:.2f}' if not self.owned else "Purchased", _price_color, self.price_font)
         price_rect = price.get_rect()
         price_rect.centerx = _rect.centerx
         price_rect.bottom = _rect.bottom

@@ -35,7 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.score = 0
         """The amount of points of the player""" 
 
-        self.money = 0
+        self.money = 1500
         """The amount of money of the player""" 
         
         self.name = kwargs.pop("name", "player")
@@ -71,12 +71,9 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.backpack.primary_weapons.append(Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack))
-        self.backpack.secondary_weapons.append(Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack))
-        self.backpack.equip_weapon(self.backpack.primary_weapons[0].weapon_type)
-        self.backpack.equip_weapon(self.backpack.secondary_weapons[0].weapon_type)
+        self.add_weapon(enums.Weapons.P_1911)
         
-        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
+        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         """The weapon on player's hand."""
         
         self.weapon_switch_ms = 300
@@ -426,3 +423,30 @@ class Player(pygame.sprite.Sprite):
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         self.health_bar.add_value(value)
         menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["health"]))
+
+    def add_weapon(self, weapon_type: enums.Weapons, equip = True):
+        if self.backpack.get_weapon(weapon_type) != None:
+            return False
+        
+        weapon = None
+        
+        match weapon_type:
+            case enums.Weapons.P_1911:
+                weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+            case enums.Weapons.SHORT_BARREL:
+                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+            case enums.Weapons.UZI:
+                weapon = SMG((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+                
+        if weapon == None:
+            return False
+        
+        if weapon.is_primary:
+            self.backpack.primary_weapons.append(weapon)
+        else:
+            self.backpack.secondary_weapons.append(weapon)
+            
+        if equip:
+            self.backpack.equip_weapon(weapon_type)
+        
+        return True
