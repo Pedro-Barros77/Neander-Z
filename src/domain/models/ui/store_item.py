@@ -31,7 +31,8 @@ class StoreItem:
         
         self.icon = pygame.image.load(self.icon_path).convert_alpha()
         _icon_ratio = self.rect.width / self.icon.get_width()
-        self.icon_scale = kwargs.pop("image_scale", _icon_ratio * 0.7)
+        self.icon_scale = _icon_ratio * 0.7 * kwargs.pop("icon_scale", 1)
+        self.store_icon_scale = kwargs.pop("store_icon_scale", 4)
         self.icon = game_controller.scale_image(self.icon, self.icon_scale)
         self.icon_rect = self.icon.get_rect()
         self.icon_rect.centerx = self.rect.centerx

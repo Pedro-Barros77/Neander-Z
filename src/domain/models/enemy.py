@@ -277,7 +277,7 @@ class Enemy(pygame.sprite.Sprite):
         if head_shot:
             _popup_args["text_color"] = colors.YELLOW
             
-        menu_controller.popup(Popup(f'-{value:.2f}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
+        menu_controller.popup(Popup(f'-{round(value,2)}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
         return not self.is_alive
 
 

@@ -1,4 +1,4 @@
-import pygame, math as maths, random 
+import pygame, math as maths, datetime
 
 from pygame.math import Vector2 as vec
 
@@ -8,6 +8,7 @@ from domain.services import game_controller, menu_controller
 from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
+from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
 from domain.models.backpack import BackPack
 from domain.models.ui.popup_text import Popup
@@ -70,9 +71,17 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
+        self.backpack.primary_weapons.append(Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack))
+        self.backpack.secondary_weapons.append(Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack))
+        self.backpack.equip_weapon(self.backpack.primary_weapons[0].weapon_type)
+        self.backpack.equip_weapon(self.backpack.secondary_weapons[0].weapon_type)
         
-        self.current_weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
         """The weapon on player's hand."""
+        
+        self.weapon_switch_ms = 300
+        """Time in milliseconds to wait since last weapon switch to be able to switch again."""
+        self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
         
         self.turning_dir = 0
         """The directino that tha player is turning to (left: -1, right: 1)."""
@@ -123,6 +132,30 @@ class Player(pygame.sprite.Sprite):
         else:
             self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)), border_width = 1)
     
+    def change_weapon(self, slot: int = None):
+        _now = datetime.datetime.now()
+        if self.last_weapon_switch + datetime.timedelta(milliseconds=self.weapon_switch_ms) > _now:
+            return False
+        
+        
+        self.last_weapon_switch = _now
+        
+        if slot == None:
+            slot = 1 if self.current_weapon.is_primary else 0
+            
+        match slot:
+            case 0:
+                w = self.backpack.get_weapon(self.backpack.equipped_primary)
+                if w:
+                    self.current_weapon = w
+                    return True
+            case 1:
+                w = self.backpack.get_weapon(self.backpack.equipped_secondary)
+                if w:
+                    self.current_weapon = w
+                    return True
+        
+        return False
     
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)

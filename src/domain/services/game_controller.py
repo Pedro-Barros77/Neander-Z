@@ -45,6 +45,13 @@ def handle_events(game, events: list[pygame.event.Event]):
             if "mouse_0" in game.pressed_keys:
                 game.pressed_keys.remove("mouse_0")
                 
+        elif event.type == pygame.MOUSEWHEEL and event.y != 0:
+            if f"wheel_{event.y}" not in game.pressed_keys:
+                game.pressed_keys.append(f"wheel_{1 if event.y > 0 else -1}")
+                
+        
+        
+                
         elif event.type == pygame.KEYDOWN and game.focused:
             handle_keydown(event.key, game)
         elif event.type == pygame.KEYUP and game.focused:

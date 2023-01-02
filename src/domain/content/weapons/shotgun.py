@@ -9,7 +9,9 @@ from domain.services import game_controller
 class Shotgun(Weapon):
     def __init__(self, pos, **kwargs):
         
-        self.bullet_type = enums.BulletType.SHOTGUN
+        kwargs["bullet_type"] = enums.BulletType.SHOTGUN
+        kwargs["weapon_type"] = enums.Weapons.SHORT_BARREL
+        kwargs["is_primary"] = True
         super().__init__(pos, **kwargs)
         
         self.damage = 3

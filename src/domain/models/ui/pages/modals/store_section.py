@@ -28,11 +28,15 @@ class Store:
         self.card_size = vec(100,100)
         
         _cards_descriptions = {
-            enums.BulletType.PISTOL: "It's ammo, for a pistol.\nYou put it in a pistol and fire...\nWhat else shoud it be?",
-            enums.BulletType.SHOTGUN: "Why shoot one bullet if you can\nshoot 12 at once?",
-            enums.BulletType.ASSAULT_RIFLE: "Auto fire goes brrrrrrrrr",
-            enums.BulletType.SNIPER: "They won't know what hit'em!",
-            enums.BulletType.ROCKET: "Booooom!",
+            "pistol_ammo": "It's ammo, for a pistol.\nYou put it in a pistol and fire...\nWhat else shoud it be?",
+            "shotgun_ammo": "Why shoot one bullet if you can\nshoot 12 at once?",
+            "rifle_ammo": "Auto fire goes brrrrrrrrr",
+            "sniper_ammo": "They won't know what hit'em!",
+            "rocket_ammo": "Booooom!",
+            
+            "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
+            "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
+            "uzi": "tags:Auto-fire, small-damage\nUZI with caution!",
         }
         
         def _select_card(card: StoreItem):
@@ -72,15 +76,15 @@ class Store:
         ]
         
         self.weapons:list[StoreItem] = [
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, **cards_dict),
             StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
         self.cards_list = [*self.ammos, *self.items, *self.weapons]
         for c in self.cards_list:
-            c.description = _cards_descriptions.pop(c.bullet_type, "")
+            c.description = _cards_descriptions.pop(c.item_name, "")
             
         
         
@@ -181,6 +185,8 @@ class Store:
         _scroll_rect.top = panel_rect.top + title_rect.height
         return panel, panel_rect, _scroll_rect
         
+    def set_btn_upgrade(self):
+        btn = self.buttons[1]
         
                 
     def draw(self, screen: pygame.Surface):
@@ -281,7 +287,7 @@ class Store:
             _divider_line_left = btn_buy.rect.right - self.panel_margin.x/2 + 10
                 
             #icon
-            icon = game_controller.scale_image(pygame.image.load(self.selected_card.icon_path), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
+            icon = game_controller.scale_image(pygame.image.load(self.selected_card.icon_path), self.selected_card.store_icon_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
             icon_rect = icon.get_rect()
             icon_rect.centerx = _description_rect.left + btn_buy.rect.width/2 + 10
             icon_rect.bottom = _description_rect.bottom - btn_buy.rect.height - 20
@@ -319,9 +325,9 @@ class Store:
             pygame.draw.line(self.image, colors.LIGHT_GRAY, (_divider_line_left, 10), (_divider_line_left, _description_rect.bottom - 10), 2)
             
             #description
-            lines = [menu_controller.get_text_surface(line, colors.WHITE, self.font(18)) for line in self.selected_card.description.split("\n")]
+            lines = [menu_controller.get_text_surface(line.replace("tags:",""), colors.YELLOW if line.startswith("tags:") else colors.WHITE, self.font(18)) for line in self.selected_card.description.split("\n")]
             _line_space = 20
-            _description_margin = vec(15,20)
+            _description_margin = vec(10,20)
             for i, line in enumerate(lines):
                 line_rect = line.get_rect()
                 line_rect.left = _divider_line_left + _description_margin.x

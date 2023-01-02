@@ -1,7 +1,6 @@
 
 from domain.utils import enums
 
-
 class BackPack:
     def __init__(self):
         self.max_pistol_ammo = 50
@@ -11,11 +10,46 @@ class BackPack:
         self.max_rocket_ammo = 5
         
         self.pistol_ammo = 30
-        self.shotgun_ammo = 0
+        self.shotgun_ammo = 30
         self.rifle_ammo = 0
         self.sniper_ammo = 0
         self.rocket_ammo = 0
         
+        
+        
+        
+        
+        self.primary_weapons = [
+        ]
+        self.secondary_weapons = [
+        ]
+        self.equipped_primary = None
+        self.equipped_secondary = enums.Weapons.P_1911
+        
+        
+        
+    def equip_weapon(self, weapon: enums.Weapons):
+        w = self.get_weapon(weapon)
+        if not w:
+            return
+        
+        if w.is_primary:
+            self.equipped_primary = w.weapon_type
+        else:
+            self.equipped_secondary = w.weapon_type
+            
+    def get_weapon(self, weapon: enums.Weapons):
+        prim = [w for w in self.primary_weapons if w.weapon_type == weapon]
+        sec = [w for w in self.secondary_weapons if w.weapon_type == weapon]
+        
+        if not prim and not sec:
+            return None
+        
+        if prim:
+            return prim[0]
+        if sec:
+            return sec[0]
+            
         
         
     def set_ammo(self, value: int, ammo_type: enums.BulletType):

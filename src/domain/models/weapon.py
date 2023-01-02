@@ -16,6 +16,8 @@ class Weapon(pygame.sprite.Sprite):
         
         self.player_backpack: BackPack = kwargs.pop("backpack", None)
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
+        self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.P_1911)
+        self.is_primary = kwargs.pop("is_primary", False)
         
         self.damage = kwargs.pop("damage", 0)
         """The damage of the weapon's bullet."""

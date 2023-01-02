@@ -45,6 +45,7 @@ class AnimActions(Enum):
     IDLE = "idle"
     ATTACK = "attack"
     DEATH = "death"
+    ICON = "icon"
     
 class Command(Enum):
     RESTART_GAME = 1

@@ -82,10 +82,14 @@ class Game(Page):
         #ui
         
         self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png').convert_alpha()
-        self._ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._pistol_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._shotgun_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\shotgun_ammo_icon.png'), 2.7, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         
-    
+        
     def setup(self):
         """Starts the game.
         """
@@ -204,6 +208,18 @@ class Game(Page):
         
         self.wave_summary = WaveSummary((result[1], result[2] if self.client_type != enums.ClientType.SINGLE else None), start_time = datetime.now())
 
+    def get_ammo_icon(self, bullet_type: enums.BulletType):
+        match bullet_type:
+            case enums.BulletType.PISTOL:
+                return self._pistol_ammo_icon
+            case enums.BulletType.SHOTGUN:
+                return self._shotgun_ammo_icon
+            case enums.BulletType.ASSAULT_RIFLE:
+                return self._rifle_ammo_icon
+            case enums.BulletType.SNIPER:
+                return self._sniper_ammo_icon
+            case enums.BulletType.ROCKET:
+                return self._rocket_ammo_icon
     
     def draw_ui(self):
         
@@ -236,7 +252,8 @@ class Game(Page):
         _txt_fps_rect.centery = _head_rect.centery
         _txt_fps_rect.right = self.screen.get_width() - _horizontal_margin
         
-        _ammo_icon_rect = self._ammo_icon.get_rect()
+        _ammo_icon = self.get_ammo_icon(self.player.current_weapon.bullet_type)
+        _ammo_icon_rect = _ammo_icon.get_rect()
         _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
         _ammo_icon_rect.left = _horizontal_margin
         
@@ -250,7 +267,7 @@ class Game(Page):
         _txt_ammo = menu_controller.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_ammo_rect = _txt_ammo.get_rect()
         _txt_ammo_rect.centery = _ammo_icon_rect.centery
-        _txt_ammo_rect.left = _ammo_icon_rect.right + _horizontal_margin
+        _txt_ammo_rect.left = _horizontal_margin + 40
         
         _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_total_ammo_rect = _txt_total_ammo.get_rect()
@@ -262,7 +279,7 @@ class Game(Page):
         self.screen.blit(_txt_money, _txt_money_rect) 
         self.screen.blit(_txt_score, _txt_score_rect)
         self.screen.blit(_txt_fps, _txt_fps_rect)
-        self.screen.blit(self._ammo_icon, _ammo_icon_rect)
+        self.screen.blit(_ammo_icon, _ammo_icon_rect)
         self.screen.blit(_txt_ammo, _txt_ammo_rect)
         self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
         
@@ -515,6 +532,26 @@ class Game(Page):
         events = kwargs.pop("events", None)
         
         game_controller.handle_events(self, events)
+        
+        #input
+        if pygame.K_p in self.pressed_keys:
+            self.pause_screen.show()
+            self.pressed_keys.remove(pygame.K_p)
+        if pygame.K_ESCAPE in self.pressed_keys:
+            self.pause_screen.show()
+            self.pressed_keys.remove(pygame.K_ESCAPE)
+        if pygame.K_r in self.pressed_keys:
+            self.player.reload_weapon()
+            self.pressed_keys.remove(pygame.K_r)
+        if pygame.K_1 in self.pressed_keys:
+            self.player.change_weapon(0)
+            self.pressed_keys.remove(pygame.K_1)
+        if pygame.K_2 in self.pressed_keys:
+            self.player.change_weapon(1)
+            self.pressed_keys.remove(pygame.K_2)
+        if "wheel_1" in self.pressed_keys or "wheel_-1" in self.pressed_keys:
+            self.player.change_weapon()
+        
         self.handle_shooting()
         
         if self.wave_summary != None:
@@ -530,8 +567,6 @@ class Game(Page):
         if not pygame.mixer.music.get_busy():
             menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
                 
-        if pygame.K_l in self.pressed_keys:
-            self.restart_game()
         # p1
         self.player.update(game = self)
         # p2
@@ -551,6 +586,11 @@ class Game(Page):
         
         self.center_camera()
         
+        if "wheel_1" in self.pressed_keys:
+            self.pressed_keys.remove("wheel_1")
+        if "wheel_-1" in self.pressed_keys:
+            self.pressed_keys.remove("wheel_-1")
+        
         #debug
         if pygame.K_UP in self.pressed_keys:
             self.player.get_health(20)
@@ -561,16 +601,8 @@ class Game(Page):
         if pygame.K_DELETE in self.pressed_keys:
             self.current_wave.kill_all()
             self.pressed_keys.remove(pygame.K_DELETE)
-        if pygame.K_r in self.pressed_keys:
-            self.player.reload_weapon()
-            self.pressed_keys.remove(pygame.K_r)
-        if pygame.K_p in self.pressed_keys:
-            self.pause_screen.show()
-            self.pressed_keys.remove(pygame.K_p)
-        if pygame.K_ESCAPE in self.pressed_keys:
-            self.pause_screen.show()
-            self.pressed_keys.remove(pygame.K_ESCAPE)
-        
+        if pygame.K_l in self.pressed_keys:
+            self.restart_game()
 
         if self.player.pos.y > self.map.rect.height:
             self.player.pos.y = 0
