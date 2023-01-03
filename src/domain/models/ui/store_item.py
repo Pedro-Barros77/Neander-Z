@@ -83,7 +83,6 @@ class StoreItem:
     def default_on_click(self, card = None):
         if self.locked:
             return
-        # print('clicked ' + self.title)
         self.selected = True
         
         

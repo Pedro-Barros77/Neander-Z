@@ -92,6 +92,25 @@ def restart_game(game):
     game.map.rect.left = 0
     game.reset_game()
     
+def load_sounds(folder_path: str, volume: int = 1):
+    """Loads all mp3 files from the specified folter into a list of mixer.Sound.
+
+    Args:
+        folder_path (str): The path to the folder containing the images.
+
+    Returns:
+        list[mixer.Sound]: A list of the sounds.
+    """    
+    _path = constants.ROOT_PATH + folder_path
+    if not os.path.exists(_path):
+        return
+    
+    sounds = [pygame.mixer.Sound(_path + "\\" + img) for img in os.listdir(_path) if img.endswith('.mp3')]
+    if volume != 1:
+        for s in sounds:
+            s.set_volume(volume)
+    return sounds
+    
 def load_sprites(folder_path: str, scale = 1, convert_type: enums.ConvertType = enums.ConvertType.CONVERT):
     """Loads all png files from the specified folter into a list of pygame.Surface.
 

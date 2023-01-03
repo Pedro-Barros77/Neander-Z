@@ -1,4 +1,4 @@
-import pygame, datetime
+import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums
@@ -13,7 +13,7 @@ class ZRoger(Enemy):
     def __init__(self, pos, enemy_name,wave, **kwargs):
         super().__init__(pos, enemy_name,wave, **kwargs)
         
-        self.damage = kwargs.pop("damage", 5)
+        self.damage = kwargs.pop("damage", 15)
         self.name = kwargs.pop("name", f"zombie_1")
         self.jump_force = kwargs.pop("jump_force", 12)
         
@@ -28,6 +28,9 @@ class ZRoger(Enemy):
         self.attack_box = vec(15,15)
         self.hit_rectangle = None
         self.head_shot_multiplier = 2
+        
+        self.damage_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\damage', 0.1)
+        self.death_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\death', 0.2)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True))
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width, self.hitbox_head.rect.height - self.rect.height/1.5)))
@@ -94,3 +97,18 @@ class ZRoger(Enemy):
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
         
+    def damage_sound(self):
+        sound = self.damage_sounds[random.randint(0, len(self.damage_sounds)-1)]
+        if not pygame.mixer.Channel(7).get_busy():
+            pygame.mixer.Channel(7).play(sound)
+        
+    def take_damage(self, value: float, attacker=None, head_shot=False):
+        died = super().take_damage(value, attacker, head_shot)
+        
+        if self.damage_sounds != None and len(self.damage_sounds) > 0:
+            self.damage_sound()
+        
+        if died:
+            self.death_sounds[random.randint(0, len(self.death_sounds)-1)].play()
+        
+        return died

@@ -15,6 +15,9 @@ class Store:
         self.player = player
         self.panel_margin = panel_margin
         self.store_v_scrollbar: ScrollBar = None
+        self.purchase_sound = pygame.mixer.Sound(f'{constants.SOUNDS_PATH}sound_effects\\ui\\purchase.mp3')
+        self.purchase_sound.set_volume(0.3)
+        
         
         self.ammo_h_scrollbar: ScrollBar = None
         self.items_h_scrollbar: ScrollBar = None
@@ -218,10 +221,6 @@ class Store:
         _scroll_rect.top = panel_rect.top + title_rect.height
         return panel, panel_rect, _scroll_rect
         
-    def set_btn_upgrade(self):
-        btn = self.buttons[1]
-        
-                
     def draw(self, screen: pygame.Surface):
         screen_rect = screen.get_rect()
         if self.image == None:
@@ -393,13 +392,10 @@ class Store:
         bought = False
         
         if self.player.money < item.price and not item.owned:
-            print("nop")
             return
         
         if item.item_name.endswith("ammo"):
-            print("ammo")
             bought = self.buy_ammo(item.bullet_type)
-            print(bought)
         
         if item.weapon_type != None:
             if item.owned:
@@ -415,5 +411,6 @@ class Store:
             
         if bought:
             self.player.money -= item.price
+            self.purchase_sound.play()
             
             menu_controller.popup(Popup(f"-${item.price}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))

@@ -36,7 +36,6 @@ class Button(pygame.sprite.Sprite):
         self.start_text = self.text_surface.copy()
         
         self.on_hover: function = kwargs.pop("on_hover", self.default_on_hover)
-        self.on_click: function = kwargs.pop("on_click", lambda: print('clicked ' + self.text))
         
         self.enabled = kwargs.pop("enabled", True)
         if not self.enabled:
