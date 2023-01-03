@@ -37,6 +37,9 @@ class Store:
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
             "uzi": "tags:Auto-fire, small-damage\nUZI with caution!",
+            
+            "first_aid_kit": "tags:Restores your health partially.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
+            "medkit": "tags:Completely restores your health.\nIn a world of virtual zombies and\npixels, the medkit is your best\nfriend. Just a quick tap and you'll\nbe back to 100% health in no time!",
         }
         
         def _select_card(card: StoreItem):
@@ -69,8 +72,8 @@ class Store:
         ]
         
         self.items:list[StoreItem] = [
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
+            StoreItem(f'{constants.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
+            StoreItem(f'{constants.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
             StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
             StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
@@ -143,35 +146,37 @@ class Store:
             
         bck = self.player.backpack
         
-        #se algum item da loja ta selecionado
+        #if there is any item selected
         if self.selected_card != None:
             btn_buy = self.buttons[1]
             btn_text = ""
             _card_equiped = False
-            #se o jogador já possui o item da loja
+            #if the player has the item
             if self.selected_card.owned:
-                #se o item da loja é uma arma
+                #if the item is a weapon
                 if self.selected_card.weapon_type != None:
                     weapon = bck.get_weapon(self.selected_card.weapon_type)
-                    #se essa arma existe no inventário do player (só pra confirmar)
+                    #if player really has this weapon
                     if weapon != None:
-                        #se essa arma é a primária ou secundária equipada do player
+                        #if this weapon is the equiped primary or secondary
                         if bck.equipped_primary == self.selected_card.weapon_type or bck.equipped_secondary == self.selected_card.weapon_type:
                             btn_text = "Equiped"
                             _card_equiped = True
-                        else: #senão ela ta só no inventário
+                        else: #otherwise it's just in the inventory
                             btn_text = "Equip " + ("Primary" if weapon.is_primary else "Secondary")
-                else:
+                else: #not a weapon
                     btn_text = "Purchased"
 
-            else: #player não possui o item
-                btn_text = f'Buy +{self.selected_card.count}'
+            else: #player doesn't have the item
+                
+                btn_text = f'Buy{" +" + str(self.selected_card.count) if self.selected_card.count > 0 else ""}'
                 
             btn_buy.set_text(btn_text)
-            #desativa o botão se o player não tiver dinheiro suficiente ou o item já estar equipado
+            #if the player can afford to buy the item
             _has_money = self.player.money >= self.selected_card.price
             
-            btn_buy.enable((_has_money or self.selected_card.owned) and not _card_equiped)
+            #disables btn buy if already has the item and it's not equiped and it's not a healthkit with full health 
+            btn_buy.enable((_has_money or self.selected_card.owned) and not _card_equiped and not (self.selected_card.item_name.endswith("kit") and self.player.health >= self.player.max_health))
 
         for card in self.cards_list:
             if card.weapon_type != None and bck.get_weapon(card.weapon_type) != None:
@@ -327,13 +332,16 @@ class Store:
             txt_card_title_rect.bottom = icon_rect.top - 5
             
             #bullets
-            bullet_text = ""
+            count_text = ""
             p = self.player
             
-            bullet_text = f'{p.backpack.get_ammo(self.selected_card.bullet_type)}/{p.backpack.get_max_ammo(self.selected_card.bullet_type)}'
+            if self.selected_card.bullet_type != None:
+                count_text = f'{p.backpack.get_ammo(self.selected_card.bullet_type)}/{p.backpack.get_max_ammo(self.selected_card.bullet_type)}'
+            if self.selected_card.item_name.endswith("kit"):
+                count_text = f'{self.player.health}/{self.player.max_health}'
             
-            if len(bullet_text) > 0:
-                txt_bullets = menu_controller.get_text_surface(bullet_text, colors.WHITE, self.font(20))
+            if len(count_text) > 0:
+                txt_bullets = menu_controller.get_text_surface(count_text, colors.WHITE, self.font(20))
                 txt_bullets_rect = txt_bullets.get_rect()
                 icon_rect.left -= txt_bullets_rect.width/2 + 2.5
                 txt_bullets_rect.centery = icon_rect.centery
@@ -346,7 +354,7 @@ class Store:
             pygame.draw.rect(self.image, colors.LIGHT_GRAY, _description_rect, 2)
             self.buttons[1].draw(self.image, -self.panel_margin/2)
             self.image.blit(icon, icon_rect)
-            if len(bullet_text) > 0:
+            if len(count_text) > 0:
                 self.image.blit(txt_bullets, txt_bullets_rect)
             self.image.blit(txt_card_title, txt_card_title_rect)
             #divider line
@@ -398,6 +406,10 @@ class Store:
                 self.player.backpack.equip_weapon(item.weapon_type)
             else:
                 bought = self.buy_weapon(item.weapon_type)
+                
+        if item.item_name.endswith("kit"):
+            self.player.get_health(item.count if item.count > 0 else 9999)
+            bought = True
             
             
             
