@@ -1,4 +1,4 @@
-import pygame, sys, datetime
+import pygame, sys, datetime, time
 from pygame import locals as ls
 from pygame.math import Vector2 as vec
 
@@ -21,6 +21,9 @@ config_state = {
     "ip": "",
     "port": ""
 }
+
+dt = 0
+
 
 popup_group = pygame.sprite.Group()
 
@@ -113,10 +116,16 @@ def play_music(music_name, volume: float, repeat_count: int = -1 ):
         
 clock = pygame.time.Clock()
 def app_loop():
+    #debug
+    fps = 60
     
+    last_frame_time = time.time()
     pygame.event.set_allowed([ls.QUIT, ls.KEYDOWN, ls.KEYUP, ls.MOUSEMOTION, ls.MOUSEBUTTONDOWN, ls.MOUSEBUTTONUP, ls.USEREVENT])
-    global clock, pages_history, playing
+    global clock, pages_history, playing, dt
     while 1:
+        dt = (time.time() - last_frame_time) * 60
+        last_frame_time = time.time()
+        
         _events = pygame.event.get()
         for event in _events:
             if event.type == pygame.QUIT:
@@ -127,6 +136,13 @@ def app_loop():
         current_page = pages_history[-1]
         
         playing = current_page.name == "Game"
+        
+        #debug
+        if playing:
+            if pygame.mouse.get_pressed(5)[3]:
+                fps = 30
+            if pygame.mouse.get_pressed(5)[4]:
+                fps = 60
             
         # update
         current_page.update(events = _events)
@@ -139,4 +155,4 @@ def app_loop():
             p.draw(current_page.screen)
             
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(fps)

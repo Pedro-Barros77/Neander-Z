@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
 from domain.content.weapons.small_bullet import SmallBullet
-from domain.services import game_controller
+from domain.services import game_controller, menu_controller as mc
 
 class Shotgun(Weapon):
     def __init__(self, pos, **kwargs):
@@ -61,11 +61,11 @@ class Shotgun(Weapon):
         speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
         
         if self.firing:
-            self.firing = self.fire_anim()
+            self.firing = self.fire_anim(self.fire_rate/10 * mc.dt)
         if self.reloading and not self.pumping:
-            self.reload_anim(speed)
+            self.reload_anim(speed * mc.dt)
         if self.pumping:
-            self.pump_anim(speed/2)
+            self.pump_anim(speed/2 * mc.dt)
     
     def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
         if not self.can_shoot() or self.pumping or self.reloading:
@@ -128,9 +128,9 @@ class Shotgun(Weapon):
             self.pumping = True
         return _will_fit_one_more
 
-    def fire_anim(self):
+    def fire_anim(self, speed: float):
         _still_firing = True
-        self.firing_frame += self.fire_rate/10
+        self.firing_frame += speed
         
         if self.firing_frame > len(self.fire_frames):
             self.firing_frame = 0

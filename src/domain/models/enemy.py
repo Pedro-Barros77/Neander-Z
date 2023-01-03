@@ -2,7 +2,7 @@ import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
-from domain.services import game_controller, menu_controller
+from domain.services import game_controller, menu_controller as mc
 from domain.models.progress_bar import ProgressBar
 from domain.models.ui.popup_text import Popup
 from domain.models.rectangle_sprite import Rectangle
@@ -144,8 +144,8 @@ class Enemy(pygame.sprite.Sprite):
             self.acceleration.x = self.movement_speed * self.dir.x
         if not self.attacking and not self.dying:
             self.acceleration.x += self.speed.x * game.friction
-            self.speed.x += self.acceleration.x
-            self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+            self.speed.x += self.acceleration.x * mc.dt
+            self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
         # Gravity
         game.apply_gravity(self)
@@ -213,7 +213,7 @@ class Enemy(pygame.sprite.Sprite):
     def fade_out_anim(self):
         anim_end = (self.death_time + datetime.timedelta(milliseconds=self.fade_out_ms))
         
-        self.image_alpha = menu_controller.fade_out_color(colors.WHITE, 255, self.death_time, anim_end)[3]
+        self.image_alpha = mc.fade_out_color(colors.WHITE, 255, self.death_time, anim_end)[3]
 
         if self.image_alpha <= 0:
             self.kill(self.killer)
@@ -277,7 +277,7 @@ class Enemy(pygame.sprite.Sprite):
         if head_shot:
             _popup_args["text_color"] = colors.YELLOW
             
-        menu_controller.popup(Popup(f'-{round(value,2)}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
+        mc.popup(Popup(f'-{round(value,2)}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
         return not self.is_alive
 
 
@@ -288,7 +288,7 @@ class Enemy(pygame.sprite.Sprite):
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         
         self.health_bar.add_value(value)
-        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["health"]))
+        mc.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **constants.POPUPS["health"]))
         
       
     

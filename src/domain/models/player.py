@@ -2,9 +2,8 @@ import pygame, math as maths, datetime
 
 from pygame.math import Vector2 as vec
 
-
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller
+from domain.services import game_controller, menu_controller as mc
 from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
@@ -12,9 +11,6 @@ from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
 from domain.models.backpack import BackPack
 from domain.models.ui.popup_text import Popup
-
-
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, character: enums.Characters, **kwargs):
@@ -35,7 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.score = 0
         """The amount of points of the player""" 
 
-        self.money = 1500
+        self.money = 0
         """The amount of money of the player""" 
         
         self.name = kwargs.pop("name", "player")
@@ -71,9 +67,9 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.P_1911)
+        self.add_weapon(enums.Weapons.UZI)
         
-        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
+        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
         """The weapon on player's hand."""
         
         self.weapon_switch_ms = 300
@@ -220,13 +216,13 @@ class Player(pygame.sprite.Sprite):
         #region Animation Triggers
         
         if self.turning_dir != 0:
-            self.turn_anim(0.3)
+            self.turn_anim(0.3 * mc.dt)
         if self.falling_ground:
-            self.fall_ground_anim(0.2)
+            self.fall_ground_anim(0.2 * mc.dt)
         if self.running:
-            self.run_anim(abs(self.speed.x / 26.4))
+            self.run_anim(abs(self.speed.x / 26.4) * mc.dt)
         if self.jumping:
-            self.jump_anim(0.2)
+            self.jump_anim(0.2 * mc.dt)
             
         #endregion Animation Triggers
         
@@ -243,7 +239,7 @@ class Player(pygame.sprite.Sprite):
         if self.current_weapon.magazine_bullets == 0:
             if self.reload_popup == None:
                 self.reload_popup = Popup("Reload: R", vec(self.rect.centerx, self.rect.top - 50) - _target_offset, name="Reload: R", unique= True, **constants.POPUPS["blink"])
-                menu_controller.popup(self.reload_popup)
+                mc.popup(self.reload_popup)
             else:
                 self.reload_popup.rect.centerx = self.rect.centerx - self.offset_camera.x
                 self.reload_popup.rect.bottom = self.rect.top - 10 - self.offset_camera.y
@@ -312,8 +308,8 @@ class Player(pygame.sprite.Sprite):
             
         # Movement
         self.acceleration.x += self.speed.x * game.friction
-        self.speed.x += self.acceleration.x
-        self.pos.x += self.speed.x + 0.5 * self.acceleration.x
+        self.speed.x += self.acceleration.x * mc.dt
+        self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
         # Gravity
         game.apply_gravity(self)
@@ -323,7 +319,7 @@ class Player(pygame.sprite.Sprite):
         _was_grounded = self.grounded
         _old_pos = self.pos.y
         self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL)
-        if not _was_grounded and self.grounded and abs(_old_pos - self.pos.y) > 2 :
+        if not _was_grounded and self.grounded and abs(_old_pos - self.pos.y) > 4 :
             self.jumping = False
             self.falling_ground = True
             self.fall_sound.play()
@@ -412,9 +408,9 @@ class Player(pygame.sprite.Sprite):
         
         
         if self.is_player1:
-            menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
+            mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
         else:
-            menu_controller.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
+            mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
         
         
     def get_health(self, value: float):
@@ -422,7 +418,7 @@ class Player(pygame.sprite.Sprite):
             return
         self.health = math.clamp(self.health + value, 0, self.health_bar.max_value)
         self.health_bar.add_value(value)
-        menu_controller.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["health"]))
+        mc.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["health"]))
 
     def add_weapon(self, weapon_type: enums.Weapons, equip = True):
         if self.backpack.get_weapon(weapon_type) != None:

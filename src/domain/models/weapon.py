@@ -42,10 +42,6 @@ class Weapon(pygame.sprite.Sprite):
         self.last_shot_time = None
         self.reload_start_time = None
         
-        self.auto_fire_callback = lambda: None
-        """Function to be called after a shot, if this gun has autofire mode."""
-        
-        
         self.dir: int = 0
         """The direction that this weapon is pointing to (left: -1, right: 1)."""
         self.last_dir: int = 1
@@ -95,9 +91,6 @@ class Weapon(pygame.sprite.Sprite):
         self.firing = True
         self.magazine_bullets -= 1
         
-        if self.auto_fire:
-            self.auto_fire_callback = kwargs.pop("auto_fire_callback", lambda: None)
-        
 
     def update(self, **kwargs):
         pass
@@ -140,11 +133,11 @@ class Weapon(pygame.sprite.Sprite):
   
             
     def can_shoot(self):
-        
         # if ran out of ammo
         if self.magazine_bullets <= 0:
+            menu_controller.pages_history[-1].pressed_keys.remove("mouse_0")
             if self.empty_sound != None:
-                self.empty_sound.play() 
+                self.empty_sound.play()
             return False
         
         _now = datetime.datetime.now()
@@ -157,7 +150,7 @@ class Weapon(pygame.sprite.Sprite):
             self.last_shot_time = _now
             return True
         
-        if _now - datetime.timedelta(milliseconds= self.fire_rate_ratio/self.fire_rate) >  self.last_shot_time:
+        if _now - datetime.timedelta(milliseconds= self.fire_rate_ratio/self.fire_rate) > self.last_shot_time:
             return True
         
         return False

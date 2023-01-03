@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
 from domain.content.weapons.small_bullet import SmallBullet
-from domain.services import game_controller
+from domain.services import game_controller, menu_controller as mc
 
 class Pistol(Weapon):
     def __init__(self, pos, **kwargs):
@@ -24,7 +24,7 @@ class Pistol(Weapon):
         self.bullet_max_range = 600
         self.bullet_min_range = 400
         
-        self.bullet_spawn_offset = vec(self.rect.width/2 + 5,0)
+        self.bullet_spawn_offset = vec(self.rect.width/2 + 30,0)
         # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
         
         
@@ -51,9 +51,9 @@ class Pistol(Weapon):
         self.reload_end_sound.set_volume(0.5)
         
     
-    def fire_anim(self):
+    def fire_anim(self, speed: float):
         _still_firing = True
-        self.firing_frame += self.fire_rate/20
+        self.firing_frame += speed
         
         if self.firing_frame > len(self.fire_frames)-1:
             self.firing_frame = 0
@@ -99,9 +99,9 @@ class Pistol(Weapon):
         super().update(**kwargs)
         
         if self.firing:
-            self.firing = self.fire_anim()
+            self.firing = self.fire_anim(self.fire_rate/20 * mc.dt)
         if self.reloading:
             speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
-            self.reload_anim(speed)
+            self.reload_anim(speed * mc.dt)
             
     

@@ -2,7 +2,7 @@ import pygame, time
 from datetime import datetime
 from pygame.math import Vector2 as vec
 
-from domain.services import game_controller, menu_controller
+from domain.services import game_controller, menu_controller as mc
 from domain.utils import colors, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
@@ -166,9 +166,9 @@ class Game(Page):
         self.player.health_bar.value = self.player.max_health
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
-        # self.player.money = 0
+        self.player.money = 0
 
-        self.player.load_state(menu_controller.player_state)
+        self.player.load_state(mc.player_state)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
@@ -237,17 +237,17 @@ class Game(Page):
         _money_icon_rect.centery = _head_rect.centery
         _money_icon_rect.left = _health_rect.right + _horizontal_margin
 
-        _txt_money = menu_controller.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_money = mc.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
         _txt_money_rect = _txt_money.get_rect()
         _txt_money_rect.centery = _head_rect.centery
         _txt_money_rect.left = _money_icon_rect.right + _horizontal_margin
 
-        _txt_score = menu_controller.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_score = mc.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
         _txt_score_rect = _txt_score.get_rect()
         _txt_score_rect.centery = _head_rect.centery
         _txt_score_rect.left = _txt_money_rect.right + _horizontal_margin*2
         
-        _txt_fps = menu_controller.get_text_surface(f'fps: {menu_controller.clock.get_fps():.0f}', colors.LIGHT_GRAY, pygame.font.SysFont('calibri', 20))
+        _txt_fps = mc.get_text_surface(f'fps: {mc.clock.get_fps():.0f}', colors.LIGHT_GRAY, pygame.font.SysFont('calibri', 20))
         _txt_fps_rect = _txt_fps.get_rect()
         _txt_fps_rect.centery = _head_rect.centery
         _txt_fps_rect.right = self.screen.get_width() - _horizontal_margin
@@ -264,12 +264,12 @@ class Game(Page):
             _bullets_color = colors.WHITE
         else:
             _bullets_color = colors.YELLOW
-        _txt_ammo = menu_controller.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_ammo_rect = _txt_ammo.get_rect()
         _txt_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_ammo_rect.left = _horizontal_margin + 40
         
-        _txt_total_ammo = menu_controller.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+        _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
         _txt_total_ammo_rect = _txt_total_ammo.get_rect()
         _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
         _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
@@ -429,8 +429,8 @@ class Game(Page):
         target.last_rect = target.rect.copy()
         
         target.acceleration.y = self.gravity_accelaration
-        target.speed.y += target.acceleration.y
-        target.pos.y += target.speed.y + 0.5 * target.acceleration.y
+        target.speed.y += target.acceleration.y * mc.dt
+        target.pos.y += (target.speed.y + 0.5 * target.acceleration.y) * mc.dt
     
     def process_gravitables(self):
         """Applies gravity to all gravitable objects (subclasses of IGravitable)"""        
@@ -511,16 +511,12 @@ class Game(Page):
         if "mouse_0" not in self.pressed_keys:
             return
         
-        def _auto_fire_callback():
-            self.pressed_keys.append("mouse_0")
-        
-        self.pressed_keys.remove("mouse_0")
-        
-        _bullets = self.player.shoot(auto_fire_callback = _auto_fire_callback)
+        _bullets = self.player.shoot()
         
         if _bullets == None:
             return
         
+
         if type(_bullets) != list:
             _bullets = [_bullets]
         if len(_bullets) > 0:
@@ -565,7 +561,7 @@ class Game(Page):
         
         
         if not pygame.mixer.music.get_busy():
-            menu_controller.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
+            mc.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
                 
         # p1
         self.player.update(game = self)
@@ -628,6 +624,10 @@ class Game(Page):
             self.wave_summary.draw(self.screen)
             return
         
+        # bullets
+        for b in self.bullets_group:
+            b.draw(self.screen, self.player.offset_camera)
+            
         # Wave
         self.current_wave.draw(self.screen, self.player.offset_camera)
         # P1
@@ -636,9 +636,6 @@ class Game(Page):
         if self.client_type != enums.ClientType.SINGLE:
             self.player2.draw(self.screen, self.player.offset_camera)
             
-        # bullets
-        for b in self.bullets_group:
-            b.draw(self.screen, self.player.offset_camera)
             
         # self.blit_debug()
         

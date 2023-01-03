@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums
-from domain.services import game_controller
+from domain.services import game_controller, menu_controller as mc
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -43,13 +43,13 @@ class ZRoger(Enemy):
         super().update(**kwargs)
         
         if self.running and self.death_time == None:
-            self.run_anim(abs(self.speed.x / 5))
+            self.run_anim(abs(self.speed.x / 5) * mc.dt)
                     
         if self.attacking and self.death_time == None:
-            self.attcking_anim(0.2)
+            self.attcking_anim(0.2 * mc.dt)
         
         if self.dying and self.death_time == None:
-            self.dying_anim(0.2)
+            self.dying_anim(0.2 * mc.dt)
             
 
 
