@@ -79,6 +79,8 @@ class Game(Page):
         self.focused = True
         
         
+        
+        
         #ui
         
         self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png').convert_alpha()
@@ -112,10 +114,10 @@ class Game(Page):
         self.players_group =  pygame.sprite.Group([self.player])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.bullets_group = pygame.sprite.Group()
+        
 
         self.reset_game()
         
-        # exec(recyclables.create_box)
         if self.client_type != enums.ClientType.SINGLE:
             self.jumpable_group.add(self.player2)
             

@@ -69,7 +69,7 @@ class ZRoger(Enemy):
         if self.run_frame > len(self.run_frames)-1:
             self.run_frame = 0
         self.image = game_controller.scale_image(self.run_frames[int(self.run_frame)], self.image_scale)
-        if self.acceleration.x > 0:
+        if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def attcking_anim(self, speed: float):

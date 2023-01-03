@@ -67,7 +67,7 @@ class SMG(Weapon):
         if prev_chann >= 0:
             pygame.mixer.Channel(prev_chann).fadeout(200)
         
-        if self.last_channel >= 3:
+        if self.last_channel >= 4:
             self.last_channel = 0
             
         

@@ -77,17 +77,12 @@ class Enemy(pygame.sprite.Sprite):
         
         #debug
         self.blit_debug = False
-        
-    def calculate_distance(self, d1: vec, d2: vec):
-        distance = d1 - d2
-        x, y = abs(distance.x), abs(distance.y)
-        return vec(x, y)
     
     def get_closest_player(self, p1, p2):
         if p2 == None:
             return p1
         
-        closest = sorted([p1, p2], key= lambda p: self.calculate_distance(vec(p.rect.center), vec(self.rect.center)).x)[0]
+        closest = sorted([p1, p2], key= lambda p: vec(p.rect.center).distance_to(vec(self.rect.center)))[0]
         return closest
     
     def client_update(self, **kwargs):

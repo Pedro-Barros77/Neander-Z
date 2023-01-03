@@ -9,6 +9,7 @@ from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
 from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
+from domain.models.rectangle_sprite import Rectangle
 from domain.models.backpack import BackPack
 from domain.models.ui.popup_text import Popup
 
@@ -112,6 +113,11 @@ class Player(pygame.sprite.Sprite):
         self.health_bar: ProgressBar = None
         """The health bar of the player."""
         
+        _feet_rect = self.rect.copy()
+        _feet_rect.width *= 0.3
+        _feet_rect.height = self.rect.height
+        self.feet_collider = Rectangle(_feet_rect.size, _feet_rect.topleft)
+        
         self.player2_offset = vec(0,0)
         
         self.is_player1 = self.name == "P1"
@@ -152,6 +158,10 @@ class Player(pygame.sprite.Sprite):
     
     def update_rect(self):
         self.rect.topleft = (self.pos.x, self.pos.y)
+        
+    def update_feet(self):
+        self.feet_collider.rect.centerx = self.rect.centerx
+        self.feet_collider.rect.bottom = self.rect.bottom + 5
         
     def load_state(self, state: dict):
         self.character = state["character"]
@@ -251,6 +261,8 @@ class Player(pygame.sprite.Sprite):
         
         if not self.is_player1:
             self.health_bar.draw(surface, _target_offset)
+            
+        # pygame.draw.rect(surface, colors.BLUE, math.rect_offset(self.feet_collider.rect, -offset), 3)
         
     
     def movement(self, game):
@@ -314,12 +326,13 @@ class Player(pygame.sprite.Sprite):
         # Gravity
         game.apply_gravity(self)
         self.update_rect()
+        self.update_feet()
+        
         
         # jump
         _was_grounded = self.grounded
-        _old_pos = self.pos.y
-        self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL)
-        if not _was_grounded and self.grounded and abs(_old_pos - self.pos.y) > 4 :
+        self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL, self.feet_collider)
+        if not _was_grounded and self.grounded:
             self.jumping = False
             self.falling_ground = True
             self.fall_sound.play()
@@ -339,15 +352,18 @@ class Player(pygame.sprite.Sprite):
     
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
+        self.update_feet()
         
-    def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation):
+    def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation, obj = None):
         """Handles collision between the player and collidable objects.
 
         Args:
             targets (pygame.sprite.Group | list[pygame.sprite.Sprite])
             direction (enums.Orientation): The direction that the player was moving.
         """
-        collision_objs = pygame.sprite.spritecollide(self, targets, False)
+        if obj == None:
+            obj = self
+        collision_objs = pygame.sprite.spritecollide(obj, targets, False)
         if collision_objs:
             game.collision(self, collision_objs, direction)
             return True
@@ -397,7 +413,7 @@ class Player(pygame.sprite.Sprite):
         if self.running_frame > len(self.run_frames):
             self.running_frame = 0
         self.image = game_controller.scale_image(self.run_frames[int(self.running_frame)], self.image_scale)
-        if self.acceleration.x > 0:
+        if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
         
     def take_damage(self, value: float):

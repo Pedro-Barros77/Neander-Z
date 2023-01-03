@@ -140,7 +140,7 @@ def app_loop():
         #debug
         if playing:
             if pygame.mouse.get_pressed(5)[3]:
-                fps = 30
+                fps = 15
             if pygame.mouse.get_pressed(5)[4]:
                 fps = 60
             

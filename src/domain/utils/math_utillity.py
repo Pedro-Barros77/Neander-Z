@@ -1,3 +1,6 @@
+import pygame
+from pygame.math import Vector2 as vec
+
 class Infix:
     def __init__(self, function):
         self.function = function
@@ -14,7 +17,10 @@ class Infix:
 
 sum_tuple_infix=Infix(lambda a, b: (a[0] + b[0], a[1] + b[1]))
 
-
+def rect_offset(rect: pygame.Rect, offset: vec):
+    _rect = rect.copy()
+    _rect.topleft += offset
+    return _rect
 
 def space_to_center(obj: tuple[int, int], container: tuple[int,int]):
     return ((container[0] - obj[0]) // 2, (container[1] - obj[1]) // 2)
