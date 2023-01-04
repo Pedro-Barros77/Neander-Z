@@ -7,6 +7,7 @@ from domain.services import game_controller, menu_controller as mc
 from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
+from domain.content.weapons.melee import Melee
 from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
 from domain.models.rectangle_sprite import Rectangle
@@ -68,9 +69,9 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.UZI)
+        self.add_weapon(enums.Weapons.MACHETE)
         
-        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
+        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         """The weapon on player's hand."""
         
         self.weapon_switch_ms = 300
@@ -214,10 +215,8 @@ class Player(pygame.sprite.Sprite):
         if self.is_player1 and game.focused:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
         
-        # The distance from the weapon anchor to position the weapon
-        _weapon_distance = self.rect.width/2 + 30
         # Weapon pos
-        self.current_weapon.rect.center = game_controller.point_to_angle_distance(_weapon_center, _weapon_distance, -maths.radians(self.current_weapon.weapon_aim_angle)) + self.current_weapon.barrel_offset
+        self.current_weapon.rect.center = game_controller.point_to_angle_distance(_weapon_center, self.current_weapon.weapon_distance, -maths.radians(self.current_weapon.weapon_aim_angle)) + self.current_weapon.barrel_offset
         # Weapon rotation
         self.current_weapon.image, self.current_weapon.rect = game_controller.rotate_to_angle(self.current_weapon.current_frame, vec(self.current_weapon.rect.center),self.current_weapon.weapon_aim_angle)
         
@@ -243,8 +242,8 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.image, self.pos - offset)
         _target_offset = offset if not self.is_player1 else vec(0,0)
         
-        surface.blit(self.current_weapon.image, vec(self.current_weapon.rect.topleft) - _target_offset)
-
+        self.current_weapon.draw(surface, offset)
+        
         #popup
         if self.current_weapon.magazine_bullets == 0:
             if self.reload_popup == None:
@@ -442,13 +441,17 @@ class Player(pygame.sprite.Sprite):
         
         weapon = None
         
+        default_weapon_distance = self.rect.width/2 + 30
+        
         match weapon_type:
             case enums.Weapons.P_1911:
-                weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+                weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.SHORT_BARREL:
-                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.UZI:
-                weapon = SMG((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), backpack = self.backpack)
+                weapon = SMG((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
+            case enums.Weapons.MACHETE:
+                weapon = Melee((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
                 
         if weapon == None:
             return False
@@ -460,5 +463,6 @@ class Player(pygame.sprite.Sprite):
             
         if equip:
             self.backpack.equip_weapon(weapon_type)
+            self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         
         return True

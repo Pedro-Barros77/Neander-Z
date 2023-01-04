@@ -12,6 +12,7 @@ class SMG(Weapon):
         kwargs["bullet_type"] = enums.BulletType.PISTOL
         kwargs["weapon_type"] = enums.Weapons.UZI
         kwargs["is_primary"] = True
+        kwargs["weapon_distance"] = self.rect.width/2 + 30
         super().__init__(pos, **kwargs)
         
         self.damage = 4

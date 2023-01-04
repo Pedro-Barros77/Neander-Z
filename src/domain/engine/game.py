@@ -89,6 +89,7 @@ class Game(Page):
         self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._melee_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\melee_ammo_icon.png'), 1.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         
         
@@ -222,6 +223,8 @@ class Game(Page):
                 return self._sniper_ammo_icon
             case enums.BulletType.ROCKET:
                 return self._rocket_ammo_icon
+            case enums.BulletType.MELEE:
+                return self._melee_ammo_icon
     
     def draw_ui(self):
         
@@ -266,15 +269,19 @@ class Game(Page):
             _bullets_color = colors.WHITE
         else:
             _bullets_color = colors.YELLOW
-        _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
-        _txt_ammo_rect = _txt_ammo.get_rect()
-        _txt_ammo_rect.centery = _ammo_icon_rect.centery
-        _txt_ammo_rect.left = _horizontal_margin + 40
         
-        _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
-        _txt_total_ammo_rect = _txt_total_ammo.get_rect()
-        _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
-        _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
+        if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
+            _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
+            _txt_ammo_rect = _txt_ammo.get_rect()
+            _txt_ammo_rect.centery = _ammo_icon_rect.centery
+            _txt_ammo_rect.left = _horizontal_margin + 40
+            
+            _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+            _txt_total_ammo_rect = _txt_total_ammo.get_rect()
+            _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
+            _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
+        
+        
         
         self.screen.blit(_player_head, _head_rect)
         self.screen.blit(self._money_icon, _money_icon_rect)
@@ -282,8 +289,9 @@ class Game(Page):
         self.screen.blit(_txt_score, _txt_score_rect)
         self.screen.blit(_txt_fps, _txt_fps_rect)
         self.screen.blit(_ammo_icon, _ammo_icon_rect)
-        self.screen.blit(_txt_ammo, _txt_ammo_rect)
-        self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
+        if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
+            self.screen.blit(_txt_ammo, _txt_ammo_rect)
+            self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
         
     
             

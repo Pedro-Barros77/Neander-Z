@@ -40,12 +40,12 @@ class Pistol(Weapon):
         
         self.barrel_offset = vec(0, 7)
         
-        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
+        self.swipe_sounds = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.P_1911))
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
         self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.START_RELOAD_1911))
         self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.END_RELOAD_1911))
    
-        self.shoot_sound.set_volume(0.1)
+        self.swipe_sounds.set_volume(0.1)
         self.empty_sound.set_volume(0.1)
         self.reload_start_sound.set_volume(0.3)
         self.reload_end_sound.set_volume(0.5)
@@ -71,7 +71,7 @@ class Pistol(Weapon):
         super().shoot(bullet_pos, player_net_id, **kwargs)
         
         self.last_shot_time = datetime.datetime.now()
-        self.shoot_sound.play()
+        self.swipe_sounds.play()
         return SmallBullet(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range)
     
     def reload_anim(self, speed):

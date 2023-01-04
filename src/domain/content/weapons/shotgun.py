@@ -42,12 +42,12 @@ class Shotgun(Weapon):
         
         self.barrel_offset = vec(0, 7)
         
-        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.SHORT_BARREL))
+        self.swipe_sounds = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.SHORT_BARREL))
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
         self.pump_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.PUMP, enums.SFXName.PUMP_SHORT_BARREL))
         self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.SHELL_LOAD_SHORT_BARREL))
    
-        self.shoot_sound.set_volume(0.5)
+        self.swipe_sounds.set_volume(0.5)
         self.pump_sound.set_volume(0.5)
         self.empty_sound.set_volume(0.1)
         self.reload_end_sound.set_volume(0.5)
@@ -74,7 +74,7 @@ class Shotgun(Weapon):
         super().shoot(bullet_pos, player_net_id, **kwargs)
         
         self.last_shot_time = datetime.datetime.now()
-        self.shoot_sound.play()
+        self.swipe_sounds.play()
         
         bullets = []
         

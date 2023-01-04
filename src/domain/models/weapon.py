@@ -32,6 +32,9 @@ class Weapon(pygame.sprite.Sprite):
         self.auto_fire = kwargs.pop("auto_fire", False)
         """If this weapon can fire repeatedly while holding the trigger."""
         
+        self.weapon_distance = kwargs.pop("weapon_distance",0)
+        """The distance from the weapon anchor to the weapon position."""
+        
         self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) 
         """The start number of extra bullets."""
         
@@ -82,7 +85,7 @@ class Weapon(pygame.sprite.Sprite):
         self.weapon_aim_angle: float = 0
         """The angle that the container is rotated along with the weapon."""
 
-        self.shoot_sound: pygame.mixer.Sound = None
+        self.swipe_sounds: pygame.mixer.Sound = None
         self.empty_sound: pygame.mixer.Sound = None
         self.reload_start_sound: pygame.mixer.Sound = None
         self.reload_end_sound: pygame.mixer.Sound = None
@@ -94,6 +97,9 @@ class Weapon(pygame.sprite.Sprite):
 
     def update(self, **kwargs):
         pass
+    
+    def draw(self, screen: pygame.Surface, offset: vec):
+        screen.blit(self.image, vec(self.rect.topleft) - vec(0,0))
            
     
            

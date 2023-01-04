@@ -30,6 +30,7 @@ class BackPack:
         
     def equip_weapon(self, weapon: enums.Weapons):
         w = self.get_weapon(weapon)
+        
         if not w:
             return
         
@@ -87,6 +88,9 @@ class BackPack:
 
             case enums.BulletType.ROCKET:
                 return self.rocket_ammo
+            
+            case enums.BulletType.MELEE:
+                return 99999
             
             
     def set_max_ammo(self, value: int, ammo_type: enums.BulletType):

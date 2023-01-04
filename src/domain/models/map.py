@@ -23,7 +23,7 @@ class Map(pygame.sprite.Sprite):
         """The rectangle of the image.""" 
         self.rect.topleft = self.pos
         
-        self.floor = Rectangle((self.size[0], 10), (0, screen.get_height() - self.floor_y), name = "floor")
+        self.floor = Rectangle((self.size[0], 200), (0, screen.get_height() - self.floor_y), name = "floor")
         """A rectangle representing the floor of the map."""  
 
         self.left_wall = Rectangle((10, screen.get_height()), (0, 0), name = "left_wall")

@@ -33,6 +33,7 @@ class Weapons(Enum):
     P_1911 = 'pistols\\1911'
     SHORT_BARREL = 'shotguns\\short_barrel'
     UZI = 'smgs\\uzi'
+    MACHETE = 'melee\\machete'
     
 class AnimActions(Enum):
     TURN = "turn"
@@ -82,6 +83,8 @@ class SFXName(Enum):
     SHORT_BARREL = "short_barrel.mp3"
     PUMP_SHORT_BARREL = "pump_short_barrel.mp3"
     UZI_SHOOT = "uzi_shoot.mp3"
+    MACHETE_SWIPE = "machete_swipe.mp3"
+    MACHETE_HIT = "machete_hit.mp3"
     
     #reload
     START_RELOAD_1911 = "start_reload_1911.mp3"
@@ -95,6 +98,7 @@ class SFXName(Enum):
     BTN_HOVER = "btn_hover.mp3"
     
 class BulletType(Enum):
+    MELEE = 0
     PISTOL = 1
     SHOTGUN = 2
     ASSAULT_RIFLE = 3
