@@ -102,3 +102,10 @@ POPUPS = {
         "font": pygame.font.Font(f'{FONTS_PATH}runescape_uf.ttf', 20)
     }
 }
+
+ATTRIBUTE_BARS = {
+    "weapon": {
+        "bars_count": 13,
+        "bar_fill_color": colors.LIGHT_BLUE
+    }
+}

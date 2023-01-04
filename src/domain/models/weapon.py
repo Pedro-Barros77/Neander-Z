@@ -17,7 +17,13 @@ class Weapon(pygame.sprite.Sprite):
         self.player_backpack: BackPack = kwargs.pop("backpack", None)
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.P_1911)
+        self.fire_mode = kwargs.pop("fire_mode", enums.FireMode.SEMI_AUTO)
+        """How this weapon fires (auto, semi-auto, pump, single shot...)."""
+        self.reload_type = kwargs.pop("reload_type", enums.ReloadType.MAGAZINE)
         self.is_primary = kwargs.pop("is_primary", False)
+        
+        self.bullet_max_range = kwargs.pop("bullet_max_range", 600)
+        self.bullet_min_range = kwargs.pop("bullet_min_range", 500)
         
         self.damage = kwargs.pop("damage", 0)
         """The damage of the weapon's bullet."""
@@ -29,13 +35,11 @@ class Weapon(pygame.sprite.Sprite):
         """The magazine capacity of the weapon."""
         self.magazine_bullets = self.magazine_size
         """The number of bullets currently in the magazine."""
-        self.auto_fire = kwargs.pop("auto_fire", False)
-        """If this weapon can fire repeatedly while holding the trigger."""
         
         self.weapon_distance = kwargs.pop("weapon_distance",0)
         """The distance from the weapon anchor to the weapon position."""
         
-        self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) 
+        self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) if self.player_backpack != None else 0
         """The start number of extra bullets."""
         
         

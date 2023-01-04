@@ -22,6 +22,8 @@ class Melee(Weapon):
         self.last_shot_time = None
         self.magazine_size = 0
         self.magazine_bullets = 1
+        self.fire_mode = enums.FireMode.MELEE
+        self.reload_type = enums.ReloadType.NO_RELOAD
         
         self.player_net_id = 0
         
@@ -32,9 +34,6 @@ class Melee(Weapon):
         self.attack_box = vec(50,20)
         
         self.barrel_offset = vec(0,0)
-        
-        #debug
-        self.player_offset: vec = vec(0,0)
         
         self.attack_frames_1 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.attack_frames_2 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)

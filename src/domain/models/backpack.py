@@ -1,4 +1,3 @@
-
 from domain.utils import enums
 
 class BackPack:
@@ -38,6 +37,7 @@ class BackPack:
             self.equipped_primary = w.weapon_type
         else:
             self.equipped_secondary = w.weapon_type
+        return w
             
     def get_weapon(self, weapon: enums.Weapons):
         prim = [w for w in self.primary_weapons if w.weapon_type == weapon]
@@ -126,7 +126,6 @@ class BackPack:
 
             case enums.BulletType.ROCKET:
                 return self.max_rocket_ammo
-            
             
     def can_carry_ammo(self, value:int, ammo_type: enums.BulletType):
         return self.get_ammo(ammo_type) + value <= self.get_max_ammo(ammo_type)

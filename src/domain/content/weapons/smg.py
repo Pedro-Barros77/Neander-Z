@@ -12,7 +12,6 @@ class SMG(Weapon):
         kwargs["bullet_type"] = enums.BulletType.PISTOL
         kwargs["weapon_type"] = enums.Weapons.UZI
         kwargs["is_primary"] = True
-        kwargs["weapon_distance"] = self.rect.width/2 + 30
         super().__init__(pos, **kwargs)
         
         self.damage = 4
@@ -21,9 +20,10 @@ class SMG(Weapon):
         self.reload_delay_ms = 1200
         self.magazine_size = 25
         self.magazine_bullets = self.magazine_size
-        self.bullet_max_range = 600
-        self.bullet_min_range = 400
-        self.auto_fire = True
+        self.bullet_max_range = 500
+        self.bullet_min_range = 300
+        self.fire_mode = enums.FireMode.FULL_AUTO
+        self.reload_type = enums.ReloadType.MAGAZINE
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 40, 2)
         self.last_shot_time = None

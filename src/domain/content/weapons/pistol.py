@@ -14,15 +14,17 @@ class Pistol(Weapon):
         kwargs["is_primary"] = False
         super().__init__(pos, **kwargs)
         
-        self.damage = 5
+        self.damage = 6
         self.bullet_speed = 30
-        self.fire_rate = 5.5
+        self.fire_rate = 4
         self.reload_delay_ms = 1000
         self.last_shot_time = None
         self.magazine_size = 7
         self.magazine_bullets = self.magazine_size
         self.bullet_max_range = 600
         self.bullet_min_range = 400
+        self.fire_mode = enums.FireMode.SEMI_AUTO
+        self.reload_type = enums.ReloadType.MAGAZINE
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 30,0)
         # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)

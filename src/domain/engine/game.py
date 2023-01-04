@@ -169,7 +169,7 @@ class Game(Page):
         self.player.health_bar.value = self.player.max_health
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
-        self.player.money = 0
+        # self.player.money = 0
 
         self.player.load_state(mc.player_state)
         

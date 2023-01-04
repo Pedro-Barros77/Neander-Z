@@ -106,9 +106,24 @@ class BulletType(Enum):
     ROCKET = 5
     GRENADE = 6
     
+class FireMode(Enum):
+    MELEE = 0
+    SEMI_AUTO = 1
+    BURST = 2
+    FULL_AUTO = 3
+    PUMP_ACTION = 4
+    BOLT_ACTION = 5
+    SINGLE_SHOT = 6
+    
+class ReloadType(Enum):
+    NO_RELOAD = 0
+    MAGAZINE = 1
+    SINGLE_BULLET = 2
+    
+    
 class ConvertType(Enum):
-    NO_CONVERT = 0,
-    CONVERT = 1,
+    NO_CONVERT = 0
+    CONVERT = 1
     CONVERT_ALPHA = 2
     
 

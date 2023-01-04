@@ -174,7 +174,7 @@ def point_to_angle_distance(pos: vec,distance: float, angle_in_radians: float):
     x = pos.x + (distance*math.cos(angle_in_radians))
     y = pos.y + (distance*math.sin(angle_in_radians))
     return vec(x, y)
-    
+
 def host_game(game, host: str, port: int):
     """Creates a server on the specified address and port.
 

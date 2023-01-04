@@ -25,6 +25,8 @@ class Shotgun(Weapon):
         self.bullet_max_range = 300
         self.bullet_min_range = 200
         self.ballin_count = 12
+        self.fire_mode = enums.FireMode.PUMP_ACTION
+        self.reload_type = enums.ReloadType.SINGLE_BULLET
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
         
