@@ -21,8 +21,8 @@ class Launcher(Weapon):
         self.last_shot_time = None
         self.magazine_size = 1
         self.magazine_bullets = self.magazine_size
-        self.bullet_max_range = 0
-        self.bullet_min_range = 0
+        self.bullet_max_range = 800
+        self.bullet_min_range = 790
         self.explosion_min_radius = 100
         self.explosion_max_radius = 200
         self.fire_mode = enums.FireMode.SINGLE_SHOT
@@ -35,9 +35,11 @@ class Launcher(Weapon):
         self.bullet_spawn_offset = vec(self.rect.width/2 + 70,-10) + vec(self.barrel_offset)
         
         self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.SHOOT), convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.RELOAD), convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.RELOAD), convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The animation frames of this weapon when reloading."""
-        self.reload_end_frame = 6
+        self.reload_start_frame = 12
+        self.playing_reload_start = False
+        self.reload_end_frame = 17
         self.playing_reload_end = False
         
         self.idle_frame = self.fire_frames[0]
@@ -47,28 +49,22 @@ class Launcher(Weapon):
         
         
         self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_LAUNCH))
-        self.explosion_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_EXPLOSION).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.START_RELOAD_1911))
-        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.END_RELOAD_1911))
+        self.reload_start_sound_launcher = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RPG_START_RELOAD))
+        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RPG_END_RELOAD))
    
         self.shoot_sound.set_volume(0.1)
         self.empty_sound.set_volume(0.1)
-        self.reload_start_sound.set_volume(0.3)
+        self.reload_start_sound_launcher.set_volume(0.3)
         self.reload_end_sound.set_volume(0.5)
-        for s in self.explosion_sounds:
-            s.set_volume(0.4)
+        
         
         self.current_bullet = None
-        
-    
-    def explosion_sound(self):
-        sound = self.explosion_sounds[random.randint(0, len(self.explosion_sounds)-1)]
-
-        sound.play()
     
     def fire_anim(self, speed: float):
         self.firing_frame += speed
+        if self.firing_frame < 1:
+            self.firing_frame = 1
         
         if self.firing_frame > len(self.fire_frames)-1:
             self.firing_frame = 0
@@ -79,11 +75,10 @@ class Launcher(Weapon):
         
         if self.dir < 0:
             self.current_frame = pygame.transform.flip(self.current_frame, False, True)
-        return
-    
+            
     def bullet_hit(self, b):
         self.shoot_sound.fadeout(500)
-        self.explosion_sound()
+        
     
     def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
         if not self.can_shoot():
@@ -99,6 +94,10 @@ class Launcher(Weapon):
     def reload_anim(self, speed):
         self.reloading_frame += speed
         
+        if int(self.reloading_frame) == self.reload_start_frame and not self.playing_reload_start:
+            self.reload_start_sound_launcher.play()
+            self.playing_reload_start = True
+            
         if int(self.reloading_frame) == self.reload_end_frame and not self.playing_reload_end:
             self.reload_end_sound.play()
             self.playing_reload_end = True
@@ -109,10 +108,8 @@ class Launcher(Weapon):
             self.reloading_frame = 0
             self.reloading = False
             self.playing_reload_end = False
+            self.playing_reload_start = False
         self.current_frame = self.reload_frames[int(self.reloading_frame)]
-        
-        #debug
-        self.current_frame = self.idle_unloaded_frame
         
         if is_last_frame:
             self.current_frame = self.idle_frame
@@ -132,13 +129,12 @@ class Launcher(Weapon):
         elif self.weapon_aim_angle < -45 and self.weapon_aim_angle > -90:
             self.barrel_offset.x -= (self.weapon_aim_angle + (90 + self.weapon_aim_angle))/4.5
             
-        
         super().update(**kwargs)
         
         if self.firing:
             self.fire_anim(self.fire_rate/5 * mc.dt)
         if self.reloading:
-            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
+            speed = ((10000/self.reload_delay_ms) / len(self.reload_frames)*2)
             self.reload_anim(speed * mc.dt)
             
     

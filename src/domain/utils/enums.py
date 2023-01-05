@@ -25,9 +25,6 @@ class Characters(Enum):
     
 class Enemies(Enum):
     Z_ROGER = "z_roger"
-
-class Bullets(Enum):
-    SMALL_BULLET = "small_bullet"
     
 class Weapons(Enum):
     P_1911 = 'pistols\\1911'
@@ -94,6 +91,8 @@ class SFXName(Enum):
     END_RELOAD_1911 = "end_reload_1911.mp3"
     SHELL_LOAD_SHORT_BARREL = "shell_load_short_barrel.mp3"
     UZI_RELOAD = "uzi_reload.mp3"
+    RPG_START_RELOAD = "rpg_start_reload.mp3"
+    RPG_END_RELOAD = "rpg_end_reload.mp3"
     
     #others
     EMPTY_1911 = "empty_1911.mp3"
@@ -122,7 +121,6 @@ class ReloadType(Enum):
     NO_RELOAD = 0
     MAGAZINE = 1
     SINGLE_BULLET = 2
-    
     
 class ConvertType(Enum):
     NO_CONVERT = 0

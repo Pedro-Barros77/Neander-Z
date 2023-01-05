@@ -252,11 +252,6 @@ class Game(Page):
         _txt_score_rect.centery = _head_rect.centery
         _txt_score_rect.left = _txt_money_rect.right + _horizontal_margin*2
         
-        _txt_fps = mc.get_text_surface(f'fps: {mc.clock.get_fps():.0f}', colors.LIGHT_GRAY, pygame.font.SysFont('calibri', 20))
-        _txt_fps_rect = _txt_fps.get_rect()
-        _txt_fps_rect.centery = _head_rect.centery
-        _txt_fps_rect.right = self.screen.get_width() - _horizontal_margin
-        
         _ammo_icon = self.get_ammo_icon(self.player.current_weapon.bullet_type)
         _ammo_icon_rect = _ammo_icon.get_rect()
         _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
@@ -287,7 +282,7 @@ class Game(Page):
         self.screen.blit(self._money_icon, _money_icon_rect)
         self.screen.blit(_txt_money, _txt_money_rect) 
         self.screen.blit(_txt_score, _txt_score_rect)
-        self.screen.blit(_txt_fps, _txt_fps_rect)
+        
         self.screen.blit(_ammo_icon, _ammo_icon_rect)
         if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
             self.screen.blit(_txt_ammo, _txt_ammo_rect)
@@ -634,12 +629,11 @@ class Game(Page):
             self.wave_summary.draw(self.screen)
             return
         
+        # Wave
+        self.current_wave.draw(self.screen, self.player.offset_camera)
         # bullets
         for b in self.bullets_group:
             b.draw(self.screen, self.player.offset_camera)
-            
-        # Wave
-        self.current_wave.draw(self.screen, self.player.offset_camera)
         # P1
         self.player.draw(self.screen, self.player.offset_camera)
         # P2

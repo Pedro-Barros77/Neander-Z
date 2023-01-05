@@ -145,5 +145,10 @@ def app_loop():
         for p in popup_group.sprites():
             p.draw(current_page.screen)
             
+        _txt_fps = get_text_surface(f'fps: {clock.get_fps():.0f}', colors.LIGHT_GRAY, pygame.font.SysFont('calibri', 20))
+        _txt_fps_rect = _txt_fps.get_rect()
+        _txt_fps_rect.topright = (current_page.screen.get_width() - 20, 20)
+        current_page.screen.blit(_txt_fps, _txt_fps_rect)
+            
         pygame.display.update()
         clock.tick(60)

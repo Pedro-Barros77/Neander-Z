@@ -131,7 +131,7 @@ class Weapon(pygame.sprite.Sprite):
         diff = self.player_backpack.get_ammo(self.bullet_type) - to_load
         
         if self.reload_start_sound != None:
-            self.reload_start_sound.play() 
+            self.reload_start_sound.play()
     
         if diff >= 0:
             self.magazine_bullets += to_load

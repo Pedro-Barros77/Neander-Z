@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as maths
@@ -15,7 +15,7 @@ class Projectile(pygame.sprite.Sprite):
         self.bullet_type = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         self.image_scale = kwargs.pop("image_scale", 1)
         self.image = game_controller.scale_image(pygame.image.load(constants.get_bullet(self.bullet_type)), self.image_scale, enums.ConvertType.CONVERT_ALPHA)
-        self.start_image = self.image
+        self.current_frame: pygame.Surface = self.image.copy()
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.angle = angle
@@ -36,6 +36,17 @@ class Projectile(pygame.sprite.Sprite):
         self.explosion_max_radius = kwargs.pop("explosion_max_radius", 0)
         self.explosion_min_radius = kwargs.pop("explosion_min_radius", 0)
         
+        self.explosion_frames = game_controller.load_sprites(f'{constants.IMAGES_PATH}weapons\\effects\\explosion_01', convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.explosion_frame = 0
+        self.exploding = False
+        self.explosion_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_EXPLOSION).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
+        for s in self.explosion_sounds:
+            s.set_volume(0.3)
+            
+    def explosion_sound(self):
+        sound = self.explosion_sounds[random.randint(0, len(self.explosion_sounds)-1)]
+
+        sound.play()
         
     def get_tail(self):
         _tail_rect = self.rect.copy()
@@ -62,7 +73,11 @@ class Projectile(pygame.sprite.Sprite):
     
     def draw(self, screen: pygame.Surface, offset: vec):
         if not self.is_alive:
-            return
+            return    
+        
+        if self.exploding:
+            self.image = self.current_frame.copy()
+        
         screen.blit(self.image, vec(self.rect.topleft) - offset)
         
         # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
@@ -73,10 +88,14 @@ class Projectile(pygame.sprite.Sprite):
         if not self.is_alive:
             return
         
+        if self.exploding:
+            self.explosion_anim(0.5)
+            return
+        
         if self.max_range > 0:
             _distance = vec(self.rect.topleft).distance_to(vec(self.start_pos))
             if _distance >= self.max_range:
-                self.kill()
+                self.destroy()
             if self.min_range > 0 and _distance > self.min_range:
                 _diff = _distance - self.min_range
                 _range = self.max_range - self.min_range
@@ -86,7 +105,7 @@ class Projectile(pygame.sprite.Sprite):
                 self.damage = self.total_damage - (_percentage * self.total_damage)
         
         _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.speed * mc.dt, -math.radians(self.angle))# * mc.dt
-        self.image, self.rect = game_controller.rotate_to_angle(self.start_image, _new_pos, self.angle)
+        self.image, self.rect = game_controller.rotate_to_angle(self.current_frame, _new_pos, self.angle)
         
         # if will be out of the map bounds
         if _new_pos.x > game_controller.map_size.x or _new_pos.x < 0 or\
@@ -97,8 +116,6 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.topleft = _new_pos
         collided = self.bullet_collision()
         
-            
-            
         if collided:
             if self.explosion_min_radius > 0:
                 for group in self.collision_groups:
@@ -126,9 +143,31 @@ class Projectile(pygame.sprite.Sprite):
                             c.take_damage(self.damage, self.owner)
                             
             self.hit_callback(self)
-            self.kill()
+            self.destroy()
         self.rect.topleft = _new_pos
         self.tail_hitbox = self.get_tail()
+        
+    
+    def explosion_anim(self, speed: float):
+        self.explosion_frame += speed
+        
+        if self.explosion_frame > len(self.explosion_frames)-1:
+            self.explosion_frame = 0
+            self.exploding = False
+            self.kill()
+        else:
+            self.current_frame = self.explosion_frames[int(self.explosion_frame)]
+            _rect = self.current_frame.get_rect()
+            _rect.center = self.rect.center
+            self.rect = _rect
+            
+    
+    def destroy(self):
+        if self.explosion_min_radius > 0:
+            self.explosion_sound()
+            self.exploding = True
+        else:
+            self.kill()
     
     def kill(self):
         self.is_alive = False

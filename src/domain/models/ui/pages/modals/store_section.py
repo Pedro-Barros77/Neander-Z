@@ -48,6 +48,7 @@ class Store:
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
             "uzi": "tags:Auto-fire, small-damage\nUZI with caution!",
+            "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
             
             "first_aid_kit": "tags:Restores your health partially.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
             "medkit": "tags:Completely restores your health.\nIn a world of virtual zombies and\npixels, the medkit is your best\nfriend. Just a quick tap and you'll\nbe back to 100% health in no time!",
@@ -94,7 +95,7 @@ class Store:
             StoreItem(f'{constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
             StoreItem(f'{constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
             StoreItem(f'{constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
+            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
             StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
