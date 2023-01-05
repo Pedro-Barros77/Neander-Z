@@ -89,7 +89,7 @@ class Weapon(pygame.sprite.Sprite):
         self.weapon_aim_angle: float = 0
         """The angle that the container is rotated along with the weapon."""
 
-        self.swipe_sounds: pygame.mixer.Sound = None
+        self.shoot_sound: pygame.mixer.Sound = None
         self.empty_sound: pygame.mixer.Sound = None
         self.reload_start_sound: pygame.mixer.Sound = None
         self.reload_end_sound: pygame.mixer.Sound = None

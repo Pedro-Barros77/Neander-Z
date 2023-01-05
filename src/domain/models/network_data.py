@@ -2,7 +2,7 @@ import ast
 from pygame.math import Vector2 as vec
 
 from domain.models.enemy import Enemy
-from domain.content.weapons.small_bullet import SmallBullet
+from domain.content.weapons.projectile import Projectile
 from domain.models.wave_result import WaveResult
 from domain.utils import enums
 from domain.services import game_controller
@@ -40,7 +40,7 @@ class Data:
         if game_controller._enemy_netdata_keys == None:
             game_controller._enemy_netdata_keys = list(Enemy((0,0),enums.Enemies.Z_ROGER, None).get_netdata().keys())
         if game_controller._bullet_netdata_keys == None:
-            game_controller._bullet_netdata_keys = list(SmallBullet(vec(0,0),0,0,0,0,0).get_netdata().keys())
+            game_controller._bullet_netdata_keys = list(Projectile(vec(0,0),0,0,0,0,0).get_netdata().keys())
         if game_controller._waveresult_netdata_keys == None:
             game_controller._waveresult_netdata_keys = list(WaveResult().get_netdata().keys())
     

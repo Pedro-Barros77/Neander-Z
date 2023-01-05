@@ -25,3 +25,5 @@ Shotgun pump Sound Effect from <a href="https://pixabay.com/?utm_source=link-att
 Shotgun shell load Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6464">Pixabay</a>
 
 Uzi shoot echo Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6349">Pixabay</a>
+
+RPG explosion Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6288">Pixabay</a>

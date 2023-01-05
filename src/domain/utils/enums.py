@@ -34,6 +34,7 @@ class Weapons(Enum):
     SHORT_BARREL = 'shotguns\\short_barrel'
     UZI = 'smgs\\uzi'
     MACHETE = 'melee\\machete'
+    RPG = 'launchers\\rpg'
     
 class AnimActions(Enum):
     TURN = "turn"
@@ -78,13 +79,15 @@ class SFXActions(Enum):
     EMPTY_M = "empty"
 
 class SFXName(Enum):
-    P_1911 = "1911.mp3"
     #shoot
+    P_1911 = "1911.mp3"
     SHORT_BARREL = "short_barrel.mp3"
     PUMP_SHORT_BARREL = "pump_short_barrel.mp3"
     UZI_SHOOT = "uzi_shoot.mp3"
     MACHETE_SWIPE = "machete_swipe.mp3"
     MACHETE_HIT = "machete_hit.mp3"
+    RPG_LAUNCH = "rpg_launch.mp3"
+    RPG_EXPLOSION = "rpg_explosion.mp3"
     
     #reload
     START_RELOAD_1911 = "start_reload_1911.mp3"
@@ -98,13 +101,13 @@ class SFXName(Enum):
     BTN_HOVER = "btn_hover.mp3"
     
 class BulletType(Enum):
-    MELEE = 0
-    PISTOL = 1
-    SHOTGUN = 2
-    ASSAULT_RIFLE = 3
-    SNIPER = 4
-    ROCKET = 5
-    GRENADE = 6
+    MELEE = "melee"
+    PISTOL = "pistol"
+    SHOTGUN = "shotgun"
+    ASSAULT_RIFLE = "rifle"
+    SNIPER = "sniper"
+    ROCKET = "rocket"
+    GRENADE = "grenade"
     
 class FireMode(Enum):
     MELEE = 0

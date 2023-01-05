@@ -3,7 +3,7 @@ from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
-from domain.content.weapons.small_bullet import SmallBullet
+from domain.content.weapons.projectile import Projectile
 from domain.services import game_controller, menu_controller as mc
 
 class SMG(Weapon):
@@ -99,7 +99,7 @@ class SMG(Weapon):
         self.last_shot_time = datetime.datetime.now()
         
         self.fire_sound()
-        return SmallBullet(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range)
+        return Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type)
     
     def reload_anim(self, speed):
         self.reloading_frame += speed

@@ -1,18 +1,20 @@
 import pygame, math
 from pygame.math import Vector2 as vec
 
-from domain.utils import colors, enums, constants
+from domain.utils import colors, enums, constants, math_utillity as maths
 from domain.services import game_controller, menu_controller as mc
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
-class SmallBullet(pygame.sprite.Sprite):
+class Projectile(pygame.sprite.Sprite):
     def __init__(self, pos: vec, angle: float, speed: float, damage: float, owner:int, id: int, **kwargs):
         super().__init__()
         
         self.id = id
         self.owner = owner
-        self.image = game_controller.scale_image(pygame.image.load(constants.SMALL_BULLET), 1, enums.ConvertType.CONVERT_ALPHA)
+        self.bullet_type = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
+        self.image_scale = kwargs.pop("image_scale", 1)
+        self.image = game_controller.scale_image(pygame.image.load(constants.get_bullet(self.bullet_type)), self.image_scale, enums.ConvertType.CONVERT_ALPHA)
         self.start_image = self.image
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
@@ -21,20 +23,32 @@ class SmallBullet(pygame.sprite.Sprite):
         self.collision_groups = game_controller.bullet_target_groups
         self.damage = damage
         self.total_damage = damage
-        self.bullet_name = enums.Bullets.SMALL_BULLET
         self.owner_offset = vec(0,0)
         self.is_alive = True
         self.start_pos = pos
         self.tail_hitbox: Rectangle = self.get_tail()
         
+        self.hit_callback: function = kwargs.pop("hit_callback", lambda s: None)
         
         self.max_range = kwargs.pop("max_range", 0)
         self.min_range = kwargs.pop("min_range", 0)
         
+        self.explosion_max_radius = kwargs.pop("explosion_max_radius", 0)
+        self.explosion_min_radius = kwargs.pop("explosion_min_radius", 0)
+        
+        
     def get_tail(self):
         _tail_rect = self.rect.copy()
-        _tail_rect.width = self.rect.width * 15
-        _tail_rect.topright = self.rect.topright
+        _tail_rect.width = self.rect.width * self.speed/2
+        if self.image_scale != 1:
+            _tail_rect.width *= self.image_scale-1
+        
+        if abs(self.angle) < 90:
+            _tail_rect.topright = self.rect.topright
+        else:
+            _tail_rect.topleft = self.rect.topleft
+            
+        
         
         if self.start_pos.x > _tail_rect.x and abs(self.angle) < 90:
             _tail_rect.width -= abs(self.start_pos.x - _tail_rect.left)
@@ -42,7 +56,7 @@ class SmallBullet(pygame.sprite.Sprite):
         elif self.start_pos.x < _tail_rect.x and abs(self.angle) > 90:
             _tail_rect.width -= abs(_tail_rect.right - (self.start_pos.x + self.rect.width))
             _tail_rect.topleft = self.rect.topleft
-            
+        _tail_rect.width = abs(_tail_rect.width)
         _rec = Rectangle(_tail_rect.size, _tail_rect.topleft)
         return _rec
     
@@ -50,6 +64,8 @@ class SmallBullet(pygame.sprite.Sprite):
         if not self.is_alive:
             return
         screen.blit(self.image, vec(self.rect.topleft) - offset)
+        
+        # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
         
         # pygame.draw.rect(screen, colors.RED, ((self.tail_hitbox.rect.topleft) - offset, self.tail_hitbox.rect.size), 2)
         
@@ -80,7 +96,36 @@ class SmallBullet(pygame.sprite.Sprite):
         # movement
         self.rect.topleft = _new_pos
         collided = self.bullet_collision()
+        
+            
+            
         if collided:
+            if self.explosion_min_radius > 0:
+                for group in self.collision_groups:
+                    _explosion_min_hitbox = Rectangle((self.explosion_min_radius*2, self.explosion_min_radius*2), vec(self.rect.topleft), radius = self.explosion_min_radius)
+                    _explosion_min_hitbox.rect.center = self.rect.center
+                    _explosion_max_hitbox = Rectangle((self.explosion_max_radius*2, self.explosion_max_radius*2), vec(self.rect.topleft), radius = self.explosion_max_radius)
+                    _explosion_max_hitbox.rect.center = self.rect.center
+                    
+                    collided_explosion = pygame.sprite.spritecollide(_explosion_max_hitbox, group, False, pygame.sprite.collide_circle)
+                    for c in collided_explosion:
+                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body":
+                            
+                            
+                            _distance = vec(self.rect.center).distance_to(c.rect.center)
+                            if _distance >= self.explosion_max_radius:
+                                break
+                            if _distance > self.explosion_min_radius:
+                                _diff = _distance - self.explosion_min_radius
+                                _range = self.explosion_max_radius - self.explosion_min_radius
+                                
+                                _percentage = (_diff * 100 / _range) / 100
+                                
+                                self.damage = self.total_damage - (_percentage * self.total_damage)
+                            
+                            c.take_damage(self.damage, self.owner)
+                            
+            self.hit_callback(self)
             self.kill()
         self.rect.topleft = _new_pos
         self.tail_hitbox = self.get_tail()
@@ -106,13 +151,13 @@ class SmallBullet(pygame.sprite.Sprite):
             "rect": tuple([*self.rect.topleft, *self.rect.size]),
             "speed": self.speed,
             "damage": self.damage,
-            "bullet_name": str(self.bullet_name.name),
+            "bullet_type": str(self.bullet_type.name),
         }
         return values
     
     def load_netdata(self, data: dict):
         self.rect = pygame.Rect(data.pop("rect", (0,0, 1,1)))
-        self.bullet_name = enums.Bullets[data.pop('bullet_name', enums.Bullets.SMALL_BULLET)]
+        self.bullet_type = enums.BulletType[data.pop('bullet_type', enums.BulletType.PISTOL)]
         
         for item, value in data.items():
             setattr(self, item, value)

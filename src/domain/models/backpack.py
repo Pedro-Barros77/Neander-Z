@@ -12,7 +12,7 @@ class BackPack:
         self.shotgun_ammo = 30
         self.rifle_ammo = 0
         self.sniper_ammo = 0
-        self.rocket_ammo = 0
+        self.rocket_ammo = 15
         
         
         
@@ -23,7 +23,7 @@ class BackPack:
         self.secondary_weapons = [
         ]
         self.equipped_primary = None
-        self.equipped_secondary = enums.Weapons.P_1911
+        self.equipped_secondary = enums.Weapons.MACHETE
         
         
         

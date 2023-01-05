@@ -8,6 +8,7 @@ from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
 from domain.content.weapons.melee import Melee
+from domain.content.weapons.launcher import Launcher
 from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
 from domain.models.rectangle_sprite import Rectangle
@@ -69,9 +70,9 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.MACHETE)
+        self.add_weapon(enums.Weapons.RPG)
         
-        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
+        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
         """The weapon on player's hand."""
         
         self.weapon_switch_ms = 300
@@ -452,6 +453,8 @@ class Player(pygame.sprite.Sprite):
                 weapon = SMG((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.MACHETE:
                 weapon = Melee((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+            case enums.Weapons.RPG:
+                weapon = Launcher((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
                 
         if weapon == None:
             return False

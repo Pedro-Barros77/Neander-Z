@@ -16,7 +16,7 @@ from domain.models.ui.pages.modals.pause import Pause
 from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.wave_1 import Wave_1
-from domain.content.weapons.small_bullet import SmallBullet
+from domain.content.weapons.projectile import Projectile
 
 class Game(Page):
     def __init__(self, client_type: enums.ClientType, screen: pygame.Surface, **kwargs):
@@ -419,9 +419,9 @@ class Game(Page):
     
     def create_netdata_bullet(game, data: dict):
         b = None
-        match data["bullet_name"]:
-            case str(enums.Bullets.SMALL_BULLET.name):
-                b = SmallBullet(vec(0,0), 0, 0, 0, '', 0)
+        match data["bullet_type"]:
+            case str(enums.BulletType.PISTOL.name):
+                b = Projectile(vec(0,0), 0, 0, 0, '', 0)
                 b.load_netdata(data)
         
         if b != None:
