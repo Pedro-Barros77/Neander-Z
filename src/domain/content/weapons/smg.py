@@ -40,6 +40,11 @@ class SMG(Weapon):
         
         self.barrel_offset = vec(0, 7)
         
+        load_content = kwargs.pop("load_content", True)
+        
+        if not load_content:
+            return
+        
         self.shoot_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.UZI_SHOOT).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
         self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.UZI_RELOAD))

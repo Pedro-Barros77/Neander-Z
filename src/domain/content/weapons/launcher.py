@@ -47,6 +47,10 @@ class Launcher(Weapon):
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         
+        load_content = kwargs.pop("load_content", True)
+        
+        if not load_content:
+            return
         
         self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_LAUNCH))
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))

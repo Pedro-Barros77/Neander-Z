@@ -44,6 +44,11 @@ class Shotgun(Weapon):
         
         self.barrel_offset = vec(0, 7)
         
+        load_content = kwargs.pop("load_content", True)
+        
+        if not load_content:
+            return
+        
         self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.SHORT_BARREL))
         self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
         self.pump_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.PUMP, enums.SFXName.PUMP_SHORT_BARREL))

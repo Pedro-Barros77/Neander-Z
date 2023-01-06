@@ -35,6 +35,11 @@ class Melee(Weapon):
         
         self.barrel_offset = vec(0,0)
         
+        load_content = kwargs.pop("load_content", True)
+        
+        if not load_content:
+            return
+        
         self.attack_frames_1 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.attack_frames_2 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.attack_frames_3 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\03", 0.08, convert_type=enums.ConvertType.CONVERT_ALPHA)

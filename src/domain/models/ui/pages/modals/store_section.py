@@ -14,6 +14,7 @@ from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
 from domain.content.weapons.launcher import Launcher
+from domain.models.weapon import Weapon
 
 
 class Store:
@@ -35,6 +36,7 @@ class Store:
         self.money_rect: pygame.Rect = None
         
         self.selected_card: StoreItem = None
+        self.selected_weapon: Weapon = None
         self.card_size = vec(100,100)
         
         _cards_descriptions = {
@@ -47,7 +49,7 @@ class Store:
             "machete": "tags:melee, small-damage\nThe ultimate multi-purpose tool\nfor cutting brains and slicing\nthrough fresh zombies. It's also\ngreat for chopping up onions\nand tomatoes! Two tools in one!",
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
-            "uzi": "tags:Auto-fire, small-damage\nUZI with caution!",
+            "uzi": "tags:Auto-fire, small-damage\nUZI with caution!\nYou'll run out of bullets before\nyou can say OH CRAP.",
             "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
             
             "first_aid_kit": "tags:Restores your health partially.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
@@ -211,19 +213,19 @@ class Store:
         
         match weapon_type:
             case enums.Weapons.MACHETE:
-                return Melee(vec(0,0))
+                return Melee(vec(0,0), load_content = False)
             
             case enums.Weapons.P_1911:
-                return Pistol(vec(0,0))
+                return Pistol(vec(0,0), load_content = False)
                 
             case enums.Weapons.SHORT_BARREL:
-                return Shotgun(vec(0,0))
+                return Shotgun(vec(0,0), load_content = False)
                 
             case enums.Weapons.UZI:
-                return SMG(vec(0,0))
+                return SMG(vec(0,0), load_content = False)
             
             case enums.Weapons.UZI:
-                return Launcher(vec(0,0))
+                return Launcher(vec(0,0), load_content = False)
 
             
     def get_panel(self,image_rect: pygame.Rect, height: float, title_text: str, cards: list[StoreItem], scroll: ScrollBar = None):
@@ -387,7 +389,10 @@ class Store:
                 txt_bullets_rect.left = icon_rect.right + 5
                 
             if self.selected_card.weapon_type != None:
-                weapon = self.get_weapon_or_default(self.selected_card.weapon_type)
+                if self.selected_weapon == None or self.selected_weapon.weapon_type != self.selected_card.weapon_type:
+                    self.selected_weapon = self.get_weapon_or_default(self.selected_card.weapon_type)
+                
+                weapon = self.selected_weapon
                 
                 #attribute bars
                 _description_rect.height *= 1.8
