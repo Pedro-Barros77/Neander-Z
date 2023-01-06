@@ -2,7 +2,7 @@ import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.models.wave_result import WaveResult
-from domain.services import menu_controller, game_controller
+from domain.services import menu_controller, game_controller, resources
 from domain.utils import colors, constants, enums
 from domain.models.ui.button import Button
 from domain.models.ui.pages.modals.modal import Modal
@@ -24,7 +24,7 @@ class WaveSummary(Modal):
         self.store_section = Store(self.P1_RESULT.player, self.panel_margin, on_return = lambda: self.set_tab(0))
         
         btn_dict = {
-            "text_font": self.font(30),
+            "text_font": resources.px_font(30),
             "text_color": colors.BLACK
         }
 
@@ -33,11 +33,11 @@ class WaveSummary(Modal):
         
         self.buttons: list[Button] = []
         self.buttons.extend([
-            Button(vec(_btn_pos), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Store", on_click = lambda: self.set_tab(1),**btn_dict),
-            Button(vec(_btn_pos + _btn_margin), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Ready", on_click = self.check_btn_ready,**btn_dict),
+            Button(vec(_btn_pos), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Store", on_click = lambda: self.set_tab(1),**btn_dict),
+            Button(vec(_btn_pos + _btn_margin), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Ready", on_click = self.check_btn_ready,**btn_dict),
         ]) 
         self.buttons.append(
-            Button(vec(self.buttons[-1].rect.topright), f'{constants.IMAGES_PATH}ui\\btn_square.png', scale = 2, text = "P2", on_click = lambda: None, on_hover = lambda: None, enabled = False,**btn_dict)
+            Button(vec(self.buttons[-1].rect.topright), f'{resources.IMAGES_PATH}ui\\btn_square.png', scale = 2, text = "P2", on_click = lambda: None, on_hover = lambda: None, enabled = False,**btn_dict)
         )
     
     def set_tab(self, i: int):
@@ -55,19 +55,16 @@ class WaveSummary(Modal):
         self.p1_ready = not self.p1_ready
         btn = self.buttons[1]
         if self.p1_ready:
-            btn.set_image(f'{constants.IMAGES_PATH}ui\\btn_small_green.png')
+            btn.set_image(f'{resources.IMAGES_PATH}ui\\btn_small_green.png')
             btn.text_surface = btn.start_text
             btn.set_text('Cancel')
             btn.default_on_hover()
         else:
-            btn.set_image(f'{constants.IMAGES_PATH}ui\\btn_small.png')
+            btn.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
             btn.text_surface = btn.start_text
             btn.set_text('Ready')
             btn.default_on_hover()
             
-
-    def font(self, size: int):
-        return pygame.font.Font(constants.PIXEL_FONT, size)
     
     def draw_summary(self, screen):
         screen_rect = screen.get_rect()
@@ -77,29 +74,29 @@ class WaveSummary(Modal):
         #distance between players panels
         _player_panels_margin = vec(30, 0)
        
-        wave_title = menu_controller.get_text_surface(f'Survived Wave {self.P1_RESULT.wave_number}', colors.RED, self.font(80))
-        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        p1_title = menu_controller.get_text_surface(self.P1_RESULT.player_character.value, colors.WHITE, self.font(60))
+        wave_title = menu_controller.get_text_surface(f'Survived Wave {self.P1_RESULT.wave_number}', colors.RED, resources.px_font(80))
+        p1_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.P1_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        p1_title = menu_controller.get_text_surface(self.P1_RESULT.player_character.value, colors.WHITE, resources.px_font(60))
         
         if self.P2_RESULT != None:
-            p2_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
-            p2_title = menu_controller.get_text_surface(self.P2_RESULT.player_character.value, colors.WHITE, self.font(60))
+            p2_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.P2_RESULT.player_character.value}\\head_icon.png'), 4, convert_type=enums.ConvertType.CONVERT_ALPHA)
+            p2_title = menu_controller.get_text_surface(self.P2_RESULT.player_character.value, colors.WHITE, resources.px_font(60))
 
-        lbl_score = menu_controller.get_text_surface("wave score:", colors.WHITE, self.font(28))
-        lbl_money = menu_controller.get_text_surface("earned money:", colors.WHITE, self.font(28))
-        lbl_kills = menu_controller.get_text_surface("total kills:", colors.WHITE, self.font(28))
-        lbl_headshots = menu_controller.get_text_surface("headshot kills:", colors.WHITE, self.font(28))
+        lbl_score = menu_controller.get_text_surface("wave score:", colors.WHITE, resources.px_font(28))
+        lbl_money = menu_controller.get_text_surface("earned money:", colors.WHITE, resources.px_font(28))
+        lbl_kills = menu_controller.get_text_surface("total kills:", colors.WHITE, resources.px_font(28))
+        lbl_headshots = menu_controller.get_text_surface("headshot kills:", colors.WHITE, resources.px_font(28))
         
-        p1_score = menu_controller.get_text_surface(str(self.P1_RESULT.score), colors.YELLOW, self.font(22))
-        p1_money = menu_controller.get_text_surface(f'$ {self.P1_RESULT.money:.2f}', colors.GREEN, self.font(22))
-        p1_kills = menu_controller.get_text_surface(str(self.P1_RESULT.kills_count), colors.RED, self.font(22))
-        p1_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, self.font(22))
+        p1_score = menu_controller.get_text_surface(str(self.P1_RESULT.score), colors.YELLOW, resources.px_font(22))
+        p1_money = menu_controller.get_text_surface(f'$ {self.P1_RESULT.money:.2f}', colors.GREEN, resources.px_font(22))
+        p1_kills = menu_controller.get_text_surface(str(self.P1_RESULT.kills_count), colors.RED, resources.px_font(22))
+        p1_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, resources.px_font(22))
         
         if self.P2_RESULT != None:
-            p2_score = menu_controller.get_text_surface(str(self.P2_RESULT.score), colors.YELLOW, self.font(22))
-            p2_money = menu_controller.get_text_surface(f'$ {self.P2_RESULT.money:.2f}', colors.GREEN, self.font(22))
-            p2_kills = menu_controller.get_text_surface(str(self.P2_RESULT.kills_count), colors.RED, self.font(22))
-            p2_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, self.font(22))
+            p2_score = menu_controller.get_text_surface(str(self.P2_RESULT.score), colors.YELLOW, resources.px_font(22))
+            p2_money = menu_controller.get_text_surface(f'$ {self.P2_RESULT.money:.2f}', colors.GREEN, resources.px_font(22))
+            p2_kills = menu_controller.get_text_surface(str(self.P2_RESULT.kills_count), colors.RED, resources.px_font(22))
+            p2_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, resources.px_font(22))
 
         labels = [lbl_score, lbl_money, lbl_kills, lbl_headshots]
         p1_values = [p1_score, p1_money, p1_kills, p1_headshots]
@@ -162,7 +159,7 @@ class WaveSummary(Modal):
             _elapsed = datetime.datetime.now() - self.start_time
             _remaining = datetime.timedelta(seconds=self.P1_RESULT.wave_interval_s) - _elapsed
             _color = colors.WHITE if _remaining.seconds > 10 else colors.RED
-            timer = menu_controller.get_text_surface(f'{_remaining.seconds}s', _color, self.font(50))
+            timer = menu_controller.get_text_surface(f'{_remaining.seconds}s', _color, resources.px_font(50))
             _ms = _remaining.microseconds/1000 - _remaining.seconds/1000
             if _remaining.seconds > 10 or (_ms > 400):
                 screen.blit(timer, self.panel_margin + vec(10,10))
@@ -180,9 +177,9 @@ class WaveSummary(Modal):
                 b.rect.left = self.buttons[1].rect.right
                 b.rect.centery = self.buttons[1].rect.centery
                 if self.p2_ready:
-                    b.set_image(f'{constants.IMAGES_PATH}ui\\btn_square_green.png')
+                    b.set_image(f'{resources.IMAGES_PATH}ui\\btn_square_green.png')
                 else:
-                    b.set_image(f'{constants.IMAGES_PATH}ui\\btn_square.png')
+                    b.set_image(f'{resources.IMAGES_PATH}ui\\btn_square.png')
                     
             b.draw(screen)
 

@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vec
 
-from domain.services import game_controller, menu_controller
+from domain.services import game_controller, menu_controller, resources
 from domain.utils import colors, constants, enums
 
 class StoreItem:
@@ -51,11 +51,11 @@ class StoreItem:
         self.title_color = kwargs.pop("title_color", colors.WHITE)
         self.title_background_color = kwargs.pop("title_background_color", colors.set_alpha(colors.BLACK, 150))
         self.title_border_radius = kwargs.pop("title_border_radius", 10)
-        self.title_font = kwargs.pop("title_font", pygame.font.Font(constants.PIXEL_FONT, 24))
+        self.title_font = kwargs.pop("title_font", resources.px_font(24))
         
         
         self.price_color = kwargs.pop("price_color", colors.GREEN)
-        self.price_font = kwargs.pop("price_font", pygame.font.Font(constants.PIXEL_FONT, 18))
+        self.price_font = kwargs.pop("price_font", resources.px_font(18))
         
         self.card_selected_border_color = kwargs.pop("card_selected_border_color", colors.GREEN)
         self.selected_scale = kwargs.pop("selected_scale", 1.2)

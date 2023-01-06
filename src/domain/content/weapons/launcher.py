@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
 from domain.content.weapons.projectile import Projectile
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 
 class Launcher(Weapon):
     def __init__(self, pos, **kwargs):
@@ -34,8 +34,8 @@ class Launcher(Weapon):
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 70,-10) + vec(self.barrel_offset)
         
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.SHOOT), convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.RELOAD), convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.SHOOT), convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.RELOAD), convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The animation frames of this weapon when reloading."""
         self.reload_start_frame = 12
         self.playing_reload_start = False
@@ -52,10 +52,10 @@ class Launcher(Weapon):
         if not load_content:
             return
         
-        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_LAUNCH))
-        self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.reload_start_sound_launcher = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RPG_START_RELOAD))
-        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.RPG_END_RELOAD))
+        self.shoot_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.SHOOT))
+        self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.EMPTY_TRIGGER))
+        self.reload_start_sound_launcher = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.RELOAD))
+        self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.RELOAD_END))
    
         self.shoot_sound.set_volume(0.1)
         self.empty_sound.set_volume(0.1)

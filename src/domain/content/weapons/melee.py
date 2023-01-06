@@ -5,7 +5,7 @@ from domain.models.weapon import Weapon
 from domain.utils import constants, enums, colors
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 
 class Melee(Weapon):
     def __init__(self, pos, **kwargs):
@@ -40,9 +40,9 @@ class Melee(Weapon):
         if not load_content:
             return
         
-        self.attack_frames_1 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames_2 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames_3 = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\03", 0.08, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_1 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_2 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_3 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\03", 0.08, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.attack_frames = [self.attack_frames_1, self.attack_frames_2, self.attack_frames_3]
         self.current_attack = 0
@@ -51,8 +51,8 @@ class Melee(Weapon):
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         
-        self.swipe_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.MACHETE_SWIPE).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
-        self.hit_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.MACHETE_HIT).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
+        self.swipe_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.MACHETE,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,4)]
+        self.hit_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.MACHETE,enums.AnimActions.HIT) + f'0{i}.mp3') for i in range(1,4)]
 
         for s in self.swipe_sounds:
             s.set_volume(0.5)

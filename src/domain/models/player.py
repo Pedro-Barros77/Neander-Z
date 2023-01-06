@@ -3,7 +3,7 @@ import pygame, math as maths, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 from domain.content.weapons.pistol import Pistol
 from domain.content.weapons.shotgun import Shotgun
 from domain.content.weapons.smg import SMG
@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.image_scale = 2
         """How much the image will be scaled from original file."""
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.character, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.character, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The surface of the player."""
         	
         self.rect = self.image.get_rect()
@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.UZI)
+        self.add_weapon(enums.Weapons.RPG)
         
         self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
         """The weapon on player's hand."""
@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
         """The directino that tha player is turning to (left: -1, right: 1)."""
         self.turning_frame = 0
         """The current frame index of the turning animation."""
-        turn_folder = constants.get_character_frames(self.character, enums.AnimActions.TURN)
+        turn_folder = resources.get_character_path(self.character, enums.AnimActions.TURN)
         self.turn_frames = game_controller.load_sprites(turn_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the turning animation."""
         
@@ -91,7 +91,7 @@ class Player(pygame.sprite.Sprite):
         """If the jumping animation is running."""
         self.jumping_frame = 0
         """The current frame index of the jumping animation."""
-        jump_folder = constants.get_character_frames(self.character, enums.AnimActions.JUMP)
+        jump_folder = resources.get_character_path(self.character, enums.AnimActions.JUMP)
         self.jump_frames = game_controller.load_sprites(jump_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the jumping animation."""
         self.jump_frames.append(self.jump_frames[-1])
@@ -100,7 +100,7 @@ class Player(pygame.sprite.Sprite):
         """If the running animation is running."""
         self.running_frame = 0
         """The current frame index of the running animation."""
-        run_folder = constants.get_character_frames(self.character, enums.AnimActions.RUN)
+        run_folder = resources.get_character_path(self.character, enums.AnimActions.RUN)
         self.run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the running animation."""
         
@@ -108,7 +108,7 @@ class Player(pygame.sprite.Sprite):
         """If the falling ground animation is running."""
         self.falling_ground_frame = 0
         """The current frame index of the falling ground animation."""
-        fall_ground_folder = constants.get_character_frames(self.character, enums.AnimActions.FALL_GROUND)
+        fall_ground_folder = resources.get_character_path(self.character, enums.AnimActions.FALL_GROUND)
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the falling ground animation."""
         
@@ -123,8 +123,8 @@ class Player(pygame.sprite.Sprite):
         self.player2_offset = vec(0,0)
         
         self.is_player1 = self.name == "P1"
-        self.jump_sounds = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\jump\\{self.character.value}\\jump.mp3')
-        self.fall_sound = pygame.mixer.Sound( f'{constants.SOUNDS_PATH}sound_effects\\sfx_player\\fall_ground\\{self.character.value}\\fall_ground.mp3')
+        self.jump_sounds = pygame.mixer.Sound(resources.get_player_sfx(self.character, enums.AnimActions.JUMP))
+        self.fall_sound = pygame.mixer.Sound(resources.get_player_sfx(self.character, enums.AnimActions.FALL_GROUND))
 
         self.reload_popup: Popup = None
         

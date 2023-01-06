@@ -2,7 +2,7 @@ import pygame, time
 from datetime import datetime
 from pygame.math import Vector2 as vec
 
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 from domain.utils import colors, enums, constants
 from domain.utils.math_utillity import sum_tuple_infix as t
 from domain.models.player import Player
@@ -83,13 +83,13 @@ class Game(Page):
         
         #ui
         
-        self._money_icon = pygame.image.load(f'{constants.IMAGES_PATH}ui\\dollar.png').convert_alpha()
-        self._pistol_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._shotgun_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\shotgun_ammo_icon.png'), 2.7, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._melee_ammo_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\melee_ammo_icon.png'), 1.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._money_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\dollar.png').convert_alpha()
+        self._pistol_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._shotgun_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\shotgun_ammo_icon.png'), 2.7, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._melee_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\melee_ammo_icon.png'), 1.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         
         
@@ -98,7 +98,7 @@ class Game(Page):
         """
         
         
-        self.map = Map(self.screen, constants.GRAVEYARD_MAP, floor_y = 50)
+        self.map = Map(self.screen, f"{resources.IMAGES_PATH}map_graveyard.png", floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.screen_size = vec(self.screen.get_size())
@@ -158,7 +158,7 @@ class Game(Page):
             p1_pos = (80, _y)
             p2_pos = (20, _y)
         
-        self.player.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.player.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.player.pos = vec(p1_pos)
         self.player.rect = self.player.image.get_rect()
         self.player.rect.topleft = self.player.pos
@@ -175,7 +175,7 @@ class Game(Page):
         self.player.load_state(mc.player_state)
         
         if self.client_type != enums.ClientType.SINGLE:
-            self.player2.image = game_controller.scale_image(pygame.image.load(constants.get_character_frames(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+            self.player2.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
             self.player2.pos = vec(p2_pos)
             self.player2.rect = self.player2.image.get_rect()
             self.player2.rect.topleft = self.player2.pos
@@ -232,7 +232,7 @@ class Game(Page):
         _top_margin = 10
         _horizontal_margin = 10
         
-        _player_head = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        _player_head = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         _head_rect = _player_head.get_rect()
         _head_rect.top = _top_margin
         _head_rect.left = _horizontal_margin
@@ -243,12 +243,12 @@ class Game(Page):
         _money_icon_rect.centery = _head_rect.centery
         _money_icon_rect.left = _health_rect.right + _horizontal_margin
 
-        _txt_money = mc.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_money = mc.get_text_surface(f"{self.player.money:.2f}", colors.WHITE, resources.px_font(25))
         _txt_money_rect = _txt_money.get_rect()
         _txt_money_rect.centery = _head_rect.centery
         _txt_money_rect.left = _money_icon_rect.right + _horizontal_margin
 
-        _txt_score = mc.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 25))
+        _txt_score = mc.get_text_surface(f"Score: {self.player.score:.0f}", colors.WHITE, resources.px_font(25))
         _txt_score_rect = _txt_score.get_rect()
         _txt_score_rect.centery = _head_rect.centery
         _txt_score_rect.left = _txt_money_rect.right + _horizontal_margin*2
@@ -267,12 +267,12 @@ class Game(Page):
             _bullets_color = colors.YELLOW
         
         if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
-            _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, pygame.font.Font(constants.PIXEL_FONT, 20))
+            _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, resources.px_font(20))
             _txt_ammo_rect = _txt_ammo.get_rect()
             _txt_ammo_rect.centery = _ammo_icon_rect.centery
             _txt_ammo_rect.left = _horizontal_margin + 40
             
-            _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, pygame.font.Font(constants.PIXEL_FONT, 20))
+            _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, resources.px_font(20))
             _txt_total_ammo_rect = _txt_total_ammo.get_rect()
             _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
             _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
@@ -567,7 +567,7 @@ class Game(Page):
         
         
         if not pygame.mixer.music.get_busy():
-            mc.play_music(constants.get_music(enums.Music.WAVE_1), 0.1, -1)
+            mc.play_music(resources.get_song(resources.Songs.WAVE_1), 0.1, -1)
                 
         # p1
         self.player.update(game = self)

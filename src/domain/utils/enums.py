@@ -14,6 +14,9 @@ class ClientType(Enum):
     def __int__(self):
         return self.value
     
+class Environment(Enum):
+    DEV = 1
+    RELEASE = 2
     
 class Orientation(Enum):
     VERTICAL = 0
@@ -34,16 +37,24 @@ class Weapons(Enum):
     RPG = 'launchers\\rpg'
     
 class AnimActions(Enum):
+    #players/enemies
     TURN = "turn"
     JUMP = "jump"
     RUN = "run"
+    FALL_GROUND = "fall_ground"
+    DEATH = "death"
+    ATTACK = "attack"
+    
+    #weapons
     RELOAD = "reload"
+    RELOAD_END = "reload_end"
     PUMP = "pump"
     SHOOT = "shoot"
-    FALL_GROUND = "fall_ground"
+    HIT = "hit"
+    EMPTY_TRIGGER = "empty"
+
+    #others
     IDLE = "idle"
-    ATTACK = "attack"
-    DEATH = "death"
     ICON = "icon"
     
 class Command(Enum):
@@ -57,47 +68,18 @@ class Command(Enum):
     def __int__(self):
         return self.value
 
-class Music(Enum):
-    MUSIC_MENU = "menu_caves_of_dawn.mp3"
-    WAVE_1 = "wave1_mysterious_celesta.mp3"
+
 
 class SFXType(Enum):
     UI = "ui"
     WEAPONS = "weapons"
-    SFX_PLAYER = "sfx_player"
+    PLAYERS = "players"
+    ENEMIES = "enemies"
 
-class SFXActions(Enum):
-    SHOOT = "shoot"
-    PUMP = "pump"
-    RELOAD = "reload"
-    CLICKED = "clicked"
-    JUMP = "jump"
-    HOVER = "hover"
-    EMPTY_M = "empty"
-
-class SFXName(Enum):
-    #shoot
-    P_1911 = "1911.mp3"
-    SHORT_BARREL = "short_barrel.mp3"
-    PUMP_SHORT_BARREL = "pump_short_barrel.mp3"
-    UZI_SHOOT = "uzi_shoot.mp3"
-    MACHETE_SWIPE = "machete_swipe.mp3"
-    MACHETE_HIT = "machete_hit.mp3"
-    RPG_LAUNCH = "rpg_launch.mp3"
-    RPG_EXPLOSION = "rpg_explosion.mp3"
-    
-    #reload
-    START_RELOAD_1911 = "start_reload_1911.mp3"
-    END_RELOAD_1911 = "end_reload_1911.mp3"
-    SHELL_LOAD_SHORT_BARREL = "shell_load_short_barrel.mp3"
-    UZI_RELOAD = "uzi_reload.mp3"
-    RPG_START_RELOAD = "rpg_start_reload.mp3"
-    RPG_END_RELOAD = "rpg_end_reload.mp3"
-    
-    #others
-    EMPTY_1911 = "empty_1911.mp3"
+class SFXUI(Enum):
     BTN_CLICK = "btn_click.mp3"
     BTN_HOVER = "btn_hover.mp3"
+    STORE_PURCHASE = "purchase.mp3"
     
 class BulletType(Enum):
     MELEE = "melee"

@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
 from domain.content.weapons.projectile import Projectile
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 
 class SMG(Weapon):
     def __init__(self, pos, **kwargs):
@@ -28,13 +28,13 @@ class SMG(Weapon):
         self.bullet_spawn_offset = vec(self.rect.width/2 + 40, 2)
         self.last_shot_time = None
         
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.SHOOT), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.RELOAD), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.SHOOT), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.RELOAD), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The animation frames of this weapon when reloading."""
-        self.reload_end_frame = 11
+        self.reload_end_frame = 10
         self.playing_reload_end = False
         
-        self.idle_frame = game_controller.scale_image(pygame.image.load(constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.IDLE)), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.idle_frame = game_controller.scale_image(pygame.image.load(resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.IDLE)), 1.2, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         
@@ -45,11 +45,10 @@ class SMG(Weapon):
         if not load_content:
             return
         
-        self.shoot_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.UZI_SHOOT).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
-        self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.reload_start_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.UZI_RELOAD))
-        self.reload_end_sound = None
-        
+        self.shoot_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.UZI,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,4)]
+        self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.UZI,enums.AnimActions.EMPTY_TRIGGER))
+        self.reload_start_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.UZI,enums.AnimActions.RELOAD))
+        self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.UZI,enums.AnimActions.RELOAD_END))
         self.last_channel = 0
    
         for s in self.shoot_sounds:
@@ -58,8 +57,7 @@ class SMG(Weapon):
    
         self.empty_sound.set_volume(0.1)
         self.reload_start_sound.set_volume(0.3)
-        if self.reload_end_sound != None:
-            self.reload_end_sound.set_volume(0.5)
+        self.reload_end_sound.set_volume(0.3)
             
     
     def fire_sound(self):
@@ -96,7 +94,7 @@ class SMG(Weapon):
         return _still_firing
     
     def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
-        if not self.can_shoot():
+        if not self.can_shoot() or (self.playing_reload_end != None and self.playing_reload_end):
             return None
         
         super().shoot(bullet_pos, player_net_id, **kwargs)

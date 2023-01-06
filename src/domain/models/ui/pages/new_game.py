@@ -6,7 +6,7 @@ from domain.models.ui.pages.page import Page
 from domain.models.ui.button import Button
 from domain.models.ui.popup_text import Popup
 from domain.utils import constants, colors, enums
-from domain.services import menu_controller, game_controller
+from domain.services import menu_controller, game_controller, resources
 from domain.engine.game import Game
 
 class NewGame(Page):
@@ -16,15 +16,15 @@ class NewGame(Page):
         self.screen: pygame.Surface = screen
         
         btn_dict = {
-            "text_font": pygame.font.Font(f'{constants.FONTS_PATH}runescape_uf.ttf', 30),
+            "text_font": resources.px_font(30),
             "text_color": colors.BLACK
         }
         
         self.buttons.extend([
-            Button(vec(0,250), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Single Player", on_click = lambda: self.start_game(enums.ClientType.SINGLE),**btn_dict),
-            Button(vec(0,395), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Host Game", on_click = lambda: self.start_game(enums.ClientType.HOST),**btn_dict),
-            Button(vec(0,455), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
-            # Button(vec(0,515), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
+            Button(vec(0,250), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Single Player", on_click = lambda: self.start_game(enums.ClientType.SINGLE),**btn_dict),
+            Button(vec(0,395), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Host Game", on_click = lambda: self.start_game(enums.ClientType.HOST),**btn_dict),
+            Button(vec(0,455), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Enter Game", on_click = lambda: self.start_game(enums.ClientType.GUEST),**btn_dict),
+            # Button(vec(0,515), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "teste", on_click = self.teste,**btn_dict)
         ])
 
         
@@ -33,7 +33,7 @@ class NewGame(Page):
             b.center = (b.rect.centerx, b.rect.centery)
             
         return_page = lambda: menu_controller.pages_history.pop()
-        self.buttons.append(Button(vec(30,self.screen.get_height() - 100), f'{constants.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = return_page,**btn_dict))
+        self.buttons.append(Button(vec(30,self.screen.get_height() - 100), f'{resources.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = return_page,**btn_dict))
         
         self.btn_panel, self.btn_panel_rect = self.create_panel()
         
@@ -43,7 +43,7 @@ class NewGame(Page):
         
         self.txt_ip_input = TextInput(
             pygame.Rect((self.buttons[0].rect.left, self.line_divider_rect.top + 20), (self.buttons[0].rect.width*0.6,30)),
-            font = pygame.font.Font(constants.PIXEL_FONT, 22),
+            font = resources.px_font(22),
             font_color = colors.BLACK,
             background_color = colors.WHITE,
             border_color = colors.LIGHT_GRAY,
@@ -61,13 +61,13 @@ class NewGame(Page):
         self.txt_ip_input.set_buffer([menu_controller.config_state['ip']])
         self.txt_port_input.set_buffer([menu_controller.config_state['port']])
         
-        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{constants.IMAGES_PATH}ui\\logo_anim\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{resources.IMAGES_PATH}ui\\logo_anim\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.logo_scale = 0.5
         self.logo_frame = 0
         self.logo_image: pygame.Surface = None
         
-        self.set_background(f'{constants.IMAGES_PATH}ui\\bg_main_menu.png')
+        self.set_background(f'{resources.IMAGES_PATH}ui\\bg_main_menu.png')
         
     
     def teste(self):

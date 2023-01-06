@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 as vec
 
 from domain.models.player import Player
-from domain.services import menu_controller, game_controller
+from domain.services import menu_controller, game_controller, resources
 from domain.utils import colors, constants, enums
 from domain.models.ui.button import Button
 from domain.models.ui.popup_text import Popup
@@ -23,7 +23,7 @@ class Store:
         self.player = player
         self.panel_margin = panel_margin
         self.store_v_scrollbar: ScrollBar = None
-        self.purchase_sound = pygame.mixer.Sound(f'{constants.SOUNDS_PATH}sound_effects\\ui\\purchase.mp3')
+        self.purchase_sound = pygame.mixer.Sound(f'{resources.SOUNDS_PATH}sound_effects\\ui\\purchase.mp3')
         self.purchase_sound.set_volume(0.3)
         
         
@@ -78,27 +78,27 @@ class Store:
         }    
         
         self.ammos:list[StoreItem] = [
-            StoreItem(f'{constants.IMAGES_PATH}ui\\pistol_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Pistol Ammo", item_name = "pistol_ammo", price = 20, count = 10, bullet_type = enums.BulletType.PISTOL, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\shotgun_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Shotgun Ammo", item_name = "shotgun_ammo", price = 30, count = 5, bullet_type = enums.BulletType.SHOTGUN, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\rifle_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Rifle Ammo", item_name = "rifle_ammo", price = 45, count = 30, bullet_type = enums.BulletType.ASSAULT_RIFLE, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\sniper_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Sniper Ammo", item_name = "sniper_ammo", price = 40, count =5, bullet_type = enums.BulletType.SNIPER, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\rocket_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Rocket Ammo", item_name = "rocket_ammo", price = 135, count =1, bullet_type = enums.BulletType.ROCKET, **cards_dict)
+            StoreItem(f'{resources.IMAGES_PATH}ui\\pistol_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Pistol Ammo", item_name = "pistol_ammo", price = 20, count = 10, bullet_type = enums.BulletType.PISTOL, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\shotgun_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Shotgun Ammo", item_name = "shotgun_ammo", price = 30, count = 5, bullet_type = enums.BulletType.SHOTGUN, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\rifle_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Rifle Ammo", item_name = "rifle_ammo", price = 45, count = 30, bullet_type = enums.BulletType.ASSAULT_RIFLE, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\sniper_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Sniper Ammo", item_name = "sniper_ammo", price = 40, count =5, bullet_type = enums.BulletType.SNIPER, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Rocket Ammo", item_name = "rocket_ammo", price = 135, count =1, bullet_type = enums.BulletType.ROCKET, **cards_dict)
         ]
         
         self.items:list[StoreItem] = [
-            StoreItem(f'{constants.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
+            StoreItem(f'{resources.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
         self.weapons:list[StoreItem] = [
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.MACHETE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Machete", item_name = "machete", price = 0, icon_scale = 0.2, store_icon_scale = 0.1, bullet_type = enums.BulletType.MELEE, weapon_type = enums.Weapons.MACHETE, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
-            StoreItem(f'{constants.get_weapon_frames(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
-            StoreItem(f'{constants.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Machete", item_name = "machete", price = 0, icon_scale = 0.2, store_icon_scale = 0.1, bullet_type = enums.BulletType.MELEE, weapon_type = enums.Weapons.MACHETE, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
         self.cards_list = [*self.ammos, *self.items, *self.weapons]
@@ -108,23 +108,23 @@ class Store:
         
         
         self.ammo_panel_buttons = [
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_forward(100)),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_backward(100))
             ]
         
         self.items_panel_buttons = [
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_forward(100)),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_backward(100))
             ]
         
         self.weapons_panel_buttons = [
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{constants.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_forward(100)),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_backward(100))
             ]
         
         self.buttons: list[Button] = [
-                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{constants.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = self.on_return),
-                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{constants.IMAGES_PATH}ui\\btn_small_green.png', text_font = self.font(20), text_color = colors.BLACK, scale=1.4, visible = False, hover_scale=1, on_click = self.process_purchase)
+                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = self.on_return),
+                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text_font = resources.px_font(20), text_color = colors.BLACK, scale=1.4, visible = False, hover_scale=1, on_click = self.process_purchase)
             ]
         
         self.attributes_max = {
@@ -135,9 +135,6 @@ class Store:
         }
         
         self.buttons.extend([*self.ammo_panel_buttons, *self.items_panel_buttons, *self.weapons_panel_buttons])
-
-    def font(self, size: int):
-        return pygame.font.Font(constants.PIXEL_FONT, size)
     
     def update(self, **kwargs):
         events = kwargs.pop("events", [])
@@ -224,7 +221,7 @@ class Store:
             case enums.Weapons.UZI:
                 return SMG(vec(0,0), load_content = False)
             
-            case enums.Weapons.UZI:
+            case enums.Weapons.RPG:
                 return Launcher(vec(0,0), load_content = False)
 
             
@@ -240,7 +237,7 @@ class Store:
         if self.store_v_scrollbar != None:
             _offset_y += self.store_v_scrollbar.scroll_offset
         
-        title = menu_controller.get_text_surface(title_text, colors.WHITE, self.font(50))
+        title = menu_controller.get_text_surface(title_text, colors.WHITE, resources.px_font(50))
         title_rect = title.get_rect()
         title_rect.topleft += _offset_y
         
@@ -271,7 +268,7 @@ class Store:
         image_rect.topleft = self.panel_margin/2
         
         #title
-        txt_store_title = menu_controller.get_text_surface("Store", colors.WHITE, self.font(80))
+        txt_store_title = menu_controller.get_text_surface("Store", colors.WHITE, resources.px_font(80))
         txt_store_title_rect = txt_store_title.get_rect()
         txt_store_title_rect.topleft = vec(self.buttons[0].rect.right, 10)
 
@@ -312,12 +309,12 @@ class Store:
             self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + _item_description_size.y), (20,screen_rect.height - self.panel_margin.y*2 - _item_description_size.y)))
             
             
-        p1_icon = game_controller.scale_image(pygame.image.load(f'{constants.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 2.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        p1_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 2.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
         p1_icon_rect = p1_icon.get_rect()
         p1_icon_rect.left = txt_store_title_rect.right + 30
         p1_icon_rect.centery = txt_store_title_rect.centery
 
-        txt_money = menu_controller.get_text_surface(f'$ {self.player.money:.2f}', colors.GREEN, self.font(25))
+        txt_money = menu_controller.get_text_surface(f'$ {self.player.money:.2f}', colors.GREEN, resources.px_font(25))
         txt_money_rect = txt_money.get_rect()
         txt_money_rect.left = p1_icon_rect.right + 15
         txt_money_rect.centery = txt_store_title_rect.centery
@@ -361,7 +358,7 @@ class Store:
             _v_divider_line_left = btn_buy.rect.right - self.panel_margin.x/2 + 10
                 
             #card title
-            txt_card_title = menu_controller.get_text_surface(self.selected_card.title, colors.WHITE, self.font(25))
+            txt_card_title = menu_controller.get_text_surface(self.selected_card.title, colors.WHITE, resources.px_font(25))
             txt_card_title_rect = txt_card_title.get_rect()
             txt_card_title_rect.centerx = _description_rect.left + btn_buy.rect.width/2 + 10
             txt_card_title_rect.top = _description_rect.top
@@ -382,7 +379,7 @@ class Store:
                 count_text = f'{self.player.health}/{self.player.max_health}'
             
             if len(count_text) > 0:
-                txt_bullets = menu_controller.get_text_surface(count_text, colors.WHITE, self.font(20))
+                txt_bullets = menu_controller.get_text_surface(count_text, colors.WHITE, resources.px_font(20))
                 txt_bullets_rect = txt_bullets.get_rect()
                 icon_rect.left -= txt_bullets_rect.width/2 + 2.5
                 txt_bullets_rect.centery = icon_rect.centery
@@ -426,22 +423,22 @@ class Store:
                 _range_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.attributes_max["range"], value = _range, **constants.ATTRIBUTE_BARS["weapon"])
 
                 #attribute labels
-                _txt_damage = menu_controller.get_text_surface("Damage:", colors.WHITE, self.font(25))
+                _txt_damage = menu_controller.get_text_surface("Damage:", colors.WHITE, resources.px_font(25))
                 _txt_damage_rect = _txt_damage.get_rect()
                 _txt_damage_rect.centery = _damage_bar.rect.centery
                 _txt_damage_rect.left = _bar_pos.x
                 
-                _txt_firerate = menu_controller.get_text_surface("Fire rate:", colors.WHITE, self.font(25))
+                _txt_firerate = menu_controller.get_text_surface("Fire rate:", colors.WHITE, resources.px_font(25))
                 _txt_firerate_rect = _txt_firerate.get_rect()
                 _txt_firerate_rect.centery = _firerate_bar.rect.centery
                 _txt_firerate_rect.left = _bar_pos.x
                 
-                _txt_reload_speed = menu_controller.get_text_surface("Reload speed:", colors.WHITE, self.font(25))
+                _txt_reload_speed = menu_controller.get_text_surface("Reload speed:", colors.WHITE, resources.px_font(25))
                 _txt_reload_speed_rect = _txt_reload_speed.get_rect()
                 _txt_reload_speed_rect.centery = _reload_speed_bar.rect.centery
                 _txt_reload_speed_rect.left = _bar_pos.x
                 
-                _txt_range = menu_controller.get_text_surface("Range:", colors.WHITE, self.font(25))
+                _txt_range = menu_controller.get_text_surface("Range:", colors.WHITE, resources.px_font(25))
                 _txt_range_rect = _txt_range.get_rect()
                 _txt_range_rect.centery = _range_bar.rect.centery
                 _txt_range_rect.left = _bar_pos.x
@@ -480,7 +477,7 @@ class Store:
             pygame.draw.line(self.image, colors.LIGHT_GRAY, (_description_rect.left, _description_rect.top + _item_description_size.y), (_description_rect.right, _item_description_size.y), 2)
             
             #description
-            lines = [menu_controller.get_text_surface(line.replace("tags:",""), colors.YELLOW if line.startswith("tags:") else colors.WHITE, self.font(18)) for line in self.selected_card.description.split("\n")]
+            lines = [menu_controller.get_text_surface(line.replace("tags:",""), colors.YELLOW if line.startswith("tags:") else colors.WHITE, resources.px_font(18)) for line in self.selected_card.description.split("\n")]
             _line_space = 20
             _description_margin = vec(10,20)
             for i, line in enumerate(lines):

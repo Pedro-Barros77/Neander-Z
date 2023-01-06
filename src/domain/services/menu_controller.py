@@ -3,11 +3,12 @@ from pygame import locals as ls
 from pygame.math import Vector2 as vec
 
 from domain.services.save_manager import SaveManager
+from domain.services import resources
 from domain.utils import constants, enums, math_utillity as math, colors
 from domain.models.ui.popup_text import Popup
 
 pages_history: list = []
-save_manager = SaveManager('.save', constants.SAVE_PATH)
+save_manager = SaveManager('.save', resources.SAVE_PATH)
 playing = False
 player_state = {
     "state_name": "player",

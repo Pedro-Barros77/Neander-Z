@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -33,8 +33,8 @@ class ZRoger(Enemy):
         self.kill_score = 53
         self.headshot_score_multiplier = 1.5
         
-        self.damage_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\damage', 0.1)
-        self.death_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\death', 0.2)
+        self.damage_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\damage', 0.1)
+        self.death_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\death', 0.2)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head")
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width, self.hitbox_head.rect.height - self.rect.height/1.5)))

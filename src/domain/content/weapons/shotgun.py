@@ -4,7 +4,7 @@ from pygame.math import Vector2 as vec
 from domain.models.weapon import Weapon
 from domain.utils import constants, enums
 from domain.content.weapons.projectile import Projectile
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 
 class Shotgun(Weapon):
     def __init__(self, pos, **kwargs):
@@ -31,9 +31,9 @@ class Shotgun(Weapon):
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
         
         _scale = 1.5
-        self.fire_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.SHOOT), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.reload_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.RELOAD), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.pump_frames = game_controller.load_sprites(constants.get_weapon_frames(enums.Weapons.SHORT_BARREL, enums.AnimActions.PUMP), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.SHOOT), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.RELOAD), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.pump_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.PUMP), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.reload_end_frame = 8
         self.playing_reload_end = False
@@ -49,10 +49,10 @@ class Shotgun(Weapon):
         if not load_content:
             return
         
-        self.shoot_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.SHORT_BARREL))
-        self.empty_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.EMPTY_M, enums.SFXName.EMPTY_1911))
-        self.pump_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.PUMP, enums.SFXName.PUMP_SHORT_BARREL))
-        self.reload_end_sound = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.RELOAD, enums.SFXName.SHELL_LOAD_SHORT_BARREL))
+        self.shoot_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.SHOOT))
+        self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.EMPTY_TRIGGER))
+        self.pump_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.PUMP))
+        self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.RELOAD))
    
         self.shoot_sound.set_volume(0.5)
         self.pump_sound.set_volume(0.5)

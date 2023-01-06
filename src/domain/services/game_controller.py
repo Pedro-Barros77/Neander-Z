@@ -4,7 +4,7 @@ import math
 import os
 
 from domain.utils import constants, enums
-from domain.services import menu_controller
+from domain.services import menu_controller, resources
 
 screen_size: vec = vec(0,0)
 map_size: vec = vec(0,0)
@@ -101,7 +101,7 @@ def load_sounds(folder_path: str, volume: int = 1):
     Returns:
         list[mixer.Sound]: A list of the sounds.
     """    
-    _path = constants.ROOT_PATH + folder_path
+    _path = resources.ROOT_PATH + folder_path
     if not os.path.exists(_path):
         return
     
@@ -120,7 +120,7 @@ def load_sprites(folder_path: str, scale = 1, convert_type: enums.ConvertType = 
     Returns:
         list[pygame.Surface]: A list of the images.
     """    
-    _path = constants.ROOT_PATH + folder_path
+    _path = resources.ROOT_PATH + folder_path
     if not os.path.exists(_path):
         return
     

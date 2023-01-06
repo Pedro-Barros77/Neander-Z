@@ -2,7 +2,7 @@ import pygame, math, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as maths
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -14,7 +14,7 @@ class Projectile(pygame.sprite.Sprite):
         self.owner = owner
         self.bullet_type = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         self.image_scale = kwargs.pop("image_scale", 1)
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_bullet(self.bullet_type)), self.image_scale, enums.ConvertType.CONVERT_ALPHA)
+        self.image = game_controller.scale_image(pygame.image.load(resources.get_bullet_path(self.bullet_type)), self.image_scale, enums.ConvertType.CONVERT_ALPHA)
         self.current_frame: pygame.Surface = self.image.copy()
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
@@ -36,12 +36,13 @@ class Projectile(pygame.sprite.Sprite):
         self.explosion_max_radius = kwargs.pop("explosion_max_radius", 0)
         self.explosion_min_radius = kwargs.pop("explosion_min_radius", 0)
         
-        self.explosion_frames = game_controller.load_sprites(f'{constants.IMAGES_PATH}weapons\\effects\\explosion_01', convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.explosion_frame = 0
         self.exploding = False
-        self.explosion_sounds = [pygame.mixer.Sound(constants.get_sfx(enums.SFXType.WEAPONS,enums.SFXActions.SHOOT, enums.SFXName.RPG_EXPLOSION).replace('.mp3', f'{i}.mp3')) for i in range(1,4)]
-        for s in self.explosion_sounds:
-            s.set_volume(0.3)
+        if self.explosion_max_radius > 0:
+            self.explosion_frames = game_controller.load_sprites(f'{resources.IMAGES_PATH}weapons\\effects\\explosion_01', convert_type=enums.ConvertType.CONVERT_ALPHA)
+            self.explosion_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.HIT) + f'0{i}.mp3') for i in range(1,4)]
+            for s in self.explosion_sounds:
+                s.set_volume(0.3)
             
     def explosion_sound(self):
         sound = self.explosion_sounds[random.randint(0, len(self.explosion_sounds)-1)]

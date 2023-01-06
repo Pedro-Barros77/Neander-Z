@@ -2,7 +2,7 @@ import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
-from domain.services import game_controller, menu_controller as mc
+from domain.services import game_controller, menu_controller as mc, resources
 from domain.models.progress_bar import ProgressBar
 from domain.models.ui.popup_text import Popup
 from domain.models.rectangle_sprite import Rectangle
@@ -48,20 +48,20 @@ class Enemy(pygame.sprite.Sprite):
         """If the running animation is running."""
         self.run_frame = 0
         """The current frame index of the running animation."""
-        run_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.RUN)
+        run_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.RUN)
         self.run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.attacking = False
         self.attack_frame = 0
-        attack_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.ATTACK)
+        attack_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.ATTACK)
         self.attack_frames = game_controller.load_sprites(attack_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
 
         self.dying = False
         self.death_frame = 0
-        death_folder = constants.get_zombie_frames(self.enemy_name, enums.AnimActions.DEATH)
+        death_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.DEATH)
         self.death_frames = game_controller.load_sprites(death_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        self.image = game_controller.scale_image(pygame.image.load(constants.get_zombie_frames(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.image = game_controller.scale_image(pygame.image.load(resources.get_enemy_path(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.size = self.image.get_size()
         	
         self.rect = self.image.get_rect()

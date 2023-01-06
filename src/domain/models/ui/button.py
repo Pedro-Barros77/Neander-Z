@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums
-from domain.services import game_controller, menu_controller
+from domain.services import game_controller, menu_controller, resources
 
 #button class
 class Button(pygame.sprite.Sprite):
@@ -24,8 +24,8 @@ class Button(pygame.sprite.Sprite):
         self.hover_scale = kwargs.pop("hover_scale", 1.1)
         
         self.last_clicked = True
-        self.sound_clicked = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.UI,enums.SFXActions.CLICKED, enums.SFXName.BTN_CLICK))
-        self.sound_hover = pygame.mixer.Sound(constants.get_sfx(enums.SFXType.UI,enums.SFXActions.HOVER, enums.SFXName.BTN_HOVER))
+        self.sound_clicked = pygame.mixer.Sound(resources.get_ui_sfx(enums.SFXUI.BTN_CLICK))
+        self.sound_hover = pygame.mixer.Sound(resources.get_ui_sfx(enums.SFXUI.BTN_HOVER))
         
         
         if len(self.text) > 0:

@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vec
 
-from domain.services import menu_controller
+from domain.services import menu_controller, resources
 from domain.utils import colors, constants
 from domain.models.ui.button import Button
 from domain.models.ui.pages.modals.modal import Modal
@@ -16,15 +16,15 @@ class Pause(Modal):
         
         self.game = game
         btn_dict = {
-            "text_font": self.font(30),
+            "text_font": resources.px_font(30),
             "text_color": colors.BLACK
         }
 
         self.buttons: list[Button] = []
         self.buttons.extend([
-            Button(vec(0, self.panel_margin.y + 200), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Continue", on_click = self.hide ,**btn_dict),
-            Button(vec(0, self.panel_margin.y + 260), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Restart", on_click = self.game.restart_game,**btn_dict),
-            Button(vec(0, self.panel_margin.y + 320), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Main Menu", on_click = self.main_menu,**btn_dict),
+            Button(vec(0, self.panel_margin.y + 200), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Continue", on_click = self.hide ,**btn_dict),
+            Button(vec(0, self.panel_margin.y + 260), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Restart", on_click = self.game.restart_game,**btn_dict),
+            Button(vec(0, self.panel_margin.y + 320), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Main Menu", on_click = self.main_menu,**btn_dict),
         ])
         
         for b in self.buttons:
@@ -54,10 +54,6 @@ class Pause(Modal):
             case 1:
                 self.buttons[0].enable(True)
                 self.buttons[1].enable(False)
-           
-
-    def font(self, size: int):
-        return pygame.font.Font(constants.PIXEL_FONT, size)
     
     def draw(self, screen: pygame.Surface):
         #black panel
@@ -65,7 +61,7 @@ class Pause(Modal):
         
         screen_rect = screen.get_rect()
         
-        pause_title = menu_controller.get_text_surface("Game Paused", colors.WHITE, self.font(80))        
+        pause_title = menu_controller.get_text_surface("Game Paused", colors.WHITE, resources.px_font(80))        
         title_rect = pause_title.get_rect()
         title_rect.centerx = screen_rect.centerx
         title_rect.top = self.panel_margin.y + 30

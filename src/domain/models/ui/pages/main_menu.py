@@ -5,7 +5,7 @@ from domain.models.ui.pages.page import Page
 from domain.models.ui.pages.new_game import NewGame
 from domain.models.ui.button import Button
 from domain.utils import constants, colors
-from domain.services import menu_controller, game_controller
+from domain.services import menu_controller, game_controller, resources
 from domain.utils import enums
 
 class MainMenu(Page):
@@ -23,14 +23,14 @@ class MainMenu(Page):
         self.screen: pygame.Surface = pygame.display.set_mode(self.monitor_size)
 
         btn_dict = {
-            "text_font": pygame.font.Font(constants.PIXEL_FONT, 30),
+            "text_font": resources.px_font(30),
             "text_color": colors.BLACK
         }
         
         self.buttons.extend([
-            Button(vec(0,250), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Play",on_click = self.open_new_game,**btn_dict),
-            Button(vec(0,310), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Options", **btn_dict),
-            Button(vec(0,370), f'{constants.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Quit",on_click = lambda: menu_controller.quit_app(), **btn_dict),
+            Button(vec(0,250), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Play",on_click = self.open_new_game,**btn_dict),
+            Button(vec(0,310), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Options", **btn_dict),
+            Button(vec(0,370), f'{resources.IMAGES_PATH}ui\\btn_small.png', scale = 2, text = "Quit",on_click = lambda: menu_controller.quit_app(), **btn_dict),
         ])
         
         for b in self.buttons:
@@ -39,12 +39,12 @@ class MainMenu(Page):
         
         self.btn_panel, self.btn_panel_rect = self.create_panel()
         
-        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{constants.IMAGES_PATH}ui\\logo_anim\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.logo_frames: list[pygame.sprite.Sprite] = game_controller.load_sprites(f'{resources.IMAGES_PATH}ui\\logo_anim\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.logo_scale = 0.5
         self.logo_frame = 0
         self.logo_image: pygame.Surface = None
         
-        self.set_background(f'{constants.IMAGES_PATH}ui\\bg_main_menu.png')
+        self.set_background(f'{resources.IMAGES_PATH}ui\\bg_main_menu.png')
     
         
     def open_new_game(self):
@@ -54,7 +54,7 @@ class MainMenu(Page):
         
     def update(self, **kwargs):
         if not pygame.mixer.music.get_busy():
-            menu_controller.play_music(constants.get_music(enums.Music.MUSIC_MENU), 0.2, -1)
+            menu_controller.play_music(resources.get_song(resources.Songs.MENU), 0.2, -1)
             
         self.logo_anim(0.1)
     
