@@ -30,6 +30,9 @@ class ZRoger(Enemy):
         self.hit_rectangle = None
         self.head_shot_multiplier = 2
         
+        self.kill_score = 53
+        self.headshot_score_multiplier = 1.5
+        
         self.damage_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\damage', 0.1)
         self.death_sounds = game_controller.load_sounds(f'{constants.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\death', 0.2)
         

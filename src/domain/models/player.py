@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.RPG)
+        self.add_weapon(enums.Weapons.UZI)
         
         self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
         """The weapon on player's hand."""

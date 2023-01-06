@@ -25,8 +25,12 @@ class Enemy(pygame.sprite.Sprite):
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.attack_targets = game_controller.enemy_target_groups
         self.client_type = enums.ClientType.UNDEFINED
+        
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 2)
+        self.kill_score = kwargs.pop("kill_score", 10)
 
         self.killer = 0
+        self.headshot_kill = False
         self.death_time: datetime.datetime = None
         self.fade_out_ms = 1000
         self.image_alpha = 255
@@ -215,7 +219,7 @@ class Enemy(pygame.sprite.Sprite):
         
         
     def kill(self, attacker):
-        self.wave.handle_score(self.enemy_name, attacker)
+        self.wave.handle_score(self, attacker, self.headshot_kill)
         self.wave.enemies_count -= 1
         self.wave.current_wave_step += 1
         if self.hitbox_head != None:
@@ -266,6 +270,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.hitbox_body = None
                 
             self.dying = True
+            self.headshot_kill = head_shot
             
                 
         _popup_args = constants.POPUPS["damage"].copy()

@@ -124,6 +124,7 @@ class Game(Page):
             
             
     def new_wave(self, wave):
+        self.pressed_keys.clear()
         self.wave_summary = None
         self.focused = True
         self.current_wave = wave

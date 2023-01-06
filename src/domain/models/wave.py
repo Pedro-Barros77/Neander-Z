@@ -70,19 +70,20 @@ class Wave():
         for e in self.enemies_group.sprites():
             e.kill(1)
 
-    def handle_score(self, enemy_type: enums.Enemies, attacker):
+    def handle_score(self, enemy: Enemy, attacker, headshot_kill = False):
         if attacker == None:
             return
-        _new_score = 0
         
         if attacker == 3:
             attacker = 1
-        match enemy_type:
-            case enums.Enemies.Z_ROGER:
-                _new_score += 53
-                # dinheiro dividi por 4    
+            
+        _new_score = enemy.kill_score
+        if headshot_kill:
+            _new_score *= enemy.headshot_score_multiplier
 
         self.players_scores[attacker].kills_count += 1
+        if headshot_kill:
+            self.players_scores[attacker].headshot_kills_count += 1
         
         if attacker == 1:
             self.game.player.score += _new_score 
