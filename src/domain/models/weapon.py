@@ -120,7 +120,7 @@ class Weapon(pygame.sprite.Sprite):
         if self.reload_start_time != None and now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time:
             return
         # if is still firing
-        if self.firing:
+        if self.firing or self.pumping:
             return
         
         self.reloading = True

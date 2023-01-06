@@ -4,11 +4,12 @@ from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
 from domain.services import game_controller, menu_controller as mc, resources
-from domain.content.weapons.pistol import Pistol
+from domain.content.weapons.semi_auto import SemiAuto
 from domain.content.weapons.shotgun import Shotgun
-from domain.content.weapons.smg import SMG
+from domain.content.weapons.full_auto import FullAuto
 from domain.content.weapons.melee import Melee
 from domain.content.weapons.launcher import Launcher
+from domain.content.weapons.sniper import Sniper
 from domain.models.weapon import Weapon
 from domain.models.progress_bar import ProgressBar
 from domain.models.rectangle_sprite import Rectangle
@@ -70,10 +71,11 @@ class Player(pygame.sprite.Sprite):
         
         
         self.backpack = BackPack()
-        self.add_weapon(enums.Weapons.RPG)
         
-        self.current_weapon: Weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
+        self.current_weapon: Weapon = None
         """The weapon on player's hand."""
+
+        self.add_weapon(enums.Weapons.SV98)
         
         self.weapon_switch_ms = 300
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -440,21 +442,25 @@ class Player(pygame.sprite.Sprite):
         if self.backpack.get_weapon(weapon_type) != None:
             return False
         
+        
         weapon = None
         
         default_weapon_distance = self.rect.width/2 + 30
+        default_weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
         
         match weapon_type:
             case enums.Weapons.P_1911:
-                weapon = Pistol((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = SemiAuto((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.SHORT_BARREL:
-                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.UZI:
-                weapon = SMG((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = FullAuto((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.MACHETE:
-                weapon = Melee((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+                weapon = Melee((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
             case enums.Weapons.RPG:
-                weapon = Launcher((self.rect.width, self.rect.centery), weapon_anchor = vec(self.rect.width/2, self.rect.height/3), weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+                weapon = Launcher((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+            case enums.Weapons.SV98:
+                weapon = Sniper((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
                 
         if weapon == None:
             return False
@@ -466,6 +472,9 @@ class Player(pygame.sprite.Sprite):
             
         if equip:
             self.backpack.equip_weapon(weapon_type)
-            self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
+            if weapon.is_primary:
+                self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_primary)
+            else:
+                self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         
         return True

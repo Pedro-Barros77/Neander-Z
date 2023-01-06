@@ -10,10 +10,11 @@ from domain.models.ui.scrollbar import ScrollBar
 from domain.models.ui.store_item import StoreItem
 from domain.models.ui.attribute_bars import AttributeBar
 from domain.content.weapons.melee import Melee
-from domain.content.weapons.pistol import Pistol
+from domain.content.weapons.semi_auto import SemiAuto
 from domain.content.weapons.shotgun import Shotgun
-from domain.content.weapons.smg import SMG
+from domain.content.weapons.full_auto import FullAuto
 from domain.content.weapons.launcher import Launcher
+from domain.content.weapons.sniper import Sniper
 from domain.models.weapon import Weapon
 
 
@@ -213,16 +214,19 @@ class Store:
                 return Melee(vec(0,0), load_content = False)
             
             case enums.Weapons.P_1911:
-                return Pistol(vec(0,0), load_content = False)
+                return SemiAuto(vec(0,0), load_content = False)
                 
             case enums.Weapons.SHORT_BARREL:
                 return Shotgun(vec(0,0), load_content = False)
                 
             case enums.Weapons.UZI:
-                return SMG(vec(0,0), load_content = False)
+                return FullAuto(vec(0,0), load_content = False)
             
             case enums.Weapons.RPG:
                 return Launcher(vec(0,0), load_content = False)
+            
+            case enums.Weapons.SV98:
+                return Sniper(vec(0,0), load_content = False)
 
             
     def get_panel(self,image_rect: pygame.Rect, height: float, title_text: str, cards: list[StoreItem], scroll: ScrollBar = None):

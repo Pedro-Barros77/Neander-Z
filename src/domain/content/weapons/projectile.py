@@ -27,6 +27,10 @@ class Projectile(pygame.sprite.Sprite):
         self.is_alive = True
         self.start_pos = pos
         self.tail_hitbox: Rectangle = self.get_tail()
+        self.pierce_damage_multiplier = kwargs.pop("pierce_damage_multiplier", 1)
+        self.pierce_count = 0
+        self.max_pierce_targets = kwargs.pop("max_pierce_targets", 1)
+        self.hit_targets: list[int] = []
         
         self.hit_callback: function = kwargs.pop("hit_callback", lambda s: None)
         
@@ -105,7 +109,7 @@ class Projectile(pygame.sprite.Sprite):
                 
                 self.damage = self.total_damage - (_percentage * self.total_damage)
         
-        _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.speed * mc.dt, -math.radians(self.angle))# * mc.dt
+        _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.speed * mc.dt, -math.radians(self.angle))
         self.image, self.rect = game_controller.rotate_to_angle(self.current_frame, _new_pos, self.angle)
         
         # if will be out of the map bounds
@@ -144,7 +148,13 @@ class Projectile(pygame.sprite.Sprite):
                             c.take_damage(self.damage, self.owner)
                             
             self.hit_callback(self)
-            self.destroy()
+            if self.pierce_damage_multiplier == 1:
+                self.destroy()
+            else:
+                self.damage *= self.pierce_damage_multiplier
+                self.pierce_count += 1
+                if self.pierce_count >= self.max_pierce_targets:
+                    self.destroy()
         self.rect.topleft = _new_pos
         self.tail_hitbox = self.get_tail()
         
@@ -175,13 +185,19 @@ class Projectile(pygame.sprite.Sprite):
         super().kill()
     
     def bullet_collision(self):
+        _collided = False
         for group in self.collision_groups:
             collisions = pygame.sprite.spritecollide(self.tail_hitbox, group, False)
             for c in collisions:
+                if c.id in self.hit_targets:
+                    continue
                 if isinstance(c, Enemy) or isinstance(c, Rectangle):
                     c.take_damage(self.damage, self.owner)
-                return True
-        return False
+                _collided = True
+                if self.pierce_damage_multiplier == 1:
+                    return _collided
+                self.hit_targets.append(c.id)
+        return _collided
     
     def get_netdata(self):
         values = {

@@ -35,6 +35,7 @@ class Weapons(Enum):
     UZI = 'smgs\\uzi'
     MACHETE = 'melee\\machete'
     RPG = 'launchers\\rpg'
+    SV98 = 'snipers\\sv98'
     
 class AnimActions(Enum):
     #players/enemies

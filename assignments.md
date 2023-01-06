@@ -29,3 +29,7 @@ Uzi shoot echo Sound Effect from <a href="https://pixabay.com/sound-effects/?utm
 RPG explosion Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6288">Pixabay</a>
 
 RPG reload 01 Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=7132">Pixabay</a>
+
+Sniper shoot Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=39789">Pixabay</a>
+
+Sniper bolt action Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=71670">Pixabay</a>
