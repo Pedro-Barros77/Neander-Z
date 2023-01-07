@@ -130,8 +130,11 @@ def app_loop():
         for event in _events:
             if event.type == pygame.QUIT:
                 quit_app()
-            if event.type == pygame.KEYDOWN:
-                pass
+            if event.type == pygame.KEYDOWN and current_page.name == "Game":
+                if event.key == pygame.K_UP:
+                    current_page.player.money += 100
+                if event.key == pygame.K_DOWN:
+                    current_page.player.money -= 100
                 
         
         playing = current_page.name == "Game"

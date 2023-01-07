@@ -28,7 +28,7 @@ class Sniper(Weapon):
         self.pierce_damage_multiplier = 0.5
         self.max_pierce_targets = 5
         
-        self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
+        self.bullet_spawn_offset = vec(self.rect.width/2 + 45, -3)
         
         _scale = 1.1
         self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.SHOOT), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)

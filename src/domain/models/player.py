@@ -35,7 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.score = 0
         """The amount of points of the player""" 
 
-        self.money = 1500
+        self.money = 0
         """The amount of money of the player""" 
         
         self.name = kwargs.pop("name", "player")

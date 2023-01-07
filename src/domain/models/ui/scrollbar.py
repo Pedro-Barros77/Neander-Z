@@ -23,6 +23,8 @@ class ScrollBar(object):
         """How much to scroll per click."""
         self.wheel_step_multiplier = kwargs.pop("wheel_step_multiplier", 2)
         """The step multiplier for the mouse scroll wheel."""
+        self.use_arrows = kwargs.pop("use_arrows", True)
+        """If the scroll bar should move on arrow keys."""
         
         #control
         self.scroll_offset: vec = vec(0,0)
@@ -255,7 +257,7 @@ class ScrollBar(object):
             self.scroll_change[i] = self.step * event.y * self.wheel_step_multiplier
         
         
-        if event.type == pygame.KEYDOWN and self.focused:
+        if event.type == pygame.KEYDOWN and self.focused and self.use_arrows:
             if is_vertical:
                 if event.key == pygame.K_UP:
                     self.scroll_change.y = self.step
