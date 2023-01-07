@@ -11,9 +11,8 @@ class Pause(Modal):
         super().__init__(**kwargs)
 
         self.active = False
+        self.title = "Game Paused"
 
-        
-        
         self.game = game
         btn_dict = {
             "text_font": resources.px_font(30),
@@ -34,6 +33,8 @@ class Pause(Modal):
     def main_menu(self):
         pygame.mixer.music.stop()
         menu_controller.pages_history = menu_controller.pages_history[:1]
+        if self.game.game_over_popup != None:
+            self.game.game_over_popup.destroy()
         
     def show(self):
         self.game.focused = False
@@ -61,12 +62,13 @@ class Pause(Modal):
         
         screen_rect = screen.get_rect()
         
-        pause_title = menu_controller.get_text_surface("Game Paused", colors.WHITE, resources.px_font(80))        
-        title_rect = pause_title.get_rect()
-        title_rect.centerx = screen_rect.centerx
-        title_rect.top = self.panel_margin.y + 30
-        
-        screen.blit(pause_title, title_rect)
+        if len(self.title) > 0:
+            pause_title = menu_controller.get_text_surface(self.title, colors.WHITE, resources.px_font(80))        
+            title_rect = pause_title.get_rect()
+            title_rect.centerx = screen_rect.centerx
+            title_rect.top = self.panel_margin.y + 30
+            
+            screen.blit(pause_title, title_rect)
         
         for b in self.buttons:
             b.draw(screen)

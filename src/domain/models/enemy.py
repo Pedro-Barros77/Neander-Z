@@ -176,7 +176,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.hitbox_body != None:
             self.hitbox_body.rect.topleft = self.pos if self.hitbox_head == None else self.hitbox_head.rect.bottomleft
             self.hitbox_body.update_pos()
-        
+            
         if not self.is_alive and self.death_time != None:
             self.fade_out_anim()
         if self.client_type == enums.ClientType.GUEST:

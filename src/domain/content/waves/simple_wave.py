@@ -1,6 +1,6 @@
 import pygame, random
 
-from domain.services import game_controller
+from domain.services import menu_controller, resources
 from domain.models.wave import Wave
 from domain.utils import enums
 from domain.content.enemies.z_roger import ZRoger
@@ -36,6 +36,7 @@ class SimpleWave(Wave):
 
     def start(self):
         super().start()
+        
 
     def get_random_enemy(self) -> dict:
         e_dict = self.enemies[random.randint(0, len(self.enemies)-1)]

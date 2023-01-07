@@ -41,6 +41,9 @@ class Player(pygame.sprite.Sprite):
         self.name = kwargs.pop("name", "player")
         """The name of this object, for debugging."""
         
+        self.is_alive = True
+        """If the player is still alive."""
+        
         self.pos: vec = vec((pos))
         """The X and Y position coordinates of the player."""
         self.speed = kwargs.pop("speed", vec(0,0))
@@ -114,8 +117,20 @@ class Player(pygame.sprite.Sprite):
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the falling ground animation."""
         
+        _grave_scale = 0.3
+        self.grave_dropping = False
+        """If the gravestone blood dropping animation is running."""
+        self.grave_drop_frame = 0
+        """The current frame index of the gravestone blood dropping."""
+        self.grave_blood_frames = game_controller.load_sprites(f'{resources.IMAGES_PATH}items\\grave_stone_blood', _grave_scale, enums.ConvertType.CONVERT_ALPHA)
+        """The frames of the gravestone blood dropping animation."""
+        self.grave_stone_frame = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}items\\grave_stone.png'), _grave_scale, enums.ConvertType.CONVERT_ALPHA)
+        """The gravestone image without blood."""
+        
         self.health_bar: ProgressBar = None
         """The health bar of the player."""
+        
+        self.survived_wave = 0
         
         _feet_rect = self.rect.copy()
         _feet_rect.width *= 0.3
@@ -175,6 +190,9 @@ class Player(pygame.sprite.Sprite):
     
     # called each frame
     def update(self, **kwargs):
+        if not self.is_alive:
+            self.grave_stone_anim(0.2)
+            return
         group_name = kwargs.pop("group_name", "")
         if group_name == "jumpable":
             return
@@ -242,6 +260,11 @@ class Player(pygame.sprite.Sprite):
         return
         
     def draw(self, surface: pygame.Surface, offset: vec):
+        if not self.is_alive:
+            self.draw_grave_stone(surface, offset)
+            return
+        
+        
         surface.blit(self.image, self.pos - offset)
         _target_offset = offset if not self.is_player1 else vec(0,0)
         
@@ -426,12 +449,13 @@ class Player(pygame.sprite.Sprite):
         self.health = math.clamp(self.health - value, 0, self.health_bar.max_value)
         self.health_bar.remove_value(value)
         
-        
         if self.is_player1:
             mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
         else:
             mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
-        
+
+        if self.health == 0:
+            self.kill()        
         
     def get_health(self, value: float):
         if value < 0:
@@ -480,3 +504,40 @@ class Player(pygame.sprite.Sprite):
                 self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         
         return True
+    
+    def grave_stone_anim(self, speed: float):
+        self.grave_drop_frame += speed
+        
+        if self.grave_drop_frame > len(self.grave_blood_frames)-1:
+            self.grave_drop_frame = 0
+        self.image = self.grave_blood_frames[int(self.grave_drop_frame)]
+        
+    def draw_grave_stone(self, screen: pygame.Surface, offset: vec):
+        _grave_rect = self.grave_stone_frame.get_rect()
+        _grave_rect.centerx = self.rect.centerx - offset.x
+        _grave_rect.bottom = self.rect.bottom - offset.y
+        
+        txt_player_name = mc.get_text_surface(str(self.character.value).upper(), colors.MEDIUM_GRAY, resources.px_font(13))
+        player_name_rect = txt_player_name.get_rect()
+        player_name_rect.centerx = _grave_rect.centerx
+        player_name_rect.bottom = _grave_rect.centery
+        
+        if self.survived_wave == 0:
+            waves_text = f'WAV 1'
+        else:
+            waves_text = f'WAV 1-{self.survived_wave}'
+            
+        txt_wave = mc.get_text_surface(waves_text, colors.MEDIUM_GRAY, resources.px_font(11))
+        wave_rect = txt_wave.get_rect()
+        wave_rect.centerx = _grave_rect.centerx
+        wave_rect.top = player_name_rect.bottom + 5
+            
+        
+        screen.blit(self.grave_stone_frame, _grave_rect)
+        screen.blit(txt_player_name, player_name_rect)
+        screen.blit(txt_wave, wave_rect)
+        screen.blit(self.image, _grave_rect)
+    
+    def kill(self):
+        self.is_alive = False
+        self.grave_dropping = True     

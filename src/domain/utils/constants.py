@@ -48,6 +48,11 @@ POPUPS = {
         "background_color": colors.set_alpha(colors.BLACK, 180),
         "padding": vec(500,10),
         "font": resources.px_font(80)
+    },
+    "game_over": {
+        "fade_in_ms": 1500,
+        "text_color": colors.RED,
+        "font": resources.px_font(80)
     }
 }
 

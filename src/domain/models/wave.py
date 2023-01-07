@@ -1,6 +1,6 @@
 import pygame, datetime
 
-from domain.services import menu_controller
+from domain.services import menu_controller, resources
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.enemy import Enemy
 from pygame.math import Vector2 as vec
@@ -17,7 +17,7 @@ class Wave():
         
         self.enemies: list[dict] = []
         for e in _enemies_dict:
-            _count = e.pop("count", 0)
+            _count = e.copy().pop("count", 0)
             for _ in range(_count):
                 self.enemies.append(e)
         
@@ -61,6 +61,7 @@ class Wave():
             self.money_multiplier = 1
         self.started = True
         menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
+        
         
     def delay_end_wave(self, delay_ms: float):
         if self.delayed_finish_time == None:

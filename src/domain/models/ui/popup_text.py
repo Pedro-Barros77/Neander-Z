@@ -55,6 +55,9 @@ class Popup(pygame.sprite.Sprite):
         self._show_time: datetime.datetime = None
         self._hide_time: datetime.datetime = None
         
+        if self.fade_in_ms > 0:
+                self._current_text_color = colors.set_alpha(self.text_color, 0)
+        
         if self.show_on_init:
             self.show()
             

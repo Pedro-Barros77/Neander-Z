@@ -1,5 +1,5 @@
 import pygame, time
-from datetime import datetime
+import datetime
 from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, menu_controller as mc, resources
@@ -14,6 +14,7 @@ from domain.models.ui.pages.page import Page
 from domain.models.ui.pages.modals.wave_summary import WaveSummary
 from domain.models.wave import Wave
 from domain.models.ui.pages.modals.pause import Pause
+from domain.models.ui.popup_text import Popup
 from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.simple_wave import SimpleWave
@@ -79,7 +80,8 @@ class Game(Page):
         
         self.focused = True
         
-        
+        self.game_over_time: datetime.datetime = None
+        self.game_over_popup: Popup = None
         
         
         #ui
@@ -135,9 +137,11 @@ class Game(Page):
         self.start_wave(self.create_wave(constants.WAVES[next_wave]))
     
     def create_wave(self, values_dict: dict):
+        print("\n", values_dict, "\n")
+        dic = values_dict.copy()
         match values_dict["wave_type"]:
             case enums.WaveType.SIMPLE:
-                return SimpleWave(self, **values_dict)
+                return SimpleWave(self, **dic)
             
     def start_wave(self, wave):
         self.pressed_keys.clear()
@@ -153,6 +157,8 @@ class Game(Page):
         """
         
         self.wave_summary = None
+        self.current_wave = None
+        self.game_over_time = None
         self.start_wave(self.create_wave(constants.WAVES[1]))
         game_controller.screen_size = vec(self.screen.get_size())
         game_controller.map_size = vec(self.map.rect.size)
@@ -160,6 +166,7 @@ class Game(Page):
         game_controller.enemy_target_groups = [self.players_group]
         self.gravity_accelaration = 0.5
         self.friction = -0.12
+        self.game_over_time = None
         
         self.bullets_group.empty()
         
@@ -186,6 +193,7 @@ class Game(Page):
         self.player.health_bar.value = self.player.max_health
         self.player.health_bar.target_value = self.player.max_health
         self.player.score = 0
+        self.player.is_alive = True
         # self.player.money = 0
 
         self.player.load_state(mc.player_state)
@@ -204,8 +212,10 @@ class Game(Page):
             self.player2.health_bar.target_value = self.player2.max_health
             self.player2.score = 0        
             self.player2.money = 0
+            self.player2.is_alive = True
 
-        
+        if self.game_over_popup != None:
+            self.game_over_popup.destroy()
         
         if self.client_type != enums.ClientType.GUEST:
             self.current_wave.start()
@@ -217,7 +227,10 @@ class Game(Page):
 
         result[_p1].player = self.player
         
+        self.player.survived_wave += 1
+        
         if self.client_type != enums.ClientType.SINGLE:
+            self.player2.survived_wave += 1
             _p2 = self.player2.net_id             
             self.player2.score += result[_p2].score
             self.player2.money += result[_p2].money
@@ -226,7 +239,7 @@ class Game(Page):
             
         
         
-        self.wave_summary = WaveSummary((result[1], result[2] if self.client_type != enums.ClientType.SINGLE else None), start_time = datetime.now())
+        self.wave_summary = WaveSummary((result[1], result[2] if self.client_type != enums.ClientType.SINGLE else None), start_time = datetime.datetime.now())
 
     def get_ammo_icon(self, bullet_type: enums.BulletType):
         match bullet_type:
@@ -525,6 +538,16 @@ class Game(Page):
             game_controller.restart_game(self)
         elif self.client_type == enums.ClientType.HOST:
             self.send_restart()
+
+    def game_over(self):
+        self.game_over_time = datetime.datetime.now()
+        self.focused = False
+        pygame.mouse.set_cursor()
+        self.game_over_popup = Popup("Game Over", (0,0), show_on_init = False, **constants.POPUPS["game_over"])
+        mc.popup(self.game_over_popup, center=True)
+        self.game_over_popup.rect.top -= self.game_over_popup.rect.height
+        self.pause_screen.title = ""
+        self.pause_screen.buttons[0].visible = False
             
     def handle_shooting(self):
         if "mouse_0" not in self.pressed_keys:
@@ -549,7 +572,18 @@ class Game(Page):
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
         
+        if not pygame.mixer.music.get_busy() and self.focused:
+            mc.play_music(resources.get_song(resources.Songs.WAVE_1), 0.1, -1)
+        
         game_controller.handle_events(self, events)
+        
+        if self.pause_screen != None and self.pause_screen.active:
+            if self.player.reload_popup != None:
+                self.player.reload_popup.destroy()
+                self.player.reload_popup = None
+            self.pause_screen.update()
+            if self.client_type == enums.ClientType.SINGLE:
+                return
         
         #input
         if pygame.K_p in self.pressed_keys:
@@ -579,11 +613,7 @@ class Game(Page):
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
                 self.next_wave()
             return
-        
-        
-        if not pygame.mixer.music.get_busy():
-            mc.play_music(resources.get_song(resources.Songs.WAVE_1), 0.1, -1)
-                
+            
         # p1
         self.player.update(game = self)
         # p2
@@ -592,7 +622,13 @@ class Game(Page):
         # wave logic
         self.current_wave.update()
         # enemies
-        self.current_wave.update_enemies()
+        if self.player.is_alive or (self.client_type != enums.ClientType.SINGLE and self.player2.is_alive):
+            self.current_wave.update_enemies()
+        else:
+            if self.game_over_time == None:
+                self.game_over()
+            if self.game_over_popup._current_text_color[3] == 255:
+                self.pause_screen.show()
         
         self.collision_group.update(group_name = "collision")
         self.jumpable_group.update(group_name = "jumpable")
@@ -629,11 +665,7 @@ class Game(Page):
             self.player2.pos.y = 0
             self.player2.update_rect()
             
-        if self.pause_screen != None and self.pause_screen.active:
-            if self.player.reload_popup != None:
-                self.player.reload_popup.destroy()
-                self.player.reload_popup = None
-            self.pause_screen.update()
+        self.last_pressed_keys = self.pressed_keys.copy()
         
     
        
@@ -650,6 +682,18 @@ class Game(Page):
         # bullets
         for b in self.bullets_group:
             b.draw(self.screen, self.player.offset_camera)
+            
+        #ui
+        if self.game_over_time == None:
+            self.draw_ui()
+        else:
+            panel_color = mc.fade_in_color(colors.BLACK, 255, self.game_over_time, self.game_over_time + datetime.timedelta(milliseconds=3000))
+            panel_surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+            panel_surface.fill(panel_color)
+            self.screen.blit(panel_surface, (0,0))
+            
+            if panel_color[3] == 255:
+                self.game_over_popup.show()
         # P1
         self.player.draw(self.screen, self.player.offset_camera)
         # P2
@@ -658,10 +702,6 @@ class Game(Page):
             
             
         # self.blit_debug()
-        
-        self.last_pressed_keys = self.pressed_keys.copy()
-
-        self.draw_ui()
         
         if self.pause_screen != None and self.pause_screen.active:
             self.pause_screen.draw(self.screen)
