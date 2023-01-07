@@ -51,6 +51,7 @@ class Store:
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
             "uzi": "tags:Auto-fire, small-damage\nUZI with caution!\nYou'll run out of bullets before\nyou can say OH CRAP.",
+            "sv98": "tags:Collateral-damage, high-damage\nFor when you want to take out\nthe undead from a safe distance\nand give them a headache they\nwon't recover from.",
             "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
             
             "first_aid_kit": "tags:Restores your health partially.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
@@ -98,6 +99,7 @@ class Store:
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 750, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SV98", item_name = "sv98", price = 900, icon_scale = 2.3, store_icon_scale = 1.1, bullet_type = enums.BulletType.SNIPER, weapon_type = enums.Weapons.SV98, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
@@ -301,13 +303,13 @@ class Store:
         self.weapons_panel_buttons[1].rect.left = weapons_panel_rect.right + image_rect.left + 5
         
         if self.ammo_h_scrollbar == None:
-            self.ammo_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.ammos)*2.1,1), pygame.Rect((ammo_panel_rect.left + self.panel_margin.x/2, ammo_panel_scroll_rect.bottom + 27), (ammo_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
+            self.ammo_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.ammos)*1.9,1), pygame.Rect((ammo_panel_rect.left + self.panel_margin.x/2, ammo_panel_scroll_rect.bottom + 27), (ammo_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
             
         if self.items_h_scrollbar == None:
-            self.items_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.items)*2.1,1), pygame.Rect((items_panel_rect.left + self.panel_margin.x/2, items_panel_scroll_rect.bottom + 27), (items_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
+            self.items_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.items)*1.9,1), pygame.Rect((items_panel_rect.left + self.panel_margin.x/2, items_panel_scroll_rect.bottom + 27), (items_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
         
         if self.weapons_h_scrollbar == None:
-            self.weapons_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.weapons)*2.1,1), pygame.Rect((weapons_panel_rect.left + self.panel_margin.x/2, weapons_panel_scroll_rect.bottom + 27), (weapons_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
+            self.weapons_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.weapons)*1.9,1), pygame.Rect((weapons_panel_rect.left + self.panel_margin.x/2, weapons_panel_scroll_rect.bottom + 27), (weapons_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
         
         if self.store_v_scrollbar == None:
             self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + _item_description_size.y), (20,screen_rect.height - self.panel_margin.y*2 - _item_description_size.y)))

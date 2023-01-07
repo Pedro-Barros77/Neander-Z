@@ -21,8 +21,8 @@ class Sniper(Weapon):
         self.last_shot_time = None
         self.magazine_size = 10
         self.magazine_bullets = self.magazine_size
-        self.bullet_max_range = 1000
-        self.bullet_min_range = 800
+        self.bullet_max_range = 1200
+        self.bullet_min_range = 1000
         self.fire_mode = enums.FireMode.BOLT_ACTION
         self.reload_type = enums.ReloadType.MAGAZINE
         self.pierce_damage_multiplier = 0.5
