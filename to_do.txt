@@ -9,3 +9,5 @@ Feature:
 -Zombies and bullets multiplayer
 -Take Damage
 -Spawn random zombies
+
+pyinstaller --onefile -w "src\app.py"

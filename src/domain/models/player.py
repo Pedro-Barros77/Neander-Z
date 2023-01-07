@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.MACHETE)
+        self.add_weapon(enums.Weapons.P_1911)
         
         self.weapon_switch_ms = 300
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -341,7 +341,7 @@ class Player(pygame.sprite.Sprite):
             if pressing_left != pressing_right:
                 self.running = True
         
-        if pygame.K_SPACE in game.pressed_keys and self.grounded:
+        if (pygame.K_SPACE in game.pressed_keys or pygame.K_w in game.pressed_keys) and self.grounded:
             self.speed.y = -self.jump_force
             self.jump_sounds.play()
             if pressing_left != pressing_right:
@@ -349,8 +349,10 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.jumping = True
                 
-           
-            game.pressed_keys.remove(pygame.K_SPACE)
+            if pygame.K_SPACE in game.pressed_keys:
+                game.pressed_keys.remove(pygame.K_SPACE)
+            elif pygame.K_w in game.pressed_keys:
+                game.pressed_keys.remove(pygame.K_w)
     
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)

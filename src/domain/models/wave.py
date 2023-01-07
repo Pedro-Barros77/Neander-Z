@@ -1,24 +1,36 @@
 import pygame, datetime
 
-from domain.services import game_controller
+from domain.services import menu_controller
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.enemy import Enemy
 from pygame.math import Vector2 as vec
-from domain.utils import enums
+from domain.utils import enums, constants
 from domain.models.wave_result import WaveResult
+from domain.models.ui.popup_text import Popup
  
 
 class Wave():
     def __init__(self, game, **kwargs):
+        
+        _enemies_dict: list[dict] = kwargs.pop("enemies", [])
+        self.total_enemies = sum([e["count"] for e in _enemies_dict])
+        
+        self.enemies: list[dict] = []
+        for e in _enemies_dict:
+            _count = e.pop("count", 0)
+            for _ in range(_count):
+                self.enemies.append(e)
+        
         self.game = game
+        self.wave_number = kwargs.pop("wave_number",0)
+        self.wave_type = kwargs.pop("wave_type", enums.WaveType.SIMPLE)
         self.enemies_current_id = 0
         self.enemies_group = pygame.sprite.Group()
         self.enemies_hitbox_group = pygame.sprite.Group()
         self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
-        self.total_enemies = kwargs.pop("total_enemies", 10)
         self.wave_step = kwargs.pop("wave_step", 1)
         self.current_wave_step = kwargs.pop("current_wave_step", 0)
-        self.money_multiplier = kwargs.pop("x2_multiplier", 1.8)
+        self.money_multiplier = kwargs.pop("money_multiplier", 1.8)
         self.wave_interval_s = kwargs.pop("wave_interval_s", 15)
         self.spawn_count = 0
         self.enemies_count = 0
@@ -48,6 +60,7 @@ class Wave():
         if self.game.client_type == enums.ClientType.SINGLE:
             self.money_multiplier = 1
         self.started = True
+        menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
         
     def delay_end_wave(self, delay_ms: float):
         if self.delayed_finish_time == None:
@@ -111,4 +124,3 @@ class Wave():
             
     def update_enemies(self):
         self.enemies_group.update(group_name = "enemies", game = self.game, client_type = self.game.client_type)
-        

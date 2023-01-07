@@ -101,7 +101,7 @@ class Shotgun(Weapon):
         if self.magazine_bullets >= self.magazine_size:
             return False
         # if is still reloading
-        if (self.reload_start_time != None and now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time) or self.pumping:
+        if (self.reload_start_time != None and now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time) or self.pumping or self.reloading:
             return False
         # if is still firing
         if self.firing:

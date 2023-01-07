@@ -11,7 +11,6 @@ from domain.models.rectangle_sprite import Rectangle
 
 class ZRoger(Enemy):
     def __init__(self, pos, enemy_name,wave, **kwargs):
-        kwargs["health"] = 30
         super().__init__(pos, enemy_name,wave, **kwargs)
         
         self.damage = kwargs.pop("damage", 15)

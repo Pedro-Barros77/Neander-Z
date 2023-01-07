@@ -110,6 +110,13 @@ class ConvertType(Enum):
     CONVERT = 1
     CONVERT_ALPHA = 2
     
+class WaveType(Enum):
+    SIMPLE = 1,
+    MEDIUM = 2,
+    HARD = 3,
+    NIGHTMARE = 4,
+    BOSS = 5
+    
 
 
 

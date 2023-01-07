@@ -12,10 +12,11 @@ from domain.models.igravitable import IGravitable
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.ui.pages.page import Page
 from domain.models.ui.pages.modals.wave_summary import WaveSummary
+from domain.models.wave import Wave
 from domain.models.ui.pages.modals.pause import Pause
 from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
-from domain.content.waves.wave_1 import Wave_1
+from domain.content.waves.simple_wave import SimpleWave
 from domain.content.weapons.projectile import Projectile
 
 class Game(Page):
@@ -70,7 +71,7 @@ class Game(Page):
         
         self.test_objects = []
 
-        self.current_wave = None
+        self.current_wave: Wave = None
         
         self.pause_screen: Pause = None
         
@@ -121,9 +122,24 @@ class Game(Page):
         
         if self.client_type != enums.ClientType.SINGLE:
             self.jumpable_group.add(self.player2)
+    
+    def next_wave(self):
+        next_wave = 0 
+        if self.current_wave == None:
+            next_wave = 1
+        elif len(constants.WAVES) < self.current_wave.wave_number+1:
+            next_wave = 1
+        else:
+            next_wave = self.current_wave.wave_number+1
+        
+        self.start_wave(self.create_wave(constants.WAVES[next_wave]))
+    
+    def create_wave(self, values_dict: dict):
+        match values_dict["wave_type"]:
+            case enums.WaveType.SIMPLE:
+                return SimpleWave(self, **values_dict)
             
-            
-    def new_wave(self, wave):
+    def start_wave(self, wave):
         self.pressed_keys.clear()
         self.wave_summary = None
         self.focused = True
@@ -137,7 +153,7 @@ class Game(Page):
         """
         
         self.wave_summary = None
-        self.current_wave = Wave_1(self)
+        self.start_wave(self.create_wave(constants.WAVES[1]))
         game_controller.screen_size = vec(self.screen.get_size())
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
@@ -423,9 +439,6 @@ class Game(Page):
         if b != None:
             game.bullets_group.add(b)
             
-    
-    
-    
     def apply_gravity(self, target: IGravitable):
         """Applies gravity to the specified IGravitable object.
 
@@ -517,6 +530,9 @@ class Game(Page):
         if "mouse_0" not in self.pressed_keys:
             return
         
+        if self.player.current_weapon.reload_type == enums.ReloadType.SINGLE_BULLET:
+            self.player.current_weapon.reloading = False
+        
         _bullets = self.player.shoot()
         
         if _bullets == None:
@@ -561,8 +577,7 @@ class Game(Page):
             self.wave_summary.update(events = events)
             # if wave interval is out or p1 is ready and is singleplayer or both players are ready
             if self.wave_summary.timed_out or (self.wave_summary.p1_ready and (self.wave_summary.p2_ready or self.client_type == enums.ClientType.SINGLE)):
-                wave = Wave_1(self)
-                self.new_wave(wave)
+                self.next_wave()
             return
         
         
