@@ -70,7 +70,7 @@ class Launcher(Weapon):
         if self.firing_frame < 1:
             self.firing_frame = 1
         
-        if self.firing_frame > len(self.fire_frames)-1:
+        if self.firing_frame > len(self.fire_frames):
             self.firing_frame = 0
             self.firing = False
             self.current_frame = self.idle_unloaded_frame
@@ -106,7 +106,7 @@ class Launcher(Weapon):
             self.reload_end_sound.play()
             self.playing_reload_end = True
             
-        is_last_frame = self.reloading_frame > len(self.reload_frames)-1
+        is_last_frame = self.reloading_frame > len(self.reload_frames)
         
         if is_last_frame:
             self.reloading_frame = 0

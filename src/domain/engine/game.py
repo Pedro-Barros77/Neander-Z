@@ -552,7 +552,7 @@ class Game(Page):
         if "mouse_0" not in self.pressed_keys:
             return
         
-        if self.player.current_weapon.reload_type == enums.ReloadType.SINGLE_BULLET:
+        if self.player.current_weapon.reload_type == enums.ReloadType.SINGLE_BULLET and self.player.current_weapon.bullet_type == enums.BulletType.SHOTGUN:
             self.player.current_weapon.reloading = False
         
         _bullets = self.player.shoot()
