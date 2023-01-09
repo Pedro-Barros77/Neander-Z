@@ -33,7 +33,7 @@ class ZRoger(Enemy):
         self.kill_score = 53
         self.headshot_score_multiplier = 1.5
         
-        self.damage_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}\\sound_effects\\enemies\\z_roger\\damage', 0.1)
+        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROGER, enums.AnimActions.TAKE_DAMAGE), 0.1)
         self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROGER, enums.AnimActions.DEATH), 0.2)
         
         

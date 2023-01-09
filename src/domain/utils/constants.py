@@ -67,17 +67,31 @@ WAVES = {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,
-        "max_alive_enemies": 1,
+        "max_alive_enemies": 7,
         "wave_step": 1,
         "wave_interval_s": 60,
         "enemies":[
             {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 4,
+                "movement_speed": 0.12,
+                "health": 28,
+                "damage": 15
+            },
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 5,
+                "movement_speed": 0.1,
+                "health": 24,
+                "damage": 20
+            },
+            {
                 "type": enums.Enemies.Z_ROBERT,
-                "count": 10,
+                "count": 4,
                 "movement_speed": 1,
-                "health": 20,
+                "health": 18,
                 "damage": 24
-            }
+            },
         ]
     },
     # 1: {

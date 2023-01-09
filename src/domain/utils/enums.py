@@ -29,6 +29,7 @@ class Characters(Enum):
 class Enemies(Enum):
     Z_ROGER = "z_roger"
     Z_ROBERT = "z_robert"
+    Z_RONALDO = "z_ronaldo"
     
 class Weapons(Enum):
     P_1911 = 'pistols\\1911'
@@ -46,6 +47,7 @@ class AnimActions(Enum):
     FALL_GROUND = "fall_ground"
     DEATH = "death"
     ATTACK = "attack"
+    TAKE_DAMAGE = "damage"
     
     #weapons
     RELOAD = "reload"

@@ -5,6 +5,7 @@ from domain.models.wave import Wave
 from domain.utils import enums
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.enemies.z_robert import ZRobert
+from domain.content.enemies.z_ronaldo import ZRonaldo
 
 class SimpleWave(Wave):
     def __init__(self, game, **kwargs):
@@ -63,6 +64,7 @@ class SimpleWave(Wave):
             
             radnx = random.randint(0, self.game.map.rect.width - 50)
             y = self.game.map.rect.bottom - (self.game.map.floor_y + 10 + 40) - 100
+
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
@@ -71,6 +73,8 @@ class SimpleWave(Wave):
                     self.spawn_enemy( ZRoger((radnx,y), self, **_enemy_dict, id = self.get_id()))
                 case enums.Enemies.Z_ROBERT:
                     self.spawn_enemy( ZRobert((radnx,y), self, **_enemy_dict, id = self.get_id()))
+                case enums.Enemies.Z_RONALDO:
+                    self.spawn_enemy( ZRonaldo((radnx,y), self, **_enemy_dict, id = self.get_id()))
             
             self.spawn_count += 1
             self.enemies_count += 1
