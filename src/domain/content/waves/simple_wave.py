@@ -4,6 +4,7 @@ from domain.services import menu_controller, resources
 from domain.models.wave import Wave
 from domain.utils import enums
 from domain.content.enemies.z_roger import ZRoger
+from domain.content.enemies.z_robert import ZRobert
 
 class SimpleWave(Wave):
     def __init__(self, game, **kwargs):
@@ -39,7 +40,7 @@ class SimpleWave(Wave):
         
 
     def get_random_enemy(self) -> dict:
-        e_dict = self.enemies[random.randint(0, len(self.enemies)-1)]
+        e_dict = self.enemies[random.randint(0, len(self.enemies)-1)].copy()
         self.enemies.remove(e_dict)
         
         _health_margin = e_dict["health"]*self.health_rand_margin
@@ -60,11 +61,16 @@ class SimpleWave(Wave):
         #if alive zumbi is smaller than max 
         while self.enemies_count < self.max_alive_enemies and self.spawn_count < self.total_enemies:
             
-            radx = random.randint(0, self.game.map.rect.width - 50)
-            y = self.game.map.rect.bottom - (self.game.map.floor_y + 10) - 100
+            radnx = random.randint(0, self.game.map.rect.width - 50)
+            y = self.game.map.rect.bottom - (self.game.map.floor_y + 10 + 40) - 100
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
-            self.spawn_enemy( ZRoger((radx,y), _type, self, **_enemy_dict, id = self.get_id()))
+            match _type:
+                case enums.Enemies.Z_ROGER:
+                    self.spawn_enemy( ZRoger((radnx,y), self, **_enemy_dict, id = self.get_id()))
+                case enums.Enemies.Z_ROBERT:
+                    self.spawn_enemy( ZRobert((radnx,y), self, **_enemy_dict, id = self.get_id()))
+            
             self.spawn_count += 1
             self.enemies_count += 1

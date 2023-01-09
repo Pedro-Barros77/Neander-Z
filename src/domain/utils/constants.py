@@ -67,33 +67,49 @@ WAVES = {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,
-        "max_alive_enemies": 5,
-        "wave_step": 3,
+        "max_alive_enemies": 1,
+        "wave_step": 1,
         "wave_interval_s": 60,
         "enemies":[
             {
-                "type": enums.Enemies.Z_ROGER,
+                "type": enums.Enemies.Z_ROBERT,
                 "count": 10,
-                "movement_speed": 0.1,
-                "health": 25,
-                "damage": 15
+                "movement_speed": 1,
+                "health": 20,
+                "damage": 24
             }
         ]
     },
-    2: {
-        "wave_number": 2,
-        "wave_type": enums.WaveType.SIMPLE,
-        "max_alive_enemies": 6,
-        "wave_step": 4,
-        "wave_interval_s": 30,
-        "enemies":[
-            {
-                "type": enums.Enemies.Z_ROGER,
-                "count": 11,
-                "movement_speed": 0.1,
-                "health": 25,
-                "damage": 15
-            }
-        ]
-    }
+    # 1: {
+    #     "wave_number": 1,
+    #     "wave_type": enums.WaveType.SIMPLE,
+    #     "max_alive_enemies": 5,
+    #     "wave_step": 3,
+    #     "wave_interval_s": 60,
+    #     "enemies":[
+    #         {
+    #             "type": enums.Enemies.Z_ROGER,
+    #             "count": 10,
+    #             "movement_speed": 0.12,
+    #             "health": 28,
+    #             "damage": 15
+    #         }
+    #     ]
+    # },
+    # 2: {
+    #     "wave_number": 2,
+    #     "wave_type": enums.WaveType.SIMPLE,
+    #     "max_alive_enemies": 6,
+    #     "wave_step": 4,
+    #     "wave_interval_s": 30,
+    #     "enemies":[
+    #         {
+    #             "type": enums.Enemies.Z_ROGER,
+    #             "count": 11,
+    #             "movement_speed": 0.12,
+    #             "health": 28,
+    #             "damage": 15
+    #         }
+    #     ]
+    # }
 }

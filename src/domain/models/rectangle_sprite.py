@@ -66,6 +66,7 @@ class Rectangle(pygame.sprite.Sprite, IGravitable):
     def set_rect(self, rect: pygame.Rect):
         self.rect = rect
         self.image = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+        self.update_pos()
         self.rerender()
         
     def rerender(self):

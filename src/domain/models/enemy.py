@@ -1,4 +1,4 @@
-import pygame, datetime
+import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
@@ -19,7 +19,7 @@ class Enemy(pygame.sprite.Sprite):
         self.jump_force = 12
         self.damage = 1
         self.enemy_name = enemy_name
-        self.image_scale = 2
+        self.image_scale = kwargs.pop("image_scale", 1)
         self.movement_speed = kwargs.pop("movement_speed", 5)
         self.health = kwargs.pop("health", 30)
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
@@ -63,6 +63,8 @@ class Enemy(pygame.sprite.Sprite):
         
         self.image = game_controller.scale_image(pygame.image.load(resources.get_enemy_path(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.size = self.image.get_size()
+        
+        self.attack_sounds: list[pygame.mixer.Sound] = None
         	
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
@@ -138,10 +140,12 @@ class Enemy(pygame.sprite.Sprite):
         self.acceleration.x = 0
         self.last_rect = self.rect.copy()
         
+        has_attack_range = abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top
+        
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        if not self.attacking and not self.dying:
+        if not self.attacking and not self.dying and not has_attack_range:
             self.acceleration.x += self.speed.x * game.friction
             self.speed.x += self.acceleration.x * mc.dt
             self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
@@ -158,7 +162,10 @@ class Enemy(pygame.sprite.Sprite):
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
 
-        if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
+        if has_attack_range:
+            if self.attack_sounds != None and not self.attacking:
+                rand_sound = random.randint(0, len(self.attack_sounds)-1)
+                self.attack_sounds[rand_sound].play()
             self.attacking = True
 
         

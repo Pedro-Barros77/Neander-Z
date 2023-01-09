@@ -137,7 +137,6 @@ class Game(Page):
         self.start_wave(self.create_wave(constants.WAVES[next_wave]))
     
     def create_wave(self, values_dict: dict):
-        print("\n", values_dict, "\n")
         dic = values_dict.copy()
         match values_dict["wave_type"]:
             case enums.WaveType.SIMPLE:
@@ -435,7 +434,7 @@ class Game(Page):
         e = None
         match data["enemy_name"]:
             case str(enums.Enemies.Z_ROGER.name):
-                e = ZRoger((0,0), enums.Enemies.Z_ROGER, self.current_wave)
+                e = ZRoger((0,0), self.current_wave)
                 e.load_netdata(data)
                 
         
@@ -677,6 +676,15 @@ class Game(Page):
             self.wave_summary.draw(self.screen)
             return
         
+        def draw_players():
+            # P1
+            self.player.draw(self.screen, self.player.offset_camera)
+            # P2
+            if self.client_type != enums.ClientType.SINGLE:
+                self.player2.draw(self.screen, self.player.offset_camera)
+        
+        draw_players()
+        
         # Wave
         self.current_wave.draw(self.screen, self.player.offset_camera)
         # bullets
@@ -694,11 +702,9 @@ class Game(Page):
             
             if panel_color[3] == 255:
                 self.game_over_popup.show()
-        # P1
-        self.player.draw(self.screen, self.player.offset_camera)
-        # P2
-        if self.client_type != enums.ClientType.SINGLE:
-            self.player2.draw(self.screen, self.player.offset_camera)
+                
+            draw_players()
+                
             
             
         # self.blit_debug()
