@@ -27,6 +27,7 @@ class Launcher(Weapon):
         self.explosion_max_radius = 200
         self.fire_mode = enums.FireMode.SINGLE_SHOT
         self.reload_type = enums.ReloadType.SINGLE_BULLET
+        self.weapon_switch_ms = 500
         
         self.barrel_offset = vec(0, 0)
         self.barrel_offset = vec(-15, 0)

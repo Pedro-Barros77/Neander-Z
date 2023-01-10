@@ -78,9 +78,9 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.MACHETE)
+        self.add_weapon(enums.Weapons.P_1911)
+        self.add_weapon(enums.Weapons.RPG)
         
-        self.weapon_switch_ms = 300
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
         
@@ -116,6 +116,9 @@ class Player(pygame.sprite.Sprite):
         fall_ground_folder = resources.get_character_path(self.character, enums.AnimActions.FALL_GROUND)
         self.fall_ground_frames = game_controller.load_sprites(fall_ground_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the falling ground animation."""
+        
+        self.changing_weapon = False
+        """If the weapon change animation is running."""
         
         _grave_scale = 0.3
         self.grave_dropping = False
@@ -153,11 +156,13 @@ class Player(pygame.sprite.Sprite):
     
     def change_weapon(self, slot: int = None):
         _now = datetime.datetime.now()
-        if self.last_weapon_switch + datetime.timedelta(milliseconds=self.weapon_switch_ms) > _now:
+        if self.last_weapon_switch + datetime.timedelta(milliseconds=self.current_weapon.weapon_switch_ms) > _now:
             return False
         
         
         self.last_weapon_switch = _now
+        self.changing_weapon = True
+        self.current_weapon.changing_weapon = True
         
         if slot == None:
             slot = 1 if self.current_weapon.is_primary else 0
@@ -234,7 +239,7 @@ class Player(pygame.sprite.Sprite):
         
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
         
-        if self.is_player1 and game.focused:
+        if self.is_player1 and game.focused and not self.changing_weapon:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
         
         # Weapon pos
@@ -254,6 +259,8 @@ class Player(pygame.sprite.Sprite):
             self.run_anim(abs(self.speed.x / 26.4) * mc.dt)
         if self.jumping:
             self.jump_anim(0.2 * mc.dt)
+        if self.changing_weapon:
+            self.change_weapon_anim()
             
         #endregion Animation Triggers
         
@@ -416,6 +423,28 @@ class Player(pygame.sprite.Sprite):
         if self.turning_dir > 0 and self.acceleration.x > 0 or\
            self.turning_dir < 0 and self.acceleration.x < 0:
             self.image = pygame.transform.flip(self.image, True, False)
+            
+    def change_weapon_anim(self):
+        now = datetime.datetime.now()
+        start = self.last_weapon_switch
+        end = self.last_weapon_switch + datetime.timedelta(milliseconds=self.current_weapon.weapon_switch_ms)
+        
+        if end < now:
+            self.changing_weapon = False
+            self.current_weapon.changing_weapon = False
+            return
+        
+        percentage = ((now - start) / (end - start)) * 100
+        percentage = math.clamp(percentage, 0, 100)
+        
+        angle = 0
+        if self.current_weapon.dir > 0:
+            angle = ((90*(100-percentage))/100)
+        else:
+            angle = 90+(90-((90*(100-percentage))/100))
+            
+        
+        self.current_weapon.weapon_aim_angle = angle
             
     def jump_anim(self, speed: float):
         if self.jumping_frame > len(self.jump_frames)-1:

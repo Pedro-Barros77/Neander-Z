@@ -24,6 +24,7 @@ class FullAuto(Weapon):
         self.bullet_min_range = 300
         self.fire_mode = enums.FireMode.FULL_AUTO
         self.reload_type = enums.ReloadType.MAGAZINE
+        self.weapon_switch_ms = 220
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 40, 2)
         self.last_shot_time = None

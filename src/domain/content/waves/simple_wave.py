@@ -63,7 +63,13 @@ class SimpleWave(Wave):
         #if alive zumbi is smaller than max 
         while self.enemies_count < self.max_alive_enemies and self.spawn_count < self.total_enemies:
             
-            radnx = random.randint(0, self.game.map.rect.width - 50)
+            floor_y = self.game.map.rect.bottom - self.game.map.floor_y
+            can_spawn = False
+            min_distance = 500
+            radnx = 0
+            while not can_spawn:
+                radnx = random.randint(0, self.game.map.rect.width - 50)
+                can_spawn = vec(self.game.player.rect.centerx, floor_y).distance_to(vec(radnx, floor_y)) > min_distance
 
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
@@ -79,7 +85,7 @@ class SimpleWave(Wave):
                     zombie = ZRonaldo((radnx,0), self, **_enemy_dict, id = self.get_id())
             
             if zombie != None:
-                zombie.rect.bottom = self.game.map.rect.bottom - self.game.map.floor_y
+                zombie.rect.bottom = floor_y
                 zombie.pos = vec(zombie.rect.topleft)
                 self.spawn_enemy(zombie)
             

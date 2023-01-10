@@ -21,6 +21,7 @@ class Weapon(pygame.sprite.Sprite):
         """How this weapon fires (auto, semi-auto, pump, single shot...)."""
         self.reload_type = kwargs.pop("reload_type", enums.ReloadType.MAGAZINE)
         self.is_primary = kwargs.pop("is_primary", False)
+        self.weapon_switch_ms = kwargs.pop("weapon_switch_ms", 300)
         
         self.bullet_max_range = kwargs.pop("bullet_max_range", 600)
         self.bullet_min_range = kwargs.pop("bullet_min_range", 500)
@@ -79,6 +80,9 @@ class Weapon(pygame.sprite.Sprite):
         """The current frame of reloading animation."""
         self.reloading = False
         """If the weapon reloading animation is running."""
+        
+        self.changing_weapon = False
+        """If the weapon change animation is running."""
         
         self.pumping = False
         
@@ -153,6 +157,10 @@ class Weapon(pygame.sprite.Sprite):
             return False
         
         _now = datetime.datetime.now()
+        
+        #if the player is switching weapons
+        if self.changing_weapon:
+            return
         
         # if is still reloading
         if self.reload_start_time != None and _now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time:

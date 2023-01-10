@@ -27,6 +27,7 @@ class Sniper(Weapon):
         self.reload_type = enums.ReloadType.MAGAZINE
         self.pierce_damage_multiplier = 0.5
         self.max_pierce_targets = 5
+        self.weapon_switch_ms = 400
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, -3)
         

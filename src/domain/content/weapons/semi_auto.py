@@ -25,6 +25,7 @@ class SemiAuto(Weapon):
         self.bullet_min_range = 400
         self.fire_mode = enums.FireMode.SEMI_AUTO
         self.reload_type = enums.ReloadType.MAGAZINE
+        self.weapon_switch_ms = 200
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 30,0)
         # self.weapon_anchor = vec(self.rect.width/2, self.rect.height/3)

@@ -27,6 +27,7 @@ class Shotgun(Weapon):
         self.ballin_count = 12
         self.fire_mode = enums.FireMode.PUMP_ACTION
         self.reload_type = enums.ReloadType.SINGLE_BULLET
+        self.weapon_switch_ms = 350
         
         self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
         
