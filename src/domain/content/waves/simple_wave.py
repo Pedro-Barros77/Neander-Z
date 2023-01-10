@@ -1,4 +1,5 @@
 import pygame, random
+from pygame.math import Vector2 as vec
 
 from domain.services import menu_controller, resources
 from domain.models.wave import Wave
@@ -63,18 +64,24 @@ class SimpleWave(Wave):
         while self.enemies_count < self.max_alive_enemies and self.spawn_count < self.total_enemies:
             
             radnx = random.randint(0, self.game.map.rect.width - 50)
-            y = self.game.map.rect.bottom - (self.game.map.floor_y + 10 + 40) - 100
 
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
+            zombie = None
+            
             match _type:
                 case enums.Enemies.Z_ROGER:
-                    self.spawn_enemy( ZRoger((radnx,y), self, **_enemy_dict, id = self.get_id()))
+                    zombie = ZRoger((radnx,0), self, **_enemy_dict, id = self.get_id())
                 case enums.Enemies.Z_ROBERT:
-                    self.spawn_enemy( ZRobert((radnx,y), self, **_enemy_dict, id = self.get_id()))
+                    zombie = ZRobert((radnx,0), self, **_enemy_dict, id = self.get_id())
                 case enums.Enemies.Z_RONALDO:
-                    self.spawn_enemy( ZRonaldo((radnx,y), self, **_enemy_dict, id = self.get_id()))
+                    zombie = ZRonaldo((radnx,0), self, **_enemy_dict, id = self.get_id())
+            
+            if zombie != None:
+                zombie.rect.bottom = self.game.map.rect.bottom - self.game.map.floor_y
+                zombie.pos = vec(zombie.rect.topleft)
+                self.spawn_enemy(zombie)
             
             self.spawn_count += 1
             self.enemies_count += 1

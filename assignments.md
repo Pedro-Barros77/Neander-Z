@@ -39,3 +39,12 @@ Machete Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source
 Machete slash collider Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=36354">Pixabay</a>
 
 Robert death Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6110">Pixabay</a>
+
+Ronaldo bite Sound Effect from <a href="https://www.epidemicsound.com/track/yKXTvfXYFX/">Pixabay</a>
+Ronaldo bite Sound Effect from <a href="https://www.epidemicsound.com/track/GXCF1mPgFl/">Pixabay</a>
+Ronaldo bite Sound Effect from <a href="https://www.epidemicsound.com/track/mvKaG9VWcT/">Pixabay</a>
+
+Roger Attack 01 Sound Effect by <a href="https://pixabay.com/pt/users/universfield-28281460/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=123106">Music | SFX</a> from <a href="https://pixabay.com//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=123106">Pixabay</a>
+Roger Attack 02 Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=5990">Pixabay</a>
+
+Carlos damage Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=47244">Pixabay</a>

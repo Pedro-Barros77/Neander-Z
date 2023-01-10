@@ -64,6 +64,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = game_controller.scale_image(pygame.image.load(resources.get_enemy_path(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.size = self.image.get_size()
         
+        self.attack_start_sounds: list[pygame.mixer.Sound] = None
         self.attack_sounds: list[pygame.mixer.Sound] = None
         	
         self.rect = self.image.get_rect()
@@ -163,9 +164,9 @@ class Enemy(pygame.sprite.Sprite):
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
 
         if has_attack_range:
-            if self.attack_sounds != None and not self.attacking:
-                rand_sound = random.randint(0, len(self.attack_sounds)-1)
-                self.attack_sounds[rand_sound].play()
+            if self.attack_start_sounds != None and not self.attacking:
+                rand_sound = random.randint(0, len(self.attack_start_sounds)-1)
+                self.attack_start_sounds[rand_sound].play()
             self.attacking = True
 
         

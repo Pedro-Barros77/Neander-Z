@@ -38,9 +38,9 @@ class ZRobert(Enemy):
         self.kill_score = 53
         self.headshot_score_multiplier = 1.5
         
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROGER, enums.AnimActions.TAKE_DAMAGE), 0.1)
+        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.TAKE_DAMAGE), 1)
         self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.DEATH), 0.8)
-        self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.ATTACK), 0.5)
+        self.attack_start_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.ATTACK), 0.5)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/3, self.hitbox_head.rect.height - self.rect.height/2)))

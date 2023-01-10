@@ -14,10 +14,6 @@ class BackPack:
         self.sniper_ammo = 0
         self.rocket_ammo = 0
         
-        
-        
-        
-        
         self.primary_weapons = [
         ]
         self.secondary_weapons = [

@@ -382,7 +382,7 @@ class Store:
             if self.selected_card.bullet_type != None and self.selected_card.bullet_type != enums.BulletType.MELEE:
                 count_text = f'{p.backpack.get_ammo(self.selected_card.bullet_type)}/{p.backpack.get_max_ammo(self.selected_card.bullet_type)}'
             if self.selected_card.item_name.endswith("kit"):
-                count_text = f'{self.player.health}/{self.player.max_health}'
+                count_text = f'{round(self.player.health,2)}/{round(self.player.max_health,2)}'
             
             if len(count_text) > 0:
                 txt_bullets = menu_controller.get_text_surface(count_text, colors.WHITE, resources.px_font(20))

@@ -24,17 +24,22 @@ class ZRonaldo(Enemy):
         self.dir: vec = vec(-1,0)
         self.last_dir = self.dir.copy()
         self.attack_distance = kwargs.pop("attack_distance", 30)
-        self.hit_frame = 8
+        self.hit_frame = 6
         self.hiting = False
         self.attack_box = vec(30,40)
         self.hit_rectangle = None
         self.head_shot_multiplier = 2
         
+        _health_rect = self.health_bar.rect.copy()
+        _health_rect.width = self.rect.width * 0.6
+        self.health_bar.set_rect(_health_rect)
+        
         self.kill_score = 53
         self.headshot_score_multiplier = 1.5
         
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROGER, enums.AnimActions.TAKE_DAMAGE), 0.1)
-        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROGER, enums.AnimActions.DEATH), 0.2)
+        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALDO, enums.AnimActions.TAKE_DAMAGE), 0.1)
+        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALDO, enums.AnimActions.DEATH), 0.2)
+        self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALDO, enums.AnimActions.ATTACK), 0.1)
         
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id)
@@ -91,6 +96,9 @@ class ZRonaldo(Enemy):
         if len(collided) > 0:
             for c in collided:
                 c.take_damage(self.damage)
+                
+            rand_sound = random.randint(0, len(self.attack_sounds)-1)
+            self.attack_sounds[rand_sound].play()
             
         
     def run_anim(self, speed: float):

@@ -1,4 +1,4 @@
-import pygame, math as maths, datetime
+import pygame, math as maths, datetime, random
 
 from pygame.math import Vector2 as vec
 
@@ -142,6 +142,7 @@ class Player(pygame.sprite.Sprite):
         self.is_player1 = self.name == "P1"
         self.jump_sounds = pygame.mixer.Sound(resources.get_player_sfx(self.character, enums.AnimActions.JUMP))
         self.fall_sound = pygame.mixer.Sound(resources.get_player_sfx(self.character, enums.AnimActions.FALL_GROUND))
+        self.damage_sounds = game_controller.load_sounds(resources.get_player_sfx(self.character, enums.AnimActions.TAKE_DAMAGE), 0.5)
 
         self.reload_popup: Popup = None
         
@@ -453,6 +454,9 @@ class Player(pygame.sprite.Sprite):
             mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
         else:
             mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
+
+        rand_sound = random.randint(0, len(self.damage_sounds)-1)
+        self.damage_sounds[rand_sound].play()
 
         if self.health == 0:
             self.kill()        
