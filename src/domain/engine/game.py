@@ -557,6 +557,10 @@ class Game(Page):
         
         _bullets = self.player.shoot()
         
+        if self.player.current_weapon.fire_mode != enums.FireMode.FULL_AUTO and\
+            self.player.current_weapon.fire_mode != enums.FireMode.MELEE and "mouse_0" in self.pressed_keys:
+                self.pressed_keys.remove("mouse_0")
+        
         if _bullets == None:
             return
         

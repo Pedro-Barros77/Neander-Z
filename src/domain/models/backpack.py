@@ -19,7 +19,7 @@ class BackPack:
         self.secondary_weapons = [
         ]
         self.equipped_primary = None
-        self.equipped_secondary = enums.Weapons.MACHETE
+        self.equipped_secondary = None
         
         
         
