@@ -72,7 +72,7 @@ class SimpleWave(Wave):
                 radnx = random.randint(0, self.game.map.rect.width - 50)
                 can_spawn = vec(self.game.player.rect.centerx, floor_y).distance_to(vec(radnx, floor_y)) > min_distance
 
-            radnx = 100
+            # radnx = 100
             
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)

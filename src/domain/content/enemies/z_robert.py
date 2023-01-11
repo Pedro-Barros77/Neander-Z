@@ -35,7 +35,7 @@ class ZRobert(Enemy):
         _health_rect.width = self.rect.width * 0.6
         self.health_bar.set_rect(_health_rect)
         
-        self.kill_score = 53
+        self.kill_score = 70
         self.headshot_score_multiplier = 1.5
         
         self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.TAKE_DAMAGE), 1)
@@ -72,7 +72,7 @@ class ZRobert(Enemy):
         super().draw(surface, offset)
         
         # self.blit_debug(surface, offset)
-        pygame.draw.rect(surface, colors.RED, math.rect_offset(self.rect, -offset), 5)
+        # pygame.draw.rect(surface, colors.RED, math.rect_offset(self.rect, -offset), 5)
     
     def blit_debug(self, screen: pygame.Surface, offset: vec):
         if self.hitbox_head != None:

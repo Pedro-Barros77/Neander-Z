@@ -80,7 +80,7 @@ class Player(pygame.sprite.Sprite):
 
         
 
-        self.add_weapon(enums.Weapons.RPG)
+        self.add_weapon(enums.Weapons.UZI)
         self.add_weapon(enums.Weapons.P_1911)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -163,7 +163,6 @@ class Player(pygame.sprite.Sprite):
         
         if type(self.backpack.equipped_primary) != type(self.backpack.equipped_secondary):
             return False
-        print(type(self.backpack.equipped_primary), type(self.backpack.equipped_secondary))
         
         self.last_weapon_switch = _now
         self.changing_weapon = True
@@ -485,9 +484,9 @@ class Player(pygame.sprite.Sprite):
         self.health_bar.remove_value(value)
         
         if self.is_player1:
-            mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
+            mc.popup(Popup(f'-{round(value,2)}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera, **constants.POPUPS["damage"]))
         else:
-            mc.popup(Popup(f'-{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
+            mc.popup(Popup(f'-{round(value,2)}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["damage"]))
 
         rand_sound = random.randint(0, len(self.damage_sounds)-1)
         self.damage_sounds[rand_sound].play()

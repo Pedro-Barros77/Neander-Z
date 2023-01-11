@@ -14,7 +14,7 @@ class FullAuto(Weapon):
         kwargs["is_primary"] = True
         super().__init__(pos, **kwargs)
         
-        self.damage = 4
+        self.damage = 3
         self.bullet_speed = 20
         self.fire_rate = 10
         self.reload_delay_ms = 1200

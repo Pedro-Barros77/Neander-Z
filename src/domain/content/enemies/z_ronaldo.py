@@ -34,8 +34,8 @@ class ZRonaldo(Enemy):
         _health_rect.width = self.rect.width * 0.6
         self.health_bar.set_rect(_health_rect)
         
-        self.kill_score = 53
-        self.headshot_score_multiplier = 1.5
+        self.kill_score = 60
+        self.headshot_score_multiplier = 1.2
         
         self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALDO, enums.AnimActions.TAKE_DAMAGE), 0.1)
         self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALDO, enums.AnimActions.DEATH), 0.2)

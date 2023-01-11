@@ -48,6 +48,7 @@ class AnimActions(Enum):
     FALL_GROUND = "fall_ground"
     DEATH = "death"
     ATTACK = "attack"
+    BUMP = "bump"
     TAKE_DAMAGE = "damage"
     
     #weapons
