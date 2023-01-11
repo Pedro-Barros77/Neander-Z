@@ -1,7 +1,7 @@
 import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
-from domain.utils import colors, constants, enums
+from domain.utils import colors, constants, enums, math_utillity as math
 from domain.services import game_controller, menu_controller as mc, resources
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
@@ -72,6 +72,7 @@ class ZRobert(Enemy):
         super().draw(surface, offset)
         
         # self.blit_debug(surface, offset)
+        pygame.draw.rect(surface, colors.RED, math.rect_offset(self.rect, -offset), 5)
     
     def blit_debug(self, screen: pygame.Surface, offset: vec):
         if self.hitbox_head != None:

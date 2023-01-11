@@ -60,7 +60,7 @@ class Wave():
         if self.game.client_type == enums.ClientType.SINGLE:
             self.money_multiplier = 1
         self.started = True
-        menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
+        # menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
         
         
     def delay_end_wave(self, delay_ms: float):

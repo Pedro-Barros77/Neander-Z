@@ -30,6 +30,7 @@ class Enemies(Enum):
     Z_ROGER = "z_roger"
     Z_ROBERT = "z_robert"
     Z_RONALDO = "z_ronaldo"
+    Z_RUI = "z_rui"
     
 class Weapons(Enum):
     P_1911 = 'pistols\\1911'
