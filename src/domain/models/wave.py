@@ -7,6 +7,11 @@ from pygame.math import Vector2 as vec
 from domain.utils import enums, constants
 from domain.models.wave_result import WaveResult
 from domain.models.ui.popup_text import Popup
+
+from domain.content.enemies.z_roger import ZRoger
+from domain.content.enemies.z_robert import ZRobert
+from domain.content.enemies.z_ronaldo import ZRonaldo
+from domain.content.enemies.z_rui import ZRui
  
 
 class Wave():
@@ -19,7 +24,7 @@ class Wave():
         for e in _enemies_dict:
             _count = e.copy().pop("count", 0)
             for _ in range(_count):
-                self.enemies.append(e)
+                self.enemies.append(e.copy())
         
         self.game = game
         self.wave_number = kwargs.pop("wave_number",0)
@@ -48,6 +53,20 @@ class Wave():
     def get_id(self):
         self.enemies_current_id += 1
         return self.enemies_current_id
+    
+    def create_enemy(self, enemy_type, pos:vec, enemy_dict):
+        enemy = None
+        match enemy_type:
+            case enums.Enemies.Z_ROGER:
+                enemy = ZRoger(pos, self, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_ROBERT:
+                enemy = ZRobert(pos, self, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_RONALDO:
+                enemy = ZRonaldo(pos, self, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_RUI:
+                enemy = ZRui(pos, self, **enemy_dict, id = self.get_id())
+        
+        return enemy
 
     def spawn_enemy(self, enemy: Enemy):
         self.enemies_group.add(enemy)
@@ -107,7 +126,7 @@ class Wave():
 
         self.players_scores[attacker].score += _new_score
         
-
+    
 
 
 

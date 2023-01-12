@@ -206,10 +206,10 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 30,0)
             for s in w.shoot_sounds:
-                s.set_volume(0.4)
+                s.set_volume(0.3)
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound_burst.set_volume(0.3)
-            w.reload_end_sound.set_volume(0.5)
+            w.reload_end_sound.set_volume(0.4)
             
     w.weapon_anchor = kwargs.pop("weapon_anchor", vec(0,0))
     w.weapon_distance = kwargs.pop("weapon_distance", 0)
@@ -277,9 +277,10 @@ ATTRIBUTE_BARS = {
 WAVES = {
     1: {
         "wave_number": 1,
-        "wave_type": enums.WaveType.SIMPLE,
+        "wave_type": enums.WaveType.BOSS,
         "max_alive_enemies": 7,
-        "wave_step": 3,
+        "timed_spawn_count": 3,
+        "spawn_timer_ms": 7000,
         "wave_interval_s": 60,
         "enemies":[
             {
@@ -291,21 +292,21 @@ WAVES = {
             },
             {
                 "type": enums.Enemies.Z_ROGER,
-                "count": 30,
+                "count": 1,
                 "movement_speed": 0.12,
                 "health": 28,
                 "damage": 15
             },
             {
                 "type": enums.Enemies.Z_RONALDO,
-                "count": 30,
+                "count": 1,
                 "movement_speed": 0.1,
                 "health": 24,
                 "damage": 20
             },
             {
                 "type": enums.Enemies.Z_ROBERT,
-                "count": 30,
+                "count": 1,
                 "movement_speed": 1,
                 "health": 18,
                 "damage": 24

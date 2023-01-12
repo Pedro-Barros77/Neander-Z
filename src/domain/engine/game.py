@@ -18,6 +18,7 @@ from domain.models.ui.popup_text import Popup
 from domain.models.wave_result import WaveResult
 from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.simple_wave import SimpleWave
+from domain.content.waves.boss_wave import BossWave
 from domain.content.weapons.projectile import Projectile
 
 class Game(Page):
@@ -141,6 +142,8 @@ class Game(Page):
         match values_dict["wave_type"]:
             case enums.WaveType.SIMPLE:
                 return SimpleWave(self, **dic)
+            case enums.WaveType.BOSS:
+                return BossWave(self, **dic)
             
     def start_wave(self, wave):
         self.pressed_keys.clear()
@@ -215,9 +218,6 @@ class Game(Page):
 
         if self.game_over_popup != None:
             self.game_over_popup.destroy()
-        
-        if self.client_type != enums.ClientType.GUEST:
-            self.current_wave.start()
             
 
     def end_wave(self, result: dict[int, WaveResult]):
