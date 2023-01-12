@@ -549,7 +549,10 @@ class Game(Page):
         self.pause_screen.buttons[0].visible = False
             
     def handle_shooting(self):
-        if "mouse_0" not in self.pressed_keys:
+        #if current weapon has burst firemode and can shoot one more round
+        _is_burst = self.player.current_weapon.fire_mode == enums.FireMode.BURST
+        
+        if "mouse_0" not in self.pressed_keys and (not _is_burst or(_is_burst and not self.player.current_weapon.firing_burst)):
             return
         
         if self.player.current_weapon.reload_type == enums.ReloadType.SINGLE_BULLET and self.player.current_weapon.bullet_type == enums.BulletType.SHOTGUN:
@@ -557,8 +560,9 @@ class Game(Page):
         
         _bullets = self.player.shoot()
         
-        if self.player.current_weapon.fire_mode != enums.FireMode.FULL_AUTO and\
-            self.player.current_weapon.fire_mode != enums.FireMode.MELEE and "mouse_0" in self.pressed_keys:
+        #if current weapon doesn't allow holding trigger
+        if self.player.current_weapon.fire_mode not in constants.HOLD_TRIGGER_FIREMODES:
+            if "mouse_0" in self.pressed_keys:
                 self.pressed_keys.remove("mouse_0")
         
         if _bullets == None:

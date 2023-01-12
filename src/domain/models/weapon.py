@@ -2,8 +2,8 @@ import pygame,datetime
 from pygame.math import Vector2 as vec
 
 
-from domain.utils import colors, constants, enums
-from domain.services import game_controller, menu_controller
+from domain.utils import colors, enums
+from domain.services import game_controller, menu_controller, resources
 from domain.models.ui.popup_text import Popup
 from domain.models.backpack import BackPack
 
@@ -13,6 +13,7 @@ class Weapon(pygame.sprite.Sprite):
         
         # The name of the object, for debugging.
         self.name = kwargs.pop("name", "weapon")
+        
         
         self.player_backpack: BackPack = kwargs.pop("backpack", None)
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
@@ -39,13 +40,14 @@ class Weapon(pygame.sprite.Sprite):
         
         self.weapon_distance = kwargs.pop("weapon_distance",0)
         """The distance from the weapon anchor to the weapon position."""
+        self.barrel_offset = kwargs.pop("barrel_offset", vec(0,0))
         
         self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) if self.player_backpack != None else 0
         """The start number of extra bullets."""
         
         
         self.fire_rate_ratio = 1000
-        self.reload_delay_ms = 1000
+        self.reload_delay_ms = kwargs.pop("reload_delay_ms", 1000)
         
         self.last_shot_time = None
         self.reload_start_time = None
@@ -55,10 +57,12 @@ class Weapon(pygame.sprite.Sprite):
         self.last_dir: int = 1
         """The direction that this weapon was pointing to on the last frame (left: -1, right: 1)."""
         
+        self.weapon_scale = kwargs.pop("weapon_scale", 1)
+        
         self.fire_frames = [pygame.Surface((1,1))]
         """The animation frames of this weapon when firing/attacking."""
             
-        self.idle_frame = self.fire_frames[0]
+        self.idle_frame = game_controller.scale_image(pygame.image.load(resources.get_weapon_path(self.weapon_type, enums.AnimActions.IDLE)), self.weapon_scale, enums.ConvertType.CONVERT_ALPHA)
         """The image of this weapon when not animating."""
             
         self.image = self.idle_frame
@@ -80,6 +84,7 @@ class Weapon(pygame.sprite.Sprite):
         """The current frame of reloading animation."""
         self.reloading = False
         """If the weapon reloading animation is running."""
+        self.reload_end_frame = kwargs.pop("reload_end_frame", 1)
         
         self.changing_weapon = False
         """If the weapon change animation is running."""

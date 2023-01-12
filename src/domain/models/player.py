@@ -78,10 +78,8 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        
-
-        self.add_weapon(enums.Weapons.UZI)
         self.add_weapon(enums.Weapons.P_1911)
+        self.add_weapon(enums.Weapons.M16)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -239,7 +237,6 @@ class Player(pygame.sprite.Sprite):
                     flip()
             else:
                 self.current_weapon.dir = 0
-        
         
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
         
@@ -513,18 +510,20 @@ class Player(pygame.sprite.Sprite):
         
         match weapon_type:
             case enums.Weapons.P_1911:
-                weapon = SemiAuto((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.SHORT_BARREL:
-                weapon = Shotgun((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.UZI:
-                weapon = FullAuto((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.MACHETE:
-                weapon = Melee((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
             case enums.Weapons.RPG:
-                weapon = Launcher((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
             case enums.Weapons.SV98:
-                weapon = Sniper((self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
-                
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+            case enums.Weapons.M16:
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 20, backpack = self.backpack)
+            
         if weapon == None:
             return False
         

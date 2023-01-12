@@ -2,47 +2,32 @@ import pygame, math, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
-from domain.utils import constants, enums, colors
+from domain.utils import enums, colors
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 from domain.services import game_controller, menu_controller as mc, resources
 
 class Melee(Weapon):
     def __init__(self, pos, **kwargs):
-
-        kwargs["bullet_type"] = enums.BulletType.MELEE
-        kwargs["weapon_type"] = enums.Weapons.MACHETE
-        kwargs["is_primary"] = False
         super().__init__(pos, **kwargs)
-        
-        self.damage = 3
-        self.bullet_speed = 30
-        self.fire_rate = 2
-        self.reload_delay_ms = 0
-        self.last_shot_time = None
-        self.magazine_size = 0
-        self.magazine_bullets = 1
-        self.fire_mode = enums.FireMode.MELEE
-        self.reload_type = enums.ReloadType.NO_RELOAD
         
         self.player_net_id = 0
         
         self.hiting = False
-        self.hit_frame = 8
+        self.hit_frame = kwargs.pop("hit_frame", 0)
         self.playing_hit_sound = False
         self.hit_rectangle: Rectangle = None
-        self.attack_box = vec(50,20)
-        
-        self.barrel_offset = vec(0,0)
+        self.attack_box = kwargs.pop("attack_box", vec(10,10))
+        self.magazine_bullets = 1
         
         load_content = kwargs.pop("load_content", True)
         
         if not load_content:
             return
         
-        self.attack_frames_1 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames_2 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames_3 = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.SHOOT)+ "\\03", 0.08, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_1 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_2 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.attack_frames_3 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\03", self.weapon_scale, enums.ConvertType.CONVERT_ALPHA)
         
         self.attack_frames = [self.attack_frames_1, self.attack_frames_2, self.attack_frames_3]
         self.current_attack = 0
@@ -51,16 +36,9 @@ class Melee(Weapon):
         self.image = self.idle_frame
         self.current_frame = self.idle_frame
         
-        self.swipe_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.MACHETE,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,4)]
-        self.hit_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.MACHETE,enums.AnimActions.HIT) + f'0{i}.mp3') for i in range(1,4)]
+        self.swipe_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,4)]
+        self.hit_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.HIT) + f'0{i}.mp3') for i in range(1,4)]
 
-        for s in self.swipe_sounds:
-            s.set_volume(0.5)
-            
-        for h in self.hit_sounds:
-            h.set_volume(0.5)
-            
-            
     def attack_sound(self, hit = False):
         sound = None
         if hit:
@@ -78,7 +56,7 @@ class Melee(Weapon):
             self.attack()
             self.playing_hit_sound = True
         
-        if self.firing_frame > len(self.attack_frames_1)-1:
+        if self.firing_frame > len(self.attack_frames[self.current_attack])-1:
             self.firing_frame = 0
             self.firing = False
             self.playing_hit_sound = False

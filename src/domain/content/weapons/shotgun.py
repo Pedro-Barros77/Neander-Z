@@ -2,66 +2,35 @@ import pygame, math, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
-from domain.utils import constants, enums
+from domain.utils import enums
 from domain.content.weapons.projectile import Projectile
 from domain.services import game_controller, menu_controller as mc, resources
 
 class Shotgun(Weapon):
     def __init__(self, pos, **kwargs):
-        
-        kwargs["bullet_type"] = enums.BulletType.SHOTGUN
-        kwargs["weapon_type"] = enums.Weapons.SHORT_BARREL
-        kwargs["is_primary"] = True
         super().__init__(pos, **kwargs)
         
-        self.damage = 3
-        self.bullet_speed = 20
-        self.fire_rate = 1.5
-        self.reload_delay_ms = 500
-        self.last_shot_time = None
-        self.magazine_size = 5
-        self.magazine_bullets = self.magazine_size
-        self.dispersion = 50
-        self.bullet_max_range = 300
-        self.bullet_min_range = 200
-        self.ballin_count = 12
-        self.fire_mode = enums.FireMode.PUMP_ACTION
-        self.reload_type = enums.ReloadType.SINGLE_BULLET
-        self.weapon_switch_ms = 350
+        self.dispersion = kwargs.pop("dispersion", 0)
+        self.ballin_count = kwargs.pop("ballin_count", 1)
         
-        self.bullet_spawn_offset = vec(self.rect.width/2 + 45, 5)
-        
-        _scale = 1.5
-        self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.SHOOT), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.reload_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.RELOAD), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.pump_frames = game_controller.load_sprites(resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.PUMP), _scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        
-        self.reload_end_frame = 8
         self.playing_reload_end = False
-        
-        self.idle_frame = self.fire_frames[0]
-        self.image = self.idle_frame
-        self.current_frame = self.idle_frame
-        
-        self.barrel_offset = vec(0, 7)
+        self.pumping = False
+        self.pumping_frame = 0
         
         load_content = kwargs.pop("load_content", True)
         
         if not load_content:
             return
         
-        self.shoot_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.SHOOT))
-        self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.EMPTY_TRIGGER))
-        self.pump_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.PUMP))
-        self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.SHORT_BARREL,enums.AnimActions.RELOAD))
-   
-        self.shoot_sound.set_volume(0.5)
-        self.pump_sound.set_volume(0.5)
-        self.empty_sound.set_volume(0.1)
-        self.reload_end_sound.set_volume(0.5)
+        self.fire_frames = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT), self.weapon_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.reload_frames = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.RELOAD), self.weapon_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.pump_frames = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.PUMP), self.weapon_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        self.pumping = False
-        self.pumping_frame = 0
+        self.shoot_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT))
+        self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.EMPTY_TRIGGER))
+        self.pump_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.PUMP))
+        self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.RELOAD))
+   
         
     def update(self, **kwargs):
         super().update(**kwargs)
