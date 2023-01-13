@@ -12,6 +12,7 @@ from domain.content.enemies.z_roger import ZRoger
 from domain.content.enemies.z_robert import ZRobert
 from domain.content.enemies.z_ronaldo import ZRonaldo
 from domain.content.enemies.z_rui import ZRui
+from domain.content.enemies.z_raven import ZRaven  
  
 
 class Wave():
@@ -38,6 +39,7 @@ class Wave():
         self.money_multiplier = kwargs.pop("money_multiplier", 1.8)
         self.wave_interval_s = kwargs.pop("wave_interval_s", 15)
         self.start_delay_ms = kwargs.pop("start_delay_ms", 2000)
+       
         self.spawn_count = 0
         self.enemies_count = 0
         self.started = False
@@ -68,6 +70,8 @@ class Wave():
                 enemy = ZRonaldo(pos, self, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RUI:
                 enemy = ZRui(pos, self, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_RAVEN:
+                enemy = ZRaven(pos, self, **enemy_dict, id = self.get_id())
         
         return enemy
 

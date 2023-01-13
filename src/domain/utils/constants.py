@@ -277,42 +277,18 @@ ATTRIBUTE_BARS = {
 WAVES = {
     1: {
         "wave_number": 1,
-        "wave_type": enums.WaveType.BOSS,
-        "max_alive_enemies": 7,
-        "timed_spawn_count": 3,
-        "spawn_timer_ms": 7000,
-        "start_delay_ms": 2000,
-        "wave_interval_s": 60,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 5,
+        "wave_step": 3,
+        "wave_interval_s": 600,
         "enemies":[
             {
-                "type": enums.Enemies.Z_RUI,
-                "count": 1,
-                "movement_speed": 0.08,
-                "health": 500,
-                "damage": 40
-            },
-            {
-                "type": enums.Enemies.Z_ROGER,
-                "count": 1,
-                "movement_speed": 0.12,
-                "health": 28,
-                "damage": 15
-            },
-            {
-                "type": enums.Enemies.Z_RONALDO,
-                "count": 1,
-                "movement_speed": 0.1,
-                "health": 24,
-                "damage": 20
-            },
-            {
-                "type": enums.Enemies.Z_ROBERT,
-                "count": 1,
-                "movement_speed": 1,
-                "health": 18,
-                "damage": 24
+                "type": enums.Enemies.Z_RAVEN,
+                "count": 500,
+                "movement_speed": 0.5,
+                "health": 1,
+                "damage": 5
             }
-            
         ]
     },
 }

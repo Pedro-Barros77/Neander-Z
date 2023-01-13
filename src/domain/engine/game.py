@@ -114,7 +114,7 @@ class Game(Page):
         self.friction = -0.12
         
         _p1_net_id = int(self.client_type)
-        self.player = Player((20, 0), enums.Characters.CARLOS if _p1_net_id != 2 else enums.Characters.CLEITON, net_id = _p1_net_id, name = "P1", screen_size = self.screen.get_size())
+        self.player = Player((500, 0), enums.Characters.CARLOS if _p1_net_id != 2 else enums.Characters.CLEITON, net_id = _p1_net_id, name = "P1", screen_size = self.screen.get_size())
         self.player.load_state(mc.player_state)
         self.player.rect.bottom = self.map.floor.rect.top
         self.player.pos = vec(self.player.rect.topleft)

@@ -75,12 +75,13 @@ class SimpleWave(Wave):
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
-            zombie = self.create_enemy(_type, (rand_x,0), _enemy_dict)
+            enemy = self.create_enemy(_type, (rand_x,floor_y), _enemy_dict)
             
-            if zombie != None:
-                zombie.rect.bottom = floor_y
-                zombie.pos = vec(zombie.rect.topleft)
-                self.spawn_enemy(zombie)
+            if enemy != None:
+                enemy.rect.bottom = floor_y
+                enemy.pos = vec(enemy.rect.topleft)
+                enemy.start_pos = enemy.pos.copy()
+                self.spawn_enemy(enemy)
             
             self.spawn_count += 1
             self.enemies_count += 1

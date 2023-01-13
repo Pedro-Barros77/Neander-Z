@@ -91,6 +91,9 @@ class Enemy(pygame.sprite.Sprite):
         
         closest = sorted([p1, p2], key= lambda p: vec(p.rect.center).distance_to(vec(self.rect.center)))[0]
         return closest
+
+    def update_rect(self):
+        self.rect.topleft = (self.pos.x, self.pos.y)
     
     def client_update(self, **kwargs):
         if not self.is_alive or self.dying:
@@ -173,8 +176,6 @@ class Enemy(pygame.sprite.Sprite):
 
         
     
-    def update_rect(self):
-        self.rect.topleft = (self.pos.x, self.pos.y)
     
     def update(self, **kwargs):
         self.client_type = kwargs.pop("client_type", enums.ClientType.UNDEFINED)

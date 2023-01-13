@@ -65,3 +65,7 @@ Rui bump spring boing Sound Effect from <a href="https://pixabay.com/?utm_source
 Rui bump spring boing Sound Effect by <a href="https://pixabay.com/pt/users/shidenbeatsmusic-25676252/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=110924">Shiden Beats Music</a> from <a href="https://pixabay.com//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=110924">Pixabay</a>
 
 M16 fire Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=14725">Pixabay</a>
+
+Raven noise 1 Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=5986">Pixabay</a>
+Raven noise 2 Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6749">Pixabay</a>
+Raven death Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=83866">Pixabay</a>
