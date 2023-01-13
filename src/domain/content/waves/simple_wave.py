@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, datetime
 from pygame.math import Vector2 as vec
 
 from domain.services import menu_controller, resources
@@ -25,7 +25,7 @@ class SimpleWave(Wave):
         self.damage_rand_margin = 0.3
           
     def update(self, **kwargs):
-        if not self.started or self.finished:
+        if not self.started or self.finished or datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
             return
 
         super().update(**kwargs)

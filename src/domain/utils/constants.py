@@ -281,13 +281,14 @@ WAVES = {
         "max_alive_enemies": 7,
         "timed_spawn_count": 3,
         "spawn_timer_ms": 7000,
+        "start_delay_ms": 2000,
         "wave_interval_s": 60,
         "enemies":[
             {
                 "type": enums.Enemies.Z_RUI,
                 "count": 1,
                 "movement_speed": 0.08,
-                "health": 500,
+                "health": 500/500,
                 "damage": 40
             },
             {

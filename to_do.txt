@@ -10,4 +10,10 @@ Feature:
 -Take Damage
 -Spawn random zombies
 
+
+#deploy
 pyinstaller --onefile -w "src\app.py"
+
+#revert commit
+git reset --hard <old_commit>
+git push -f origin master
