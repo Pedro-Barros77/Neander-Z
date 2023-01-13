@@ -288,7 +288,7 @@ WAVES = {
                 "type": enums.Enemies.Z_RUI,
                 "count": 1,
                 "movement_speed": 0.08,
-                "health": 500/500,
+                "health": 500,
                 "damage": 40
             },
             {

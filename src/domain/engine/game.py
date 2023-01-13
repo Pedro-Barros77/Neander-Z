@@ -101,30 +101,41 @@ class Game(Page):
         """Starts the game.
         """
         
-        
+        self.current_wave = self.create_wave(constants.WAVES[1])
+        self.start_wave()
         self.map = Map(self.screen, f"{resources.IMAGES_PATH}map_graveyard.png", floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
         game_controller.map_size = vec(self.map.rect.size)
         game_controller.screen_size = vec(self.screen.get_size())
+        game_controller.screen_size = vec(self.screen.get_size())
+        game_controller.map_size = vec(self.map.rect.size)
         self.pause_screen = Pause(self)
-        
+        self.gravity_accelaration = 0.5
+        self.friction = -0.12
         
         _p1_net_id = int(self.client_type)
         self.player = Player((20, 0), enums.Characters.CARLOS if _p1_net_id != 2 else enums.Characters.CLEITON, net_id = _p1_net_id, name = "P1", screen_size = self.screen.get_size())
+        self.player.load_state(mc.player_state)
+        self.player.rect.bottom = self.map.floor.rect.top
+        self.player.pos = vec(self.player.rect.topleft)
         
         if self.client_type != enums.ClientType.SINGLE:
             self.player2 = Player((80, 0), enums.Characters.CARLOS if _p1_net_id == 2 else enums.Characters.CLEITON, net_id = 1 if self.client_type == 2 else 2, name = "P2", gravity_enabled = False)
+            self.player2.rect.bottom = self.map.floor.rect.top
+            self.player2.pos = vec(self.player.rect.topleft)
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
         self.players_group =  pygame.sprite.Group([self.player])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.bullets_group = pygame.sprite.Group()
-        
 
-        self.reset_game()
+        game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
+        game_controller.enemy_target_groups = [self.players_group]
         
         if self.client_type != enums.ClientType.SINGLE:
             self.jumpable_group.add(self.player2)
+            
+        
     
     def next_wave(self):
         next_wave = 0 
@@ -135,7 +146,8 @@ class Game(Page):
         else:
             next_wave = self.current_wave.wave_number+1
         
-        self.start_wave(self.create_wave(constants.WAVES[next_wave]))
+        self.current_wave = self.create_wave(constants.WAVES[next_wave])
+        self.start_wave()
     
     def create_wave(self, values_dict: dict):
         dic = values_dict.copy()
@@ -145,79 +157,18 @@ class Game(Page):
             case enums.WaveType.BOSS:
                 return BossWave(self, **dic)
             
-    def start_wave(self, wave):
+    def start_wave(self):
         self.pressed_keys.clear()
         self.wave_summary = None
         self.focused = True
-        self.current_wave = wave
         
         game_controller.bullet_target_groups.append(self.current_wave.enemies_hitbox_group)
-        self.current_wave.start()
-            
-    def reset_game(self):
-        """Resets all players attributes to default values.
-        """
-        
-        self.wave_summary = None
-        self.current_wave = None
-        self.game_over_time = None
-        self.start_wave(self.create_wave(constants.WAVES[1]))
-        game_controller.screen_size = vec(self.screen.get_size())
-        game_controller.map_size = vec(self.map.rect.size)
-        game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
-        game_controller.enemy_target_groups = [self.players_group]
-        self.gravity_accelaration = 0.5
-        self.friction = -0.12
-        self.game_over_time = None
-        
-        self.bullets_group.empty()
-        
-        _y = self.screen.get_height() - 200
-        
-        p1_pos, p2_pos = None, None
-        
-        if self.client_type == enums.ClientType.HOST:
-            p1_pos = (20, _y)
-            p2_pos = (80, _y)
-        else:
-            p1_pos = (80, _y)
-            p2_pos = (20, _y)
-        
-        self.player.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.player.character, enums.AnimActions.IDLE)), self.player.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.player.pos = vec(p1_pos)
-        self.player.rect = self.player.image.get_rect()
-        self.player.rect.topleft = self.player.pos
-        self.player.speed = vec(0,0)
-        self.player.acceleration = vec(0,0)
-        self.player.last_rect = self.player.rect
-        self.player.offset_camera = vec(0,0)
-        self.player.health = self.player.max_health
-        self.player.health_bar.value = self.player.max_health
-        self.player.health_bar.target_value = self.player.max_health
-        self.player.score = 0
-        self.player.is_alive = True
-        # self.player.money = 0
-
-        self.player.load_state(mc.player_state)
-        
-        if self.client_type != enums.ClientType.SINGLE:
-            self.player2.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.player2.character, enums.AnimActions.IDLE)), self.player2.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
-            self.player2.pos = vec(p2_pos)
-            self.player2.rect = self.player2.image.get_rect()
-            self.player2.rect.topleft = self.player2.pos
-            self.player2.size = self.player2.rect.size
-            self.player2.speed = vec(0,0)
-            self.player2.acceleration = vec(0,0)
-            self.player2.last_rect = self.player2.rect
-            self.player2.health = self.player2.max_health
-            self.player2.health_bar.value = self.player2.max_health
-            self.player2.health_bar.target_value = self.player2.max_health
-            self.player2.score = 0        
-            self.player2.money = 0
-            self.player2.is_alive = True
 
         if self.game_over_popup != None:
             self.game_over_popup.destroy()
+        self.current_wave.start()
+
+
             
 
     def end_wave(self, result: dict[int, WaveResult]):
@@ -362,7 +313,7 @@ class Game(Page):
         """
         if data.command_id == int(enums.Command.RESTART_GAME):
             self.wave_summary = None
-            game_controller.restart_game(self)
+            self.restart_game()
         
         if self.client_type == enums.ClientType.GUEST:
             self.player.score = data.player2_score
@@ -526,17 +477,13 @@ class Game(Page):
         self.command_id = int(enums.Command.RESTART_GAME)
             
         time.sleep(0.5)
-        game_controller.restart_game(self)
+        self.restart_game()
         
         
     def restart_game(self):
-        self.focused = True
-        self.wave_summary = None
-        self.pause_screen.hide()
-        if self.client_type == enums.ClientType.SINGLE:
-            game_controller.restart_game(self)
-        elif self.client_type == enums.ClientType.HOST:
-            self.send_restart()
+        if self.game_over_popup != None:
+            self.game_over_popup.destroy()
+        game_controller.restart_game(self)
 
     def game_over(self):
         self.game_over_time = datetime.datetime.now()

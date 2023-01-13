@@ -85,12 +85,8 @@ def restart_game(game):
     Args:
         game (domain.engine.game): The game to be restarted.
     """
-    pygame.mixer.music.stop()
-    if game.client_type != enums.ClientType.GUEST:
-        game.command_id = 0
-    game.pressed_keys = []
-    game.map.rect.left = 0
-    game.reset_game()
+    menu_controller.pages_history = menu_controller.pages_history[:-1]
+    menu_controller.pages_history[-1].start_game(game.client_type)
     
 def load_sounds(folder_path: str, volume: int = 1):
     """Loads all mp3 files from the specified folter into a list of mixer.Sound.
