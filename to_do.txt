@@ -5,10 +5,7 @@ Bug fix:
 
 
 Feature:
--Gun rate of fire
 -Zombies and bullets multiplayer
--Take Damage
--Spawn random zombies
 
 
 #deploy
@@ -17,3 +14,6 @@ pyinstaller --onefile -w "src\app.py"
 #revert commit
 git reset --hard <old_commit>
 git push -f origin master
+
+#log commits
+git log --pretty=oneline

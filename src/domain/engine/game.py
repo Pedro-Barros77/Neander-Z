@@ -505,7 +505,12 @@ class Game(Page):
         if self.player.current_weapon.reload_type == enums.ReloadType.SINGLE_BULLET and self.player.current_weapon.bullet_type == enums.BulletType.SHOTGUN:
             self.player.current_weapon.reloading = False
         
-        _bullets = self.player.shoot()
+        def bullet_kill_callback(hit_target):
+            if hit_target:
+                self.current_wave.players_scores[1].bullets_hit += 1
+        
+        
+        _bullets = self.player.shoot(kill_callback = bullet_kill_callback)
         
         #if current weapon doesn't allow holding trigger
         if self.player.current_weapon.fire_mode not in constants.HOLD_TRIGGER_FIREMODES:
@@ -520,6 +525,7 @@ class Game(Page):
             _bullets = [_bullets]
         if len(_bullets) > 0:
             for b in _bullets:
+                self.current_wave.players_scores[1].bullets_shot += 1
                 self.bullets_group.add(b)
     
 

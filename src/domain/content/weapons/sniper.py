@@ -58,7 +58,7 @@ class Sniper(Weapon):
         self.last_shot_time = datetime.datetime.now()
         self.shoot_sound.play()
         
-        return Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, pierce_damage_multiplier = self.pierce_damage_multiplier, max_pierce_targets = self.max_pierce_targets)
+        return Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, pierce_damage_multiplier = self.pierce_damage_multiplier, max_pierce_targets = self.max_pierce_targets, kill_callback = self.bullet_kill_callback)
     
 
     

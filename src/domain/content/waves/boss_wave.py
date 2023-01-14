@@ -91,6 +91,7 @@ class BossWave(Wave):
             if enemy != None:
                 enemy.rect.bottom = floor_y
                 enemy.pos = vec(enemy.rect.topleft)
+                enemy.start_pos = enemy.pos.copy()
                 self.spawn_enemy(enemy)
                 if self.boss == None:
                     self.boss = enemy

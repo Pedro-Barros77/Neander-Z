@@ -64,7 +64,7 @@ class Launcher(Weapon):
         
         self.last_shot_time = datetime.datetime.now()
         self.shoot_sound.play()
-        self.current_bullet = Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, image_scale = 1.4, hit_callback = self.bullet_hit, explosion_max_radius = self.explosion_max_radius, explosion_min_radius = self.explosion_min_radius)
+        self.current_bullet = Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, image_scale = 1.4, hit_callback = self.bullet_hit, explosion_max_radius = self.explosion_max_radius, explosion_min_radius = self.explosion_min_radius, kill_callback = self.bullet_kill_callback)
         return self.current_bullet
     
     def reload_anim(self, speed):

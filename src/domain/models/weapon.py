@@ -27,6 +27,8 @@ class Weapon(pygame.sprite.Sprite):
         self.bullet_max_range = kwargs.pop("bullet_max_range", 600)
         self.bullet_min_range = kwargs.pop("bullet_min_range", 500)
         
+        self.bullet_kill_callback: function = kwargs.pop("bullet_hit_callback", lambda b: None)
+        
         self.damage = kwargs.pop("damage", 0)
         """The damage of the weapon's bullet."""
         self.bullet_speed = kwargs.pop("bullet_speed", 30)
@@ -108,6 +110,7 @@ class Weapon(pygame.sprite.Sprite):
     def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
         self.firing = True
         self.magazine_bullets -= 1
+        self.bullet_kill_callback = kwargs.pop("kill_callback", lambda b: None)
         
 
     def update(self, **kwargs):

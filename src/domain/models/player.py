@@ -79,7 +79,7 @@ class Player(pygame.sprite.Sprite):
         """The weapon on player's hand."""
 
         self.add_weapon(enums.Weapons.SHORT_BARREL)
-        self.add_weapon(enums.Weapons.MACHETE)
+        self.add_weapon(enums.Weapons.P_1911)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()

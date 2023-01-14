@@ -10,6 +10,9 @@ class WaveResult():
         self.money = kwargs.pop("money",0)
         self.kills_count = kwargs.pop("kills_count",0)
         self.headshot_kills_count = kwargs.pop("headshot_kills_count",0)
+        self.bullets_shot = kwargs.pop("bullets_shot", 0)
+        self.bullets_hit = kwargs.pop("bullets_hit", 0)
+        
         self.wave_interval_s: float = kwargs.pop("wave_interval_ms", 10)
         
     def get_netdata(self):

@@ -86,22 +86,26 @@ class WaveSummary(Modal):
         lbl_money = menu_controller.get_text_surface("earned money:", colors.WHITE, resources.px_font(28))
         lbl_kills = menu_controller.get_text_surface("total kills:", colors.WHITE, resources.px_font(28))
         lbl_headshots = menu_controller.get_text_surface("headshot kills:", colors.WHITE, resources.px_font(28))
+        lbl_precision = menu_controller.get_text_surface("precision:", colors.WHITE, resources.px_font(28))
         
         p1_score = menu_controller.get_text_surface(str(self.P1_RESULT.score), colors.YELLOW, resources.px_font(22))
         p1_money = menu_controller.get_text_surface(f'$ {self.P1_RESULT.money:.2f}', colors.GREEN, resources.px_font(22))
         p1_kills = menu_controller.get_text_surface(str(self.P1_RESULT.kills_count), colors.RED, resources.px_font(22))
         p1_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, resources.px_font(22))
+        p1_precision = menu_controller.get_text_surface(f'{round(self.P1_RESULT.bullets_hit * 100 / self.P1_RESULT.bullets_shot, 2)}%', colors.WHITE, resources.px_font(22))
         
         if self.P2_RESULT != None:
             p2_score = menu_controller.get_text_surface(str(self.P2_RESULT.score), colors.YELLOW, resources.px_font(22))
             p2_money = menu_controller.get_text_surface(f'$ {self.P2_RESULT.money:.2f}', colors.GREEN, resources.px_font(22))
             p2_kills = menu_controller.get_text_surface(str(self.P2_RESULT.kills_count), colors.RED, resources.px_font(22))
             p2_headshots = menu_controller.get_text_surface(str(self.P1_RESULT.headshot_kills_count), colors.RED, resources.px_font(22))
+            p2_precision = menu_controller.get_text_surface(f'{round(self.P2_RESULT.bullets_hit * 100 / self.P2_RESULT.bullets_shot, 2)}%', colors.WHITE, resources.px_font(22))
+            
 
-        labels = [lbl_score, lbl_money, lbl_kills, lbl_headshots]
-        p1_values = [p1_score, p1_money, p1_kills, p1_headshots]
+        labels = [lbl_score, lbl_money, lbl_kills, lbl_headshots, lbl_precision]
+        p1_values = [p1_score, p1_money, p1_kills, p1_headshots, p1_precision]
         if self.P2_RESULT != None:
-            p2_values = [p2_score, p2_money, p2_kills, p2_headshots]
+            p2_values = [p2_score, p2_money, p2_kills, p2_headshots, p2_precision]
         
         p1_surface = pygame.Surface((p1_icon.get_width() + p1_title.get_width() + 10, p1_icon.get_height() + 200), pygame.SRCALPHA)
         p1_surface.fill((0,0,0,0))
@@ -110,7 +114,7 @@ class WaveSummary(Modal):
             p2_surface = pygame.Surface((p2_icon.get_width() + p2_title.get_width() + 10, p2_icon.get_height() + 200), pygame.SRCALPHA)
             p2_surface.fill((0,0,0,0))
         
-        labels_surface = pygame.Surface(vec(screen_rect.width - self.panel_margin.x - _player_panels_margin.x - self.panel_margin.x/2 - (_player_panels_margin.x*2),200), pygame.SRCALPHA)
+        labels_surface = pygame.Surface(vec(screen_rect.width - self.panel_margin.x - _player_panels_margin.x - self.panel_margin.x/2 - (_player_panels_margin.x*2),250), pygame.SRCALPHA)
         labels_surface.fill((0,0,0,0))
         
         p1_surface.blit(p1_icon, (0,0))

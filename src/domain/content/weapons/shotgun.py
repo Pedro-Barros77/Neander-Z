@@ -57,7 +57,7 @@ class Shotgun(Weapon):
         
         for i in range(self.ballin_count):
             _angle = self.weapon_aim_angle + round(random.uniform(-self.dispersion, self.dispersion), 2)
-            bullets.append(Projectile(bullet_pos, _angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type))
+            bullets.append(Projectile(bullet_pos, _angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, kill_callback = self.bullet_kill_callback))
         
         return bullets
     
