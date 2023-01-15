@@ -28,6 +28,7 @@ class Weapon(pygame.sprite.Sprite):
         self.bullet_min_range = kwargs.pop("bullet_min_range", 500)
         
         self.bullet_kill_callback: function = kwargs.pop("bullet_hit_callback", lambda b: None)
+        self.reload_speed_multiplier = kwargs.pop("reload_speed_multiplier", 1)
         
         self.damage = kwargs.pop("damage", 0)
         """The damage of the weapon's bullet."""

@@ -111,6 +111,7 @@ class Wave():
     def kill_all(self):
         for e in self.enemies_group.sprites():
             e.kill(1)
+        self.players_scores[1].bullets_shot += 1
 
     def handle_score(self, enemy: Enemy, attacker, headshot_kill = False):
         if attacker == None:

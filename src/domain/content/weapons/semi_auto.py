@@ -32,7 +32,7 @@ class SemiAuto(Weapon):
         if self.firing:
             self.firing = self.fire_anim(self.fire_rate/20 * mc.dt)
         if self.reloading:
-            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*2)
+            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)* self.reload_speed_multiplier)
             self.reload_anim(speed * mc.dt)
     
     def fire_anim(self, speed: float):

@@ -51,6 +51,7 @@ class Store:
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
             "uzi": "tags:Auto-fire, small-damage\nUZI with caution!\nYou'll run out of bullets before\nyou can say OH CRAP.",
+            "93r": "tags:Burst-fire, small-damage\nalgo.",
             "m16": "tags:Burst-fire, medium-damage\nThe sharpshooter's best friend.\nThis rifle will take out hordes of\nzombies with precision and control.\nMake sure every shot counts to\nsave your ammo for real threats.",
             "sv98": "tags:Collateral-damage, high-damage\nFor when you want to take out\nthe undead from a safe distance\nand give them a headache they\nwon't recover from.",
             "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
@@ -100,6 +101,7 @@ class Store:
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 650, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93r, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.5, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93r, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.M16, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "M16", item_name = "m16", price = 800, icon_scale = 2, store_icon_scale = 1.7, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.M16, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SV98", item_name = "sv98", price = 900, icon_scale = 2.3, store_icon_scale = 1.1, bullet_type = enums.BulletType.SNIPER, weapon_type = enums.Weapons.SV98, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
@@ -403,7 +405,7 @@ class Store:
                     case enums.FireMode.MELEE:
                         _range = 0
                     case enums.FireMode.BURST:
-                        _firerate = weapon.burst_fire_rate
+                        _firerate = (weapon.burst_fire_rate + weapon.fire_rate) / 2
                     case _:
                         pass
                                             

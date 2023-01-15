@@ -69,3 +69,10 @@ M16 fire Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribu
 Raven noise 1 Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=5986">Pixabay</a>
 Raven noise 2 Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=6749">Pixabay</a>
 Raven death Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=83866">Pixabay</a>
+
+93r shot 1 Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=37188">Pixabay</a>
+93r shot 2 Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=7152">Pixabay</a>
+93r shot 3 Sound Effect by <a href="https://pixabay.com/pt/users/gutierrreztom-24654473/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=11651">Thomas Matthew Gutierrez</a> from <a href="https://pixabay.com//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=11651">Pixabay</a>
+93r reload start Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=39882">Pixabay</a>
+93r reload end Sound Effect from <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=89711">Pixabay</a>
+

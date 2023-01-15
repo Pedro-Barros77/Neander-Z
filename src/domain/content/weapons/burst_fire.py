@@ -53,7 +53,7 @@ class BurstFire(Weapon):
         if self.firing:
             self.fire_anim(self.burst_fire_rate/20 * mc.dt)
         if self.reloading:
-            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*12)
+            speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*self.reload_speed_multiplier)
             self.reload_anim(speed * mc.dt)
     
     def reload(self):

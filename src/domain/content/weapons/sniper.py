@@ -40,7 +40,7 @@ class Sniper(Weapon):
         
         super().update(**kwargs)
         
-        speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)*9)
+        speed = ((1000/self.reload_delay_ms) / len(self.reload_frames)* self.reload_speed_multiplier)
         
         if self.firing:
             self.firing = self.fire_anim(self.fire_rate/5 * mc.dt)

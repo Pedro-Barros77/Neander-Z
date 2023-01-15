@@ -37,9 +37,10 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 bullet_max_range = 600,
                 bullet_min_range = 400,
                 reload_end_frame = 6,
+                reload_speed_multiplier = 2,
                 barrel_offset = vec(0, 7),
                 )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 30,0)
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 20,0)
             w.shoot_sound.set_volume(0.1)
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound.set_volume(0.3)
@@ -64,9 +65,10 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 bullet_max_range = 300,
                 bullet_min_range = 200,
                 reload_end_frame = 8,
+                reload_speed_multiplier = 2,
                 barrel_offset = vec(0, 7)
                 )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 45, 5)
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 25, 5)
             w.shoot_sound.set_volume(0.5)
             w.pump_sound.set_volume(0.5)
             w.empty_sound.set_volume(0.1)
@@ -88,6 +90,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 bullet_max_range = 500,
                 bullet_min_range = 300,
                 reload_end_frame = 10,
+                reload_speed_multiplier = 4,
                 barrel_offset = vec(0, 7),
                 weapon_scale = 1.2
                 )
@@ -146,9 +149,10 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 explosion_max_radius = 200,
                 reload_start_frame = 12,
                 reload_end_frame = 17,
-                barrel_offset = vec(-15, 0),
+                reload_speed_multiplier = 2,
+                barrel_offset = vec(-15, 3),
                 )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 70,-10) + vec(w.barrel_offset)
+            w.bullet_spawn_offset = vec(w.rect.width/2,-10) + vec(w.barrel_offset)
             w.shoot_sound.set_volume(0.1)
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound_launcher.set_volume(0.3)
@@ -170,12 +174,13 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 bullet_max_range = 1200,
                 bullet_min_range = 1000,
                 reload_end_frame = 17,
+                reload_speed_multiplier = 9,
                 barrel_offset = vec(10, -5),
                 pierce_damage_multiplier = 0.5,
                 max_pierce_targets = 5,
                 weapon_scale = 1.1,
                 )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 45, -3)
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 20, -3)
             w.shoot_sound.set_volume(0.5)
             w.pump_sound.set_volume(0.5)
             w.empty_sound.set_volume(0.1)
@@ -201,10 +206,40 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                 bullet_min_range = 700,
                 reload_start_frame = 5,
                 reload_end_frame = 10,
+                reload_speed_multiplier = 12,
                 barrel_offset = vec(0, 3),
                 weapon_scale = 1.3
                 )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 30,0)
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 5,0)
+            for s in w.shoot_sounds:
+                s.set_volume(0.3)
+            w.empty_sound.set_volume(0.1)
+            w.reload_start_sound_burst.set_volume(0.3)
+            w.reload_end_sound.set_volume(0.4)
+            
+        case enums.Weapons.P_93r:
+            w = BurstFire(pos,
+                bullet_type = enums.BulletType.PISTOL,
+                weapon_type = weapon,
+                is_primary = False,
+                fire_mode = enums.FireMode.BURST,
+                reload_type = enums.ReloadType.MAGAZINE,
+                weapon_switch_ms = 230,
+                damage = 4,
+                bullet_speed = 30,
+                fire_rate = 5,
+                burst_fire_rate = 12,
+                burst_count = 3,
+                reload_delay_ms = 1500,
+                magazine_size = 15,
+                bullet_max_range = 600,
+                bullet_min_range = 400,
+                reload_end_frame = 12,
+                reload_speed_multiplier = 8,
+                barrel_offset = vec(0, 4),
+                weapon_scale = 0.5
+                )
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 20,-3)
             for s in w.shoot_sounds:
                 s.set_volume(0.3)
             w.empty_sound.set_volume(0.1)
