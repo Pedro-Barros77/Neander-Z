@@ -363,6 +363,7 @@ WAVES = {
         "max_alive_enemies": 5,
         "wave_step": 3,
         "wave_interval_s": 60,
+        "start_delay_ms":0,
         "enemies":[
             {
                 "type": enums.Enemies.Z_ROGER,

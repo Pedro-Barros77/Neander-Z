@@ -9,12 +9,6 @@ from domain.models.ui.popup_text import Popup
 from domain.models.ui.scrollbar import ScrollBar
 from domain.models.ui.store_item import StoreItem
 from domain.models.ui.attribute_bars import AttributeBar
-from domain.content.weapons.melee import Melee
-from domain.content.weapons.semi_auto import SemiAuto
-from domain.content.weapons.shotgun import Shotgun
-from domain.content.weapons.full_auto import FullAuto
-from domain.content.weapons.launcher import Launcher
-from domain.content.weapons.sniper import Sniper
 from domain.models.weapon import Weapon
 
 
