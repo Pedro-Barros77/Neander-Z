@@ -45,7 +45,7 @@ class Store:
             "p_1911": "tags:Semi-auto, medium-damage\nIt's an old weapon, but it is\nreliable enough. Or is it?",
             "short_barrel": "tags:Pump-action, high-damage\nThis little shotgun packs a big\npunch! Don't let its compact size\nfool you, it may be small enough to\nfit in your pocket, but it can kill\nan elephant with a single shot!",
             "uzi": "tags:Auto-fire, small-damage\nUZI with caution!\nYou'll run out of bullets before\nyou can say OH CRAP.",
-            "93r": "tags:Burst-fire, small-damage\nalgo.",
+            "93r": "tags:Burst-fire, small-damage\nThe Beretta 93R is like a party in\nyour hand, except the party\nguests are zombies and the music\nis the sound of their brains\nsplattering everywhere.",
             "m16": "tags:Burst-fire, medium-damage\nThe sharpshooter's best friend.\nThis rifle will take out hordes of\nzombies with precision and control.\nMake sure every shot counts to\nsave your ammo for real threats.",
             "sv98": "tags:Collateral-damage, high-damage\nFor when you want to take out\nthe undead from a safe distance\nand give them a headache they\nwon't recover from.",
             "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
@@ -203,6 +203,8 @@ class Store:
         for card in self.cards_list:
             if card.weapon_type != None and bck.get_weapon(card.weapon_type) != None:
                 card.owned = True
+            else:
+                card.owned = False
             card.update(self.panel_margin/2, self.player.money)
             
     def get_weapon_or_default(self, weapon_type: enums.Weapons):
@@ -509,7 +511,8 @@ class Store:
                 w = self.player.backpack.equip_weapon(item.weapon_type)
                 self.player.current_weapon = w
             else:
-                bought = self.buy_weapon(item.weapon_type)
+                weapon, bought = self.buy_weapon(item.weapon_type)
+                weapon.purchase_price = item.price
                 
         if item.item_name.endswith("kit"):
             self.player.get_health(item.count if item.count > 0 else 9999)

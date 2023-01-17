@@ -19,6 +19,9 @@ class Weapon(pygame.sprite.Sprite):
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.P_1911)
         self.display_name = kwargs.pop("display_name", "Weapon")
+        self.purchase_price = kwargs.pop("purchase_price", 0)
+        
+        
         self.fire_mode = kwargs.pop("fire_mode", enums.FireMode.SEMI_AUTO)
         """How this weapon fires (auto, semi-auto, pump, single shot...)."""
         self.reload_type = kwargs.pop("reload_type", enums.ReloadType.MAGAZINE)
@@ -49,10 +52,10 @@ class Weapon(pygame.sprite.Sprite):
         self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) if self.player_backpack != None else 0
         """The start number of extra bullets."""
         
-        self.upgrades_dict = kwargs.pop("upgrades_dict", None)
+        self.upgrades_dict: dict = kwargs.pop("upgrades_dict", None)
         """The upgrades steps, values and prices of this weapon."""
         
-        self.upgrades_map = kwargs.pop("upgrades_map", None)
+        self.upgrades_map: dict = kwargs.pop("upgrades_map", None)
         """Upgrades that the player bought for this weapon."""
         
         

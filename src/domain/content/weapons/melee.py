@@ -25,6 +25,8 @@ class Melee(Weapon):
         if not load_content:
             return
         
+        self.hits_count = 0
+        
         self.attack_frames_1 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.attack_frames_2 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.attack_frames_3 = game_controller.load_sprites(resources.get_weapon_path(self.weapon_type, enums.AnimActions.SHOOT)+ "\\03", self.weapon_scale, enums.ConvertType.CONVERT_ALPHA)
@@ -112,6 +114,8 @@ class Melee(Weapon):
     def attack(self):
         self.hiting = True
         
+        self.hits_count += 1
+        
         collided = self.melee_collision()
         
         self.attack_sound(collided)
@@ -124,6 +128,9 @@ class Melee(Weapon):
             for c in collisions:
                 if isinstance(c, Enemy) or isinstance(c, Rectangle):
                     c.take_damage(self.damage, self.player_net_id)
+                    c.owner.wave.players_scores[1].bullets_shot += self.hits_count
+                    c.owner.wave.players_scores[1].bullets_hit += 1
+                    self.hits_count = 0
                 return True
         return False
             

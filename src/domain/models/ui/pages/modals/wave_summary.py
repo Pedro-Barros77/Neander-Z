@@ -58,6 +58,7 @@ class WaveSummary(Modal):
                 self.buttons[0].hide()
                 self.buttons[1].hide()
                 self.buttons[2].hide()
+                self.inventory_section.load_inventory()
            
     
     def check_btn_ready(self):

@@ -44,6 +44,10 @@ class Button(pygame.sprite.Sprite):
         self.clicked = False
         self.hovered = False
         
+    def set_pos(self, pos: vec):
+        self.rect.topleft = pos
+        self.center = self.rect.center
+        
     def set_image(self, file_path: str):
         self.image = pygame.image.load(file_path).convert_alpha()
         if self.scale != 1:

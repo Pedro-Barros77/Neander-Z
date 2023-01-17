@@ -143,6 +143,8 @@ class Popup(pygame.sprite.Sprite):
                         self.rect.top = self.start_pos.y - (self.float_anim_distance - offset_y)
                 elif self.use_blink_anim:
                     self.show(True)
+                else:
+                    self.destroy()
             else:
                 self.destroy()
                 

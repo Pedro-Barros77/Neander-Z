@@ -18,8 +18,8 @@ class Inventory:
         self.player = player
         self.panel_margin = panel_margin
         self.inv_v_scrollbar: ScrollBar = None
-        self.sell_sound = pygame.mixer.Sound(f'{resources.SOUNDS_PATH}sound_effects\\ui\\purchase.mp3')
-        self.sell_sound.set_volume(0.3)
+        self.purchase_sound = pygame.mixer.Sound(f'{resources.SOUNDS_PATH}sound_effects\\ui\\purchase.mp3')
+        self.purchase_sound.set_volume(0.3)
         
         
         self.image: pygame.Surface = None
@@ -29,34 +29,25 @@ class Inventory:
         self.selected_weapon: Weapon = None
         self.card_size = vec(100,100)
         
-        def _select_card(card: StoreItem):
-            card.default_on_click()
-            self.selected_card = card
-        
-        def _unselect_card(card: StoreItem):
-            btns_hovered = [b for b in self.buttons if b.hovered and "equip" not in b.name]
-            scroll_bars_held = [s for s in [self.inv_v_scrollbar] if s.holding_bar]
-            
-            if len(btns_hovered) > 0 or len(scroll_bars_held) > 0:
-                return
-            
-            
-            card.default_on_blur()
-            if self.selected_card != None and self.selected_card.item_name == card.item_name:
-                self.selected_card = None
-        
-        cards_dict = {
-            "on_click": _select_card,
-            "on_blur": _unselect_card,
-            "owned": True
-        }    
-        
         self.weapons: list[StoreItem] = []
+        self.cards_list = []
+        self.buttons: list[Button] = []
         
-        for w in [*self.player.backpack.primary_weapons, *self.player.backpack.secondary_weapons]:
-            self.weapons.append(
-                StoreItem(f'{resources.get_weapon_path(w.weapon_type, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), w.display_name, item_name = str(w.weapon_type.value), price = 0, icon_scale = w.store_scale, bullet_type = w.bullet_type, weapon_type = w.weapon_type, **cards_dict)
-            )
+        self.attributes_max = kwargs.pop("attributes_max",{
+            "damage": 50,
+            "firerate": 15,
+            "reload_speed": 10,
+            "range": 1000,
+            "dispersion": 90
+        })
+        
+        self.damage_bar = None
+        self.firerate_bar = None
+        self.reload_bar = None
+        self.range_bar = None
+        self.dispersion_bar = None
+        
+        self.load_inventory()
         
         self.ammos:list[StoreItem] = [
             # StoreItem(f'{resources.IMAGES_PATH}ui\\pistol_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Pistol Ammo", item_name = "pistol_ammo", price = 20, count = 10, bullet_type = enums.BulletType.PISTOL, **cards_dict),
@@ -84,24 +75,50 @@ class Inventory:
         #     StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         # ]
         
-        self.cards_list = [*self.ammos, *self.items, *self.weapons]
+            
+    def load_inventory(self):
+        self.weapons.clear()
+        self.cards_list.clear()
+        self.buttons.clear()
         
-        self.attributes_max = kwargs.pop("attributes_max",{
-            "damage": 50,
-            "firerate": 15,
-            "reload_speed": 10,
-            "range": 1000,
-            "dispersion": 90
-        })
+        #region cards callbacks
+        def _select_card(card: StoreItem):
+            card.default_on_click()
+            self.selected_card = card
         
-        self.damage_bar = None
-        self.firerate_bar = None
-        self.reload_bar = None
-        self.range_bar = None
-        self.dispersion_bar = None
+        def _unselect_card(card: StoreItem):
+            btns_hovered = [b for b in self.buttons if b.hovered and "equip" not in b.name]
+            scroll_bars_held = [s for s in [self.inv_v_scrollbar] if s.holding_bar]
+            
+            if len(btns_hovered) > 0 or len(scroll_bars_held) > 0:
+                return
+            
+            
+            card.default_on_blur()
+            if self.selected_card != None and self.selected_card.item_name == card.item_name:
+                self.selected_card = None 
+        #endregion
         
-        self.buttons: list[Button] = [
+        cards_dict = {
+            "on_click": _select_card,
+            "on_blur": _unselect_card,
+            "owned": True
+        }  
+         
+        #Weapons
+        for w in [*self.player.backpack.primary_weapons, *self.player.backpack.secondary_weapons]:
+            self.weapons.append(
+                StoreItem(f'{resources.get_weapon_path(w.weapon_type, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), w.display_name, item_name = str(w.weapon_type.value), price = 0, icon_scale = w.store_scale, bullet_type = w.bullet_type, weapon_type = w.weapon_type, **cards_dict)
+            )
+            
+        #Cards
+        self.cards_list = [*self.weapons]#*self.ammos, *self.items, 
+        
+        #Buttons
+        self.buttons = [
                 Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = self.on_return),
+                Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text="", text_color = colors.BLACK, text_font = resources.px_font(25), scale = 2, name="sell_weapon", on_click = lambda: self.sell_weapon(self.selected_card.weapon_type)),
+                Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\swap.png', scale = 1, name="swap_slots", on_click = self.swap_weapon_slots),
             ]
         
         weapons_btn_dict = {
@@ -110,6 +127,7 @@ class Inventory:
             "text_font": resources.px_font(20)
         }
         
+        #Weapons buttons
         self.buttons.extend(
             [
                 *[Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', on_click = lambda w_type = w.weapon_type: self.equip_weapon(w_type, True), name = f'equip-primary_{w.weapon_type.value}', **weapons_btn_dict) for w in self.weapons],
@@ -117,6 +135,7 @@ class Inventory:
             ]
         )
         
+        #Upgrades buttons
         for att in self.attributes_max.keys():
             self.buttons.append(
                 Button((0,0), f'{resources.IMAGES_PATH}ui\\plus.png', on_click = lambda: print("click"), text_font = resources.px_font(20),name = f'btn_upgrade_{att}', text_color = colors.BLACK, scale = 0.5, visible = False)
@@ -125,15 +144,21 @@ class Inventory:
     def update(self, **kwargs):
         events = kwargs.pop("events", [])
         
+        
         for e in events:
             if self.inv_v_scrollbar != None:
                 self.inv_v_scrollbar.event_handler(e)
                 self.inv_v_scrollbar.update()
                 
+        if self.selected_card != None:
+            self.buttons[1].visible = True
+        else:
+            self.buttons[1].visible = False
+                
         for b in self.buttons:
             b.update()
             
-        bck = self.player.backpack
+        bkp = self.player.backpack
         
         for card in self.cards_list:
         
@@ -146,17 +171,21 @@ class Inventory:
                 btn_equip_prim.rect.bottomleft = card.rect.bottomright + vec(_btn_margin.x,0) + self.panel_margin/2
                 btn_equip_sec.rect.bottomleft = card.rect.bottomright + vec(_btn_margin.x,-btn_equip_prim.rect.height -_btn_margin.y) + self.panel_margin/2
                 
-                weapon = bck.get_weapon(card.weapon_type)
-
+                weapon = bkp.get_weapon(card.weapon_type)
+                
                 #if this weapon is the equiped primary or secondary
-                if bck.equipped_primary == card.weapon_type or bck.equipped_secondary == card.weapon_type:
+                if bkp.equipped_primary == card.weapon_type or bkp.equipped_secondary == card.weapon_type:
                     if btn_equip_prim.text != "Unequip":
                         btn_equip_prim.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
                         btn_equip_prim.text_surface = btn_equip_prim.start_text
                         btn_equip_prim.set_text("Unequip")
                     btn_equip_sec.visible = False
-                    card.price_text = "Primary" if bck.equipped_primary == card.weapon_type else "Secondary"
+                    if bkp.equipped_primary == card.weapon_type:
+                        card.price_text = "Primary"
+                    else: 
+                        card.price_text = "Secondary"
                 else: #otherwise it's just in the inventory
+                    card.price_text = " "
                     if btn_equip_prim.text == "Unequip":
                         btn_equip_prim.set_image(f'{resources.IMAGES_PATH}ui\\btn_small_green.png')
                         btn_equip_prim.text_surface = btn_equip_prim.start_text
@@ -185,7 +214,7 @@ class Inventory:
         image_rect = self.image.get_rect()
         image_rect.topleft = self.panel_margin/2
         
-        bcp = self.player.backpack
+        bkp = self.player.backpack
         
         #title
         txt_inv_title = menu_controller.get_text_surface("Inventory", colors.WHITE, resources.px_font(80))
@@ -215,25 +244,31 @@ class Inventory:
         primary_slot_rect.centery = txt_store_title_rect.centery
         
         primary_icon, primary_icon_rect = None, None
-        if bcp.equipped_primary != None:
-            primary_icon = pygame.image.load(resources.get_weapon_path(bcp.equipped_primary, enums.AnimActions.ICON))
+        if bkp.equipped_primary != None:
+            primary_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_primary, enums.AnimActions.ICON))
             _max_dim = max(primary_icon.get_width(), primary_icon.get_height())
             _percentage = ((primary_slot_rect.width * 100 / _max_dim)/100) * 1.1
             primary_icon = game_controller.scale_image(primary_icon, _percentage, enums.ConvertType.CONVERT_ALPHA)
             primary_icon_rect = primary_icon.get_rect()
             primary_icon_rect.center = primary_slot_rect.center
         
+        btn_swap = self.buttons[2]
+        if btn_swap.rect.topleft == (0,0):
+            btn_swap.rect.centery = txt_store_title_rect.centery + self.panel_margin.y/2
+            btn_swap.rect.left = primary_slot_rect.right + self.panel_margin.x/2 + 20
+            btn_swap.set_pos(vec(btn_swap.rect.topleft))
+        
         txt_secondary = menu_controller.get_text_surface('2:', colors.WHITE, resources.px_font(30))
         txt_secondary_rect = txt_secondary.get_rect()
-        txt_secondary_rect.left = primary_slot_rect.right + 20
+        txt_secondary_rect.left = btn_swap.rect.right - self.panel_margin.x/2 + 20
         txt_secondary_rect.centery = txt_store_title_rect.centery
         
         secondary_slot_rect = pygame.Rect((txt_secondary_rect.left + 20, 0), (_slot_size, _slot_size))
         secondary_slot_rect.centery = txt_store_title_rect.centery
         
         secondary_icon, secondary_icon_rect = None, None
-        if bcp.equipped_secondary != None:
-            secondary_icon = pygame.image.load(resources.get_weapon_path(bcp.equipped_secondary, enums.AnimActions.ICON))
+        if bkp.equipped_secondary != None:
+            secondary_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_secondary, enums.AnimActions.ICON))
             _max_dim = max(secondary_icon.get_width(), secondary_icon.get_height())
             _percentage = ((secondary_slot_rect.width * 100 / _max_dim)/100) * 1.1
             secondary_icon = game_controller.scale_image(secondary_icon, _percentage, enums.ConvertType.CONVERT_ALPHA)
@@ -278,6 +313,8 @@ class Inventory:
         pygame.draw.rect(self.image, colors.LIGHT_PASTEL_BLUE, primary_slot_rect, 2, 15)
         if primary_icon != None:
             self.image.blit(primary_icon, primary_icon_rect)
+            
+        self.buttons[2].draw(self.image, -self.panel_margin/2)
         
         #secondary slot
         self.image.blit(txt_secondary, txt_secondary_rect)
@@ -416,7 +453,8 @@ class Inventory:
                         _btn_upgrade.on_click = lambda attr_name = key: self.buy_upgrade(self.selected_card.weapon_type, attr_name)
                         _upgrade_map_index = math.clamp(weapon.upgrades_map[key], 0, len(value)) if weapon.upgrades_map != None else 0
                         _has_upgrade = weapon.upgrades_map == None or _upgrade_map_index < len(value)
-                        _btn_upgrade.enable(_has_upgrade)
+                        _has_money = self.player.money >= value[_upgrade_map_index-1]["price"]
+                        _btn_upgrade.enable(_has_upgrade and _has_money)
                         
                         
                         def btn_upgrade_hover(btn: Button, upgrade_steps = value, bar = _bar, key = key):
@@ -444,9 +482,8 @@ class Inventory:
                         else:
                             _upgrade_price_text = "MAX"
                             _bar.upgrade_value = 0
-                        print(_btn_upgrade.hovered)
                             
-                        _txt_upgrade_price = menu_controller.get_text_surface(_upgrade_price_text, colors.WHITE, resources.px_font(18))
+                        _txt_upgrade_price = menu_controller.get_text_surface(_upgrade_price_text, colors.WHITE if _has_money else colors.RED, resources.px_font(18))
                         _txt_upgrade_price_rect = _txt_upgrade_price.get_rect()
                         _txt_upgrade_price_rect.centery = _bar.rect.centery
                         _txt_upgrade_price_rect.left = _bar.rect.right + _btn_upgrade.rect.width + 5
@@ -458,6 +495,18 @@ class Inventory:
                     
                 for b in _upgrade_btns:
                     b.draw(pnl_right, vec(0,0))
+                    
+                btn_sell_weapon = self.buttons[1]
+                if btn_sell_weapon.rect.topleft == (0,0):
+                    btn_sell_weapon.rect.left = self.panel_margin.x/2 + pnl_right_rect.left + 20
+                    btn_sell_weapon.rect.bottom = self.panel_margin.y/2 + pnl_right_rect.top + pnl_right_rect.height - 20
+                    btn_sell_weapon.set_pos(vec(btn_sell_weapon.rect.topleft))
+                _btn_sell_text = f"Sell for $ {self.get_weapon_value(weapon)/2:.2f}"
+                if btn_sell_weapon.text != _btn_sell_text:
+                    btn_sell_weapon.set_text(_btn_sell_text)
+                    btn_sell_weapon.on_hover(btn_sell_weapon)
+                    
+                btn_sell_weapon.draw(pnl_right, vec(-self.panel_margin.x/2 - pnl_right_rect.left, -self.panel_margin.y/2 - pnl_right_rect.top))
                 
                 pnl_right.blit(_txt_weapon_title, _txt_weapon_title_rect)
             
@@ -482,7 +531,8 @@ class Inventory:
         
         self.image.blit(pnl_right, pnl_right_rect.topleft)
         
-        for b in [b for b in self.buttons if not b.name.startswith("equip")]:
+        pnl_btns = ["sell_weapon", "swap_slots"]
+        for b in [b for b in self.buttons if not b.name.startswith("equip") and b.name not in pnl_btns]:
             b.draw(self.image, -self.panel_margin/2)
 
         #scroll bars
@@ -500,38 +550,49 @@ class Inventory:
     
         
     def equip_weapon(self, weapon_type: enums.Weapons, as_primary = False):
-        bck = self.player.backpack
+        bkp = self.player.backpack
         
         #weapon already equipped and has only one (trying to be weaponless)
-        if (bck.equipped_primary == weapon_type or bck.equipped_secondary == weapon_type) and type(bck.equipped_primary) != type(bck.equipped_secondary):
-            print("tem que ter ao menos uma")
+        if (bkp.equipped_primary == weapon_type or bkp.equipped_secondary == weapon_type) and type(bkp.equipped_primary) != type(bkp.equipped_secondary):
+            menu_controller.popup(Popup(f"You cannot be unarmed!", vec(0,0), name="unarmed_error", unique=True, **constants.POPUPS["error"]), center=True)
             return
         
-        if bck.equipped_primary == weapon_type:
+        if bkp.equipped_primary == weapon_type:
             self.player.change_weapon()
-            bck.equipped_primary = None
+            bkp.equipped_primary = None
             return
-        elif bck.equipped_secondary == weapon_type:
+        elif bkp.equipped_secondary == weapon_type:
             self.player.change_weapon()
-            bck.equipped_secondary = None
+            bkp.equipped_secondary = None
             return
             
-        self.player.current_weapon = bck.equip_weapon(weapon_type, as_primary)
+        self.player.current_weapon = bkp.equip_weapon(weapon_type, as_primary)
         
     def buy_upgrade(self, weapon_type: enums.Weapons, attr_name):
-        print(f"Buying {attr_name} for {weapon_type}")
         
         bpk = self.player.backpack
         weapon = bpk.get_weapon(weapon_type)
         attributes_dict = constants.get_weapon_upgrade(weapon_type)
         
         if weapon.upgrades_map == None:
-            weapon.upgrades_map = self.attributes_max.copy()
+            weapon.upgrades_map = constants.get_weapon_upgrade(weapon_type).copy()
             for key in weapon.upgrades_map.keys():
                 weapon.upgrades_map[key] = 0
                 
-        weapon.upgrades_map[attr_name] += 1
+        price = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["price"]
+        
+        if price > self.player.money:
+            return
+        
         ammount = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["ammount"]
+        weapon.upgrades_map[attr_name] += 1
+        
+        self.purchase_sound.play()
+        self.player.money -= price
+        menu_controller.popup(Popup(f"-${price:.2f}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))
+        
+        
+        
         match attr_name:
             case "damage":
                 match weapon.bullet_type:
@@ -556,3 +617,75 @@ class Inventory:
             case "dispersion":
                 _step = self.dispersion_bar.max_value / self.dispersion_bar.bars_count
                 weapon.dispersion -= _step * ammount
+                
+    def swap_weapon_slots(self):
+        bkp = self.player.backpack
+        
+        w1 = bkp.get_weapon(bkp.equipped_primary)
+        w2 = bkp.get_weapon(bkp.equipped_secondary)
+        
+        #primary cannot fit in secondary slot
+        if (w1!=None and w1.is_primary) or (w2!=None and w2.is_primary):
+            return
+        
+        bkp.equipped_primary = w2.weapon_type if w2 != None else None
+        bkp.equipped_secondary = w1.weapon_type if w1 != None else None
+                
+    def get_weapon_value(self, weapon: Weapon):
+        value = weapon.purchase_price
+        
+        if weapon.upgrades_dict == None or weapon.upgrades_map == None:
+            return value
+        
+        for up_name in weapon.upgrades_dict.keys():
+            for i, step in enumerate(weapon.upgrades_dict[up_name]):
+                if i > weapon.upgrades_map[up_name]-1:
+                    continue
+                value += step["price"]
+        
+        return value
+                
+    def sell_weapon(self, weapon_type: enums.Weapons):
+        
+        bkp = self.player.backpack
+        weapon = bkp.get_weapon(weapon_type)
+        if weapon == None:
+            return
+        
+    
+        #if it's equiped
+        if (weapon_type == bkp.equipped_primary or weapon_type == bkp.equipped_secondary):
+            #if it's the only equiped
+            if type(bkp.equipped_primary) != type(bkp.equipped_secondary):
+                _weapons = [*bkp.primary_weapons, *bkp.secondary_weapons]
+                if weapon in _weapons:
+                    _weapons.remove(weapon)
+                #if there's no more weapon to equip
+                if len(_weapons) <= 0:
+                    menu_controller.popup(Popup(f"You cannot be unarmed!", vec(0,0), name="unarmed_error", unique=True, **constants.POPUPS["error"]), center=True)
+                    return
+        
+        if weapon_type == bkp.equipped_primary:
+            bkp.equipped_primary = None
+        elif weapon_type == bkp.equipped_secondary:
+            bkp.equipped_secondary = None
+        
+        if weapon.is_primary:
+            bkp.primary_weapons.remove(weapon)
+        else:
+            bkp.secondary_weapons.remove(weapon)
+            
+        
+            
+        if bkp.equipped_primary == None and bkp.equipped_secondary == None:
+            _weapons = [*bkp.primary_weapons, *bkp.secondary_weapons]
+            self.player.current_weapon = bkp.equip_weapon(_weapons[0].weapon_type)
+
+        sell_price = self.get_weapon_value(weapon)/2
+        self.player.money += sell_price
+        
+        menu_controller.popup(Popup(f"+${sell_price:.2f}", vec(self.money_rect.topleft), **constants.POPUPS["health"]))
+        self.selected_card = None
+        self.selected_weapon = None
+        self.purchase_sound.play()
+        self.load_inventory()

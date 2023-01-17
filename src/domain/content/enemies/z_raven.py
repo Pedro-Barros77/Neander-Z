@@ -49,10 +49,10 @@ class ZRaven(Enemy):
         self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.DEATH), 0.8)
         self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.ATTACK), 0.2)
         
-        self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id)
+        self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/5, self.hitbox_head.rect.height/5)))
         
-        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, False), name = "zombie_body", id = self.id)
+        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, False), name = "zombie_body", id = self.id, owner = self)
         self.hitbox_body.set_rect(pygame.Rect((0,0),(self.hitbox_body.rect.width/3, self.hitbox_body.rect.height/3)))
 
         self.hight_set = False

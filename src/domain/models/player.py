@@ -78,7 +78,6 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.P_1911)
         self.add_weapon(enums.Weapons.MACHETE)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -499,8 +498,9 @@ class Player(pygame.sprite.Sprite):
         mc.popup(Popup(f'+{value}', self.pos + vec(self.rect.width / 2 - 20,-30) - self.offset_camera - self.player2_offset, **constants.POPUPS["health"]))
 
     def add_weapon(self, weapon_type: enums.Weapons, equip = True):
-        if self.backpack.get_weapon(weapon_type) != None:
-            return False
+        existing_weapon = self.backpack.get_weapon(weapon_type)
+        if existing_weapon != None:
+            return existing_weapon, False
         
         
         weapon = None
@@ -527,7 +527,7 @@ class Player(pygame.sprite.Sprite):
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             
         if weapon == None:
-            return False
+            return None, False
         
         if weapon.is_primary:
             self.backpack.primary_weapons.append(weapon)
@@ -541,7 +541,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         
-        return True
+        return weapon, True
     
     def grave_stone_anim(self, speed: float):
         self.grave_drop_frame += speed

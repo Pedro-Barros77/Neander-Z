@@ -74,7 +74,7 @@ class Enemy(pygame.sprite.Sprite):
         
         self.last_rect = self.rect.copy()
         
-        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft)
+        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, owner = self)
         self.hitbox_head: Rectangle = None
         
         self.health_bar = ProgressBar(self.health, pygame.Rect(self.pos - vec(0,-15), (self.rect.width * 1.3, 7)), 

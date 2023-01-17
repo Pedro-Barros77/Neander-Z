@@ -56,10 +56,10 @@ class ZRui(Enemy):
         self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.ATTACK), 0.4)
         self.bump_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.BUMP), 0.5)
         
-        self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id)
+        self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/8, self.hitbox_head.rect.height - self.rect.height/1.4)))
         
-        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, False), name = "zombie_body", id = self.id)
+        self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, False), name = "zombie_body", id = self.id, owner = self)
         self.hitbox_body.set_rect(pygame.Rect((0,0),(self.hitbox_body.rect.width / 3.8, self.hitbox_body.rect.height - self.hitbox_head.rect.height*1.5)))
 
         self.bump_distance = kwargs.pop("bump_distance", self.hitbox_body.rect.width/1.8)
