@@ -23,13 +23,13 @@ class BackPack:
         
         
         
-    def equip_weapon(self, weapon: enums.Weapons):
+    def equip_weapon(self, weapon: enums.Weapons, as_primary = False):
         w = self.get_weapon(weapon)
         
         if not w:
             return
         
-        if w.is_primary:
+        if w.is_primary or as_primary:
             self.equipped_primary = w.weapon_type
         else:
             self.equipped_secondary = w.weapon_type

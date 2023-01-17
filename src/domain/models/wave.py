@@ -39,6 +39,7 @@ class Wave():
         self.money_multiplier = kwargs.pop("money_multiplier", 1.8)
         self.wave_interval_s = kwargs.pop("wave_interval_s", 15)
         self.start_delay_ms = kwargs.pop("start_delay_ms", 2000)
+        self.end_delay_ms = kwargs.pop("end_delay_ms", 1500)
        
         self.spawn_count = 0
         self.enemies_count = 0
@@ -110,7 +111,7 @@ class Wave():
         
     def kill_all(self):
         for e in self.enemies_group.sprites():
-            e.kill(1)
+            e.take_damage(99999, 1, True)
         self.players_scores[1].bullets_shot += 1
 
     def handle_score(self, enemy: Enemy, attacker, headshot_kill = False):

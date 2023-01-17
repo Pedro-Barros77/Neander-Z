@@ -1,4 +1,4 @@
-import pygame
+import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.services import game_controller, menu_controller
@@ -27,6 +27,10 @@ class AttributeBar:
         self.bar_border_width = kwargs.pop("bar_border_width", 1)
         self.bar_border_radius = kwargs.pop("bar_border_radius", 5)
         
+        self.upgrade_blink_ms = kwargs.pop("upgrade_blink_ms", 0)
+        self.last_upgrade_blink: datetime.datetime = datetime.datetime.now()
+        self.upgrade_visible = True
+        
         self.bars_margin = kwargs.pop("bars_margin", 5)
         self.bar_size: vec = kwargs.pop("bar_size", vec(self.rect.width/self.bars_count - self.bars_margin, self.rect.height))
         
@@ -46,33 +50,50 @@ class AttributeBar:
         _value_step = self.max_value / self.bars_count
         
         for b in range(self.bars_count):
-            _fill_color = None
-            _fill_half = False
+            _upgrade = 0
+            _value = 0
             _bar_rect = pygame.Rect((self.bars_margin/2 + b * (self.bar_size.x + self.bars_margin), 0), self.bar_size)
             
-            if (self.downgrade_value * _value_step) + self.value >= _value_step * (b+1): #fill downgrade
-                _fill_color = self.bar_downgrade_fill_color
-                pygame.draw.rect(self.image, _fill_color, _bar_rect, border_radius = self.bar_border_radius)
-            elif (self.upgrade_value * _value_step) + self.value >= _value_step * (b+1): #fill upgrade
-                _fill_color = self.bar_upgrade_fill_color
-                pygame.draw.rect(self.image, _fill_color, _bar_rect, border_radius = self.bar_border_radius)
-            else: #fill background
-                _fill_color = self.bar_background_color
+            # if (self.downgrade_value * _value_step) + self.value >= _value_step * (b+1): #fill downgrade
+            #     pygame.draw.rect(self.image, _fill_color, _bar_rect, border_radius = self.bar_border_radius)
+            
+            _upgrade_step = self.upgrade_value + self.value
+            
+            if _upgrade_step >= _value_step * (b+1): #fill upgrade
+                _upgrade = 2
+            elif _upgrade_step < _value_step * (b+1) and _upgrade_step >= (_value_step * (b)) + _value_step/2: #fill half upgrade
+                _upgrade = 1
                 
             if self.value >= _value_step * (b+1): #fill value
-                _fill_color = self.bar_fill_color
+                _value = 2
             elif self.value < _value_step * (b+1) and self.value >= (_value_step * (b)) + _value_step/2: #fill half value
-                _fill_color = self.bar_fill_color
-                _fill_half = True
+                _value = 1
                 
+            #background
+            pygame.draw.rect(self.image, self.bar_background_color, _bar_rect, border_radius= self.bar_border_radius)
             
+            _half_bar_rect = _bar_rect.copy()
+            _half_bar_rect.width /= 2
+            
+            _now = datetime.datetime.now()
+            
+            if _now > self.last_upgrade_blink + datetime.timedelta(milliseconds=self.upgrade_blink_ms):
+                self.last_upgrade_blink = _now
+                self.upgrade_visible = not self.upgrade_visible
+            
+            #upgrade
+            if _upgrade == 1:
+                pygame.draw.rect(self.image, self.bar_upgrade_fill_color if self.upgrade_visible else colors.BLACK, _half_bar_rect, border_radius= self.bar_border_radius)
+            elif _upgrade == 2:
+                pygame.draw.rect(self.image, self.bar_upgrade_fill_color if self.upgrade_visible else colors.BLACK, _bar_rect, border_radius= self.bar_border_radius)
+            
+            #value
+            if _value == 1:
+                pygame.draw.rect(self.image, self.bar_fill_color, _half_bar_rect, border_radius= self.bar_border_radius)
+            elif _value == 2:
+                pygame.draw.rect(self.image, self.bar_fill_color, _bar_rect, border_radius= self.bar_border_radius)
                 
-            if _fill_half:
-                _half_bar_rect = _bar_rect.copy()
-                _half_bar_rect.width /= 2
-                pygame.draw.rect(self.image, _fill_color, _half_bar_rect, border_radius= self.bar_border_radius)
-            else:
-                pygame.draw.rect(self.image, _fill_color, _bar_rect, border_radius= self.bar_border_radius)
+            #border
             pygame.draw.rect(self.image, self.bar_border_color, _bar_rect, self.bar_border_width, self.bar_border_radius)
             
         
@@ -81,6 +102,9 @@ class AttributeBar:
         pass
     
     def draw(self, screen: pygame.Surface, offset: vec = vec(0,0)):
+        if self.upgrade_blink_ms > 0:
+            self.rerender()
+        
         screen.blit(self.image, math.rect_offset(self.rect, offset))
         
         

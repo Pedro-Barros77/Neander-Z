@@ -35,7 +35,7 @@ class Button(pygame.sprite.Sprite):
         self.start_image = self.image.copy()
         self.start_text = self.text_surface.copy()
         
-        self.on_hover: function = kwargs.pop("on_hover", self.default_on_hover)
+        self.on_hover: function = kwargs.pop("on_hover", lambda btn: self.default_on_hover(btn))
         self.on_click: function = kwargs.pop("on_click", lambda: print('clicked ' + self.text))
         
         self.enabled = kwargs.pop("enabled", True)
@@ -71,6 +71,7 @@ class Button(pygame.sprite.Sprite):
         _darkness = 100
         
         if not self.enabled:
+            pass
             self.image = self.start_image.copy()
             self.image.fill(colors.set_alpha(colors.BLACK, _darkness), special_flags=pygame.BLEND_RGBA_SUB)
             self.text_surface = self.start_text
@@ -83,7 +84,7 @@ class Button(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = self.center
         
-    def default_on_hover(self):
+    def default_on_hover(self, btn):
         _brightness = 30
         
         if self.hovered: #hover in
@@ -113,22 +114,22 @@ class Button(pygame.sprite.Sprite):
         mouse_pos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()[0] == 1
         
+        if not self.enabled:
+            return
         _was_hovered = self.hovered
         self.hovered = self.rect.collidepoint(mouse_pos)
         
-        if not self.enabled:
-            return
         
         if self.hovered:
             if not _was_hovered:
-                self.on_hover()
+                self.on_hover(self)
             if clicked and not self.clicked and not self.last_clicked:
                 self.sound_clicked.play()
                 self.clicked = True
                 self.on_click()
                 
         elif _was_hovered:
-            self.on_hover()
+            self.on_hover(self)
             
         if not clicked:
             self.clicked = False

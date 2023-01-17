@@ -13,6 +13,7 @@ class StoreItem:
         self.description = kwargs.pop("description", "")
         self.item_name = kwargs.pop("item_name", self.title)
         self.price = kwargs.pop("price", 0)
+        self.price_text = kwargs.pop("price_text", "")
         self.count = kwargs.pop("count", 1)
         self.locked = kwargs.pop("locked", False)
         self.player_money = kwargs.pop("player_money", 0)
@@ -145,7 +146,14 @@ class StoreItem:
         
         #price
         _price_color = colors.RED if self.player_money < self.price and not self.owned else self.price_color
-        price = menu_controller.get_text_surface(f'${self.price:.2f}' if not self.owned else "Purchased", _price_color, self.price_font)
+        _price_text = ""
+        if len(self.price_text) > 0:
+            _price_text = self.price_text
+        elif self.owned:
+            _price_text = "Purchased"
+        else:
+            _price_text = f'${self.price:.2f}'
+        price = menu_controller.get_text_surface(_price_text, _price_color, self.price_font)
         price_rect = price.get_rect()
         price_rect.centerx = _rect.centerx
         price_rect.bottom = _rect.bottom

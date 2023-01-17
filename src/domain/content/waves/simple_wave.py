@@ -32,7 +32,7 @@ class SimpleWave(Wave):
 
         if self.spawn_count >= self.total_enemies:
             if self.enemies_count == 0:
-                self.delay_end_wave(1500)
+                self.delay_end_wave(self.end_delay_ms)
         
         elif self.current_wave_step >= self.wave_step:
             self.current_wave_step = 0

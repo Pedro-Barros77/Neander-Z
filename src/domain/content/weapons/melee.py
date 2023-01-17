@@ -52,7 +52,7 @@ class Melee(Weapon):
     def fire_anim(self, speed: float):
         self.firing_frame += speed
         
-        if int(self.firing_frame) == self.hit_frame and not self.playing_hit_sound:
+        if int(self.firing_frame) in [self.hit_frame, self.hit_frame-1, self.hit_frame+1] and not self.playing_hit_sound:
             self.attack()
             self.playing_hit_sound = True
         

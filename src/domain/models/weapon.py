@@ -18,6 +18,7 @@ class Weapon(pygame.sprite.Sprite):
         self.player_backpack: BackPack = kwargs.pop("backpack", None)
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
         self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.P_1911)
+        self.display_name = kwargs.pop("display_name", "Weapon")
         self.fire_mode = kwargs.pop("fire_mode", enums.FireMode.SEMI_AUTO)
         """How this weapon fires (auto, semi-auto, pump, single shot...)."""
         self.reload_type = kwargs.pop("reload_type", enums.ReloadType.MAGAZINE)
@@ -48,6 +49,12 @@ class Weapon(pygame.sprite.Sprite):
         self.start_total_ammo = self.player_backpack.get_ammo(self.bullet_type) if self.player_backpack != None else 0
         """The start number of extra bullets."""
         
+        self.upgrades_dict = kwargs.pop("upgrades_dict", None)
+        """The upgrades steps, values and prices of this weapon."""
+        
+        self.upgrades_map = kwargs.pop("upgrades_map", None)
+        """Upgrades that the player bought for this weapon."""
+        
         
         self.fire_rate_ratio = 1000
         self.reload_delay_ms = kwargs.pop("reload_delay_ms", 1000)
@@ -61,6 +68,7 @@ class Weapon(pygame.sprite.Sprite):
         """The direction that this weapon was pointing to on the last frame (left: -1, right: 1)."""
         
         self.weapon_scale = kwargs.pop("weapon_scale", 1)
+        self.store_scale = kwargs.pop("store_scale", 1)
         
         self.fire_frames = [pygame.Surface((1,1))]
         """The animation frames of this weapon when firing/attacking."""

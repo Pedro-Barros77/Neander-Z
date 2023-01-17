@@ -67,12 +67,12 @@ class WaveSummary(Modal):
             btn.set_image(f'{resources.IMAGES_PATH}ui\\btn_small_green.png')
             btn.text_surface = btn.start_text
             btn.set_text('Cancel')
-            btn.default_on_hover()
+            btn.default_on_hover(btn)
         else:
             btn.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
             btn.text_surface = btn.start_text
             btn.set_text('Ready')
-            btn.default_on_hover()
+            btn.default_on_hover(btn)
             
     
     def draw_summary(self, screen):
