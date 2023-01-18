@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller as mc, resources
+from domain.services import game_controller, menu_controller as mc, resources, assets_manager
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -10,9 +10,9 @@ from domain.models.rectangle_sprite import Rectangle
 
 
 class ZRaven(Enemy):
-    def __init__(self, pos,wave, **kwargs):
+    def __init__(self, pos,wave,assets_manager: assets_manager.AssetsManager, **kwargs):
         kwargs["image_scale"] = 0.4
-        super().__init__(pos, enums.Enemies.Z_RAVEN, wave, **kwargs)
+        super().__init__(pos, enums.Enemies.Z_RAVEN, wave, assets_manager, **kwargs)
         
         self.damage = kwargs.pop("damage", 5)
         self.name = kwargs.pop("name", f"raven_1")
@@ -43,11 +43,6 @@ class ZRaven(Enemy):
         
         self.kill_score = 53
         self.headshot_score_multiplier = 1.5
-        
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.TAKE_DAMAGE), 0.1)
-        self.dash_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.DASH), 0.1)
-        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.DEATH), 0.8)
-        self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAVEN, enums.AnimActions.ATTACK), 0.2)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/5, self.hitbox_head.rect.height/5)))
@@ -179,13 +174,6 @@ class ZRaven(Enemy):
         
         if self.rising:
             self.fly_back()
-        
-            # if has_attack_range:
-            #     if self.attack_start_sounds != None and not self.attacking:
-            #         rand_sound = random.randint(0, len(self.attack_start_sounds)-1)
-            #         self.attack_start_sounds[rand_sound].play()
-            #     self.attacking = True
-            
             
         #animations
         
@@ -213,7 +201,6 @@ class ZRaven(Enemy):
             self.hit_rectangle.draw(screen, offset)
         
         pygame.draw.rect(screen, colors.BLUE, math.rect_offset(self.rect, -offset), 1)
-        pygame.draw.line(screen, colors.YELLOW, vec(self.player_rect.centerx - self.dive_attack_distance, self.rect.centery) - offset, vec(self.player_rect.centerx + self.dive_attack_distance, self.rect.centery) - offset)
         pygame.draw.line(screen, colors.GREEN, vec(self.rect.centerx, self.rect.bottom + 20) - offset,vec(self.rect.centerx, self.rect.top - 20) - offset)
 
     def try_attack(self):
@@ -241,8 +228,8 @@ class ZRaven(Enemy):
     def fly_to(self, target: pygame.Rect):
         
         if not self.diving:
-            _rand = random.randint(0, len(self.dash_sounds)-1)
-            self.dash_sounds[_rand].play()
+            _rand = random.randint(0, len(self.get_sounds(enums.AnimActions.DASH))-1)
+            self.get_sounds(enums.AnimActions.DASH)[_rand].play()
         
         self.hovering = False
         self.rising = False
@@ -259,8 +246,9 @@ class ZRaven(Enemy):
             _distance = abs(self.rect.centerx - target.centerx)
             if _distance <= self.attack_distance:
                 if self.attack_start_sounds != None and not self.attacking:
-                    rand_sound = random.randint(0, len(self.attack_start_sounds)-1)
-                    self.attack_start_sounds[rand_sound].play()
+                    print("iiih faltou em")
+                    # rand_sound = random.randint(0, len(self.attack_start_sounds)-1)
+                    # self.attack_start_sounds[rand_sound].play()
                 self.attacking = True
             else:
                 self.rising = True
@@ -297,16 +285,16 @@ class ZRaven(Enemy):
             for c in collided:
                 c.take_damage(self.damage)
             
-            rand_sound = random.randint(0, len(self.attack_sounds)-1)
-            self.attack_sounds[rand_sound].play()
+            rand_sound = random.randint(0, len(self.get_sounds(enums.AnimActions.ATTACK))-1)
+            self.get_sounds(enums.AnimActions.ATTACK)[rand_sound].play()
             
         
     def run_anim(self, speed: float):
        
         self.run_frame += speed
-        if self.run_frame > len(self.run_frames)-1:
+        if self.run_frame > len(self.get_frames(enums.AnimActions.RUN))-1:
             self.run_frame = 0
-        self.image = game_controller.scale_image(self.run_frames[int(self.run_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.RUN)[int(self.run_frame)], self.image_scale)
         if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
@@ -314,37 +302,36 @@ class ZRaven(Enemy):
         self.attack_frame += speed
         if int(self.attack_frame) == self.hit_frame - 1 and not self.hiting:
             self.attack()
-        if self.attack_frame > len(self.attack_frames)-1:
+        if self.attack_frame > len(self.get_frames(enums.AnimActions.ATTACK))-1:
             self.attack_frame = 0
             self.attacking = False
             self.hiting = False
             self.rising = True
-        self.image = game_controller.scale_image(self.attack_frames[int(self.attack_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.ATTACK)[int(self.attack_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def dying_anim(self, speed: float):
         self.death_frame += speed
-        if self.death_frame > len(self.death_frames)-1:
+        if self.death_frame > len(self.get_frames(enums.AnimActions.DEATH))-1:
             self.death_time = datetime.datetime.now()
             self.death_frame = 0
         else:
-            self.image = game_controller.scale_image(self.death_frames[int(self.death_frame)], self.image_scale)
+            self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.DEATH)[int(self.death_frame)], self.image_scale)
         if self.acceleration.x > 0 and self.death_time == None:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def damage_sound(self):
-        sound = self.damage_sounds[random.randint(0, len(self.damage_sounds)-1)]
+        sound = self.get_sounds(enums.AnimActions.TAKE_DAMAGE)[random.randint(0, len(self.get_sounds(enums.AnimActions.TAKE_DAMAGE))-1)]
         if not pygame.mixer.Channel(7).get_busy():
             pygame.mixer.Channel(7).play(sound)
         
     def take_damage(self, value: float, attacker=None, head_shot=False):
         died = super().take_damage(value, attacker, head_shot)
         
-        if self.damage_sounds != None and len(self.damage_sounds) > 0:
-            self.damage_sound()
+        self.damage_sound()
         
         if died:
-            self.death_sounds[random.randint(0, len(self.death_sounds)-1)].play()
+            self.get_sounds(enums.AnimActions.DEATH)[random.randint(0, len(self.get_sounds(enums.AnimActions.DEATH))-1)].play()
         
         return died

@@ -27,10 +27,10 @@ class BossWave(Wave):
         self.damage_rand_margin = 0.3
           
     def update(self, **kwargs):
+        super().update(**kwargs)
+
         if not self.started or self.finished or datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
             return
-
-        super().update(**kwargs)
         
         if self.boss == None:
             self.spawn()

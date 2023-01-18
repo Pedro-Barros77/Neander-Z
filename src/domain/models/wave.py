@@ -1,6 +1,6 @@
 import pygame, datetime
 
-from domain.services import menu_controller, resources
+from domain.services import menu_controller, resources, assets_manager
 from domain.models.rectangle_sprite import Rectangle
 from domain.models.enemy import Enemy
 from pygame.math import Vector2 as vec
@@ -21,10 +21,15 @@ class Wave():
         
         _enemies_dict: list[dict] = kwargs.pop("enemies", [])
         self.total_enemies = sum([e["count"] for e in _enemies_dict])
+        self.enemy_types: list[enums.Enemies] = []
         
         self.enemies: list[dict] = []
         for e in _enemies_dict:
-            _count = e.copy().pop("count", 0)
+            _d = e.copy()
+            _count = _d.pop("count", 0)
+            _type = _d.pop("type", enums.Enemies.Z_ROGER)
+            if _type not in self.enemy_types:
+                self.enemy_types.append(_type)
             for _ in range(_count):
                 self.enemies.append(e.copy())
         
@@ -55,6 +60,7 @@ class Wave():
         }
         
         self.delayed_finish_time: datetime.datetime = None
+        self.assets_manager = assets_manager.AssetsManager(self.enemy_types)
 
 
     def get_id(self):
@@ -65,17 +71,17 @@ class Wave():
         enemy = None
         match enemy_type:
             case enums.Enemies.Z_ROGER:
-                enemy = ZRoger(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRoger(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_ROBERT:
-                enemy = ZRobert(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRobert(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RONALDO:
-                enemy = ZRonaldo(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRonaldo(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RUI:
-                enemy = ZRui(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRui(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RAVEN:
-                enemy = ZRaven(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRaven(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RAIMUNDO:
-                enemy = ZRaimundo(pos, self, **enemy_dict, id = self.get_id())
+                enemy = ZRaimundo(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
         
         return enemy
 
@@ -89,7 +95,6 @@ class Wave():
     def start(self):
         if self.game.client_type == enums.ClientType.SINGLE:
             self.money_multiplier = 1
-        self.started = True
         
         self.start_time = datetime.datetime.now()
         # menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
@@ -145,8 +150,18 @@ class Wave():
 
 
     def update(self, **kwargs):
-        if self.finished or datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
+        if self.finished:
             return
+        
+        if datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
+            self.started = False
+            return
+        elif not self.started:
+            self.started = True
+            self.assets_manager.load_resources()
+        
+
+        
         self.enemies_count = len(self.enemies_group.sprites())
     
         if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:

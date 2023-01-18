@@ -63,7 +63,7 @@ class Rectangle(pygame.sprite.Sprite, IGravitable):
         self.rect.topleft = self.pos
         
     def update_pos(self):
-        self.pos = self.rect.topleft
+        self.pos = vec(self.rect.topleft)
         
     def set_rect(self, rect: pygame.Rect):
         self.rect = rect

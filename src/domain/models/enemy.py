@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, enums, constants, math_utillity as math
-from domain.services import game_controller, menu_controller as mc, resources
+from domain.services import game_controller, menu_controller as mc, resources, assets_manager
 from domain.models.progress_bar import ProgressBar
 from domain.models.ui.popup_text import Popup
 from domain.models.rectangle_sprite import Rectangle
@@ -10,9 +10,10 @@ from domain.models.rectangle_sprite import Rectangle
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, enemy_name: enums.Enemies, wave, **kwargs):
+    def __init__(self, pos, enemy_name: enums.Enemies, wave, assets_manager: assets_manager.AssetsManager, **kwargs):
         super().__init__()
         
+        self.assets_manager = assets_manager
         self.id = kwargs.pop("id", 0)
         self.name = "enemy"
         self.wave = wave
@@ -48,18 +49,12 @@ class Enemy(pygame.sprite.Sprite):
         """If the running animation is running."""
         self.run_frame = 0
         """The current frame index of the running animation."""
-        run_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.RUN)
-        self.run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.attacking = False
         self.attack_frame = 0
-        attack_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.ATTACK)
-        self.attack_frames = game_controller.load_sprites(attack_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
 
         self.dying = False
         self.death_frame = 0
-        death_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.DEATH)
-        self.death_frames = game_controller.load_sprites(death_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         self.image = game_controller.scale_image(pygame.image.load(resources.get_enemy_path(self.enemy_name, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.size = self.image.get_size()
@@ -164,7 +159,7 @@ class Enemy(pygame.sprite.Sprite):
         #     self.speed.y = - self.jump_force
         
         # solid collision
-        self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL)
+        self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL, self.hitbox_body if self.hitbox_body != None else self)
 
         _should_attack = kwargs.pop("attack", True)
 
@@ -219,6 +214,31 @@ class Enemy(pygame.sprite.Sprite):
                 self.hitbox_head.draw(surface, offset)
         
         self.player_offset = offset
+        
+        
+    def get_frames(self, anim_action: enums.AnimActions):
+        match anim_action:
+            case enums.AnimActions.RUN:
+                return self.assets_manager.get_assets(self.enemy_name, "run_frames")
+            case enums.AnimActions.ATTACK:
+                return self.assets_manager.get_assets(self.enemy_name, "attack_frames")
+            case enums.AnimActions.DEATH:
+                return self.assets_manager.get_assets(self.enemy_name, "death_frames")
+            case _:
+                return self.assets_manager.get_assets(self.enemy_name, str(anim_action))
+    
+    def get_sounds(self, anim_action: enums.AnimActions):
+        match anim_action:
+            case enums.AnimActions.TAKE_DAMAGE:
+                return self.assets_manager.get_assets(self.enemy_name, "damage_sounds")
+            case enums.AnimActions.ATTACK:
+                return self.assets_manager.get_assets(self.enemy_name, "attack_sounds")
+            case enums.AnimActions.DEATH:
+                return self.assets_manager.get_assets(self.enemy_name, "death_sounds")
+            case enums.AnimActions.DASH:
+                return self.assets_manager.get_assets(self.enemy_name, "dash_sounds")
+            case _:
+                return self.assets_manager.get_assets(self.enemy_name, str(anim_action))
 
     def fade_out_anim(self):
         anim_end = (self.death_time + datetime.timedelta(milliseconds=self.fade_out_ms))
@@ -240,16 +260,18 @@ class Enemy(pygame.sprite.Sprite):
         super().kill()
         
     
-    def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation):
+    def collision(self,game, targets: pygame.sprite.Group, direction: enums.Orientation, target = None):
         """Handles collision between the enemy and collidable objects.
 
         Args:
             targets (pygame.sprite.Group | list[pygame.sprite.Sprite])
             direction (enums.Orientation): The direction that the enemy was moving.
         """
-        collision_objs = pygame.sprite.spritecollide(self, targets, False)
+        if target == None:
+            target = self
+        collision_objs = pygame.sprite.spritecollide(target, targets, False)
         if collision_objs:
-            game.collision(self, collision_objs, direction)
+            game.collision(target, collision_objs, direction)
             return True
         return False
         

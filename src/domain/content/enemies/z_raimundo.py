@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller as mc, resources
+from domain.services import game_controller, menu_controller as mc, resources, assets_manager
 from domain.models.ui.popup_text import Popup
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
@@ -10,10 +10,12 @@ from domain.models.rectangle_sprite import Rectangle
 
 
 
+
 class ZRaimundo(Enemy):
-    def __init__(self, pos,wave, **kwargs):
+    def __init__(self, pos, wave, assets_manager: assets_manager.AssetsManager, **kwargs):
         kwargs["image_scale"] = 1.1
-        super().__init__(pos, enums.Enemies.Z_RAIMUNDO,wave, **kwargs)
+        super().__init__(pos, enums.Enemies.Z_RAIMUNDO,wave, assets_manager, **kwargs)
+        
         
         self.damage = kwargs.pop("damage", 15)
         self.name = kwargs.pop("name", f"zombie_1")
@@ -52,30 +54,30 @@ class ZRaimundo(Enemy):
         self.helmet_frame = 0
         
         
-        run_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.RUN)
-        self.run_frames_1 = game_controller.load_sprites(run_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.run_frames_2 = game_controller.load_sprites(run_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.run_frames_3 = game_controller.load_sprites(run_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.run_frames_4 = game_controller.load_sprites(run_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # run_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.RUN)
+        # self.run_frames_1 = game_controller.load_sprites(run_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.run_frames_2 = game_controller.load_sprites(run_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.run_frames_3 = game_controller.load_sprites(run_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.run_frames_4 = game_controller.load_sprites(run_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        attack_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.ATTACK)
-        self.attack_frames1 = game_controller.load_sprites(attack_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames2 = game_controller.load_sprites(attack_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames3 = game_controller.load_sprites(attack_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames4 = game_controller.load_sprites(attack_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # attack_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.ATTACK)
+        # self.attack_frames1 = game_controller.load_sprites(attack_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.attack_frames2 = game_controller.load_sprites(attack_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.attack_frames3 = game_controller.load_sprites(attack_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.attack_frames4 = game_controller.load_sprites(attack_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        death_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.DEATH)
-        self.death_frames1 = game_controller.load_sprites(death_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.death_frames2 = game_controller.load_sprites(death_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.death_frames3 = game_controller.load_sprites(death_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.death_frames4 = game_controller.load_sprites(death_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # death_folder = resources.get_enemy_path(self.enemy_name, enums.AnimActions.DEATH)
+        # self.death_frames1 = game_controller.load_sprites(death_folder + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.death_frames2 = game_controller.load_sprites(death_folder + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.death_frames3 = game_controller.load_sprites(death_folder + "\\03", convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.death_frames4 = game_controller.load_sprites(death_folder + "\\04", convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        self.helmet_frames = game_controller.load_sprites(f'{resources.IMAGES_PATH}enemies\\{str(self.enemy_name.value)}\\helmet_breaking\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
+        # self.helmet_frames = game_controller.load_sprites(f'{resources.IMAGES_PATH}enemies\\{str(self.enemy_name.value)}\\helmet_breaking\\', convert_type=enums.ConvertType.CONVERT_ALPHA)
         
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.TAKE_DAMAGE), 0.1)
-        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.DEATH), 0.2)
-        self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.ATTACK), 0.2)
-        self.helmet_bullet_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}sound_effects\\enemies\\{str(self.enemy_name.value)}\\helmet_bullet_hit\\', 0.2)
+        # self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.TAKE_DAMAGE), 0.1)
+        # self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.DEATH), 0.2)
+        # self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.ATTACK), 0.2)
+        # self.helmet_bullet_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}sound_effects\\enemies\\{str(self.enemy_name.value)}\\helmet_bullet_hit\\', 0.2)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/4, self.hitbox_head.rect.height - self.rect.height/1.8)))
@@ -106,7 +108,7 @@ class ZRaimundo(Enemy):
         
         self.calculate_helmet_stage()
         
-        if int(self.helmet_frame) == len(self.helmet_frames)-1:
+        if int(self.helmet_frame) == len(self.get_helmet_frames())-1:
             self.fade_out_helmet()
         
         if self.running and self.death_time == None:
@@ -128,7 +130,7 @@ class ZRaimundo(Enemy):
         
         #helmet
         if self.helmet_break_pos != None and self.helmet_break_time != None and _now < self.helmet_break_time + datetime.timedelta(milliseconds=self.helmet_timeout_ms):
-            _helmet = game_controller.scale_image(self.helmet_frames[int(self.helmet_frame)], self.image_scale)
+            _helmet = game_controller.scale_image(self.get_helmet_frames()[int(self.helmet_frame)], self.image_scale)
             _result = pygame.Surface(_helmet.get_size(), pygame.SRCALPHA)
             _result.blit(_helmet, (0,0))
             _result.set_alpha(self.helmet_alpha)
@@ -156,24 +158,27 @@ class ZRaimundo(Enemy):
             
     def get_run_frames(self):
         match self.helmet_stage:
-            case 0: return self.run_frames_1
-            case 1: return self.run_frames_2
-            case 2: return self.run_frames_3
-            case 3: return self.run_frames_4
+            case 0: return self.assets_manager.get_assets(self.enemy_name, "run_frames_1")
+            case 1: return self.assets_manager.get_assets(self.enemy_name, "run_frames_2")
+            case 2: return self.assets_manager.get_assets(self.enemy_name, "run_frames_3")
+            case 3: return self.assets_manager.get_assets(self.enemy_name, "run_frames_4")
     
     def get_atk_frames(self):
         match self.helmet_stage:
-            case 0: return self.attack_frames1
-            case 1: return self.attack_frames2
-            case 2: return self.attack_frames3
-            case 3: return self.attack_frames4
+            case 0: return self.assets_manager.get_assets(self.enemy_name, "attack_frames1")
+            case 1: return self.assets_manager.get_assets(self.enemy_name, "attack_frames2")
+            case 2: return self.assets_manager.get_assets(self.enemy_name, "attack_frames3")
+            case 3: return self.assets_manager.get_assets(self.enemy_name, "attack_frames4")
             
     def get_death_frames(self):
         match self.helmet_stage:
-            case 0: return self.death_frames1
-            case 1: return self.death_frames2
-            case 2: return self.death_frames3
-            case 3: return self.death_frames4
+            case 0: return self.assets_manager.get_assets(self.enemy_name, "death_frames1")
+            case 1: return self.assets_manager.get_assets(self.enemy_name, "death_frames2")
+            case 2: return self.assets_manager.get_assets(self.enemy_name, "death_frames3")
+            case 3: return self.assets_manager.get_assets(self.enemy_name, "death_frames4")
+            
+    def get_helmet_frames(self):
+        return self.assets_manager.get_assets(self.enemy_name, "helmet_frames")
 
     def attack(self):
         self.hiting = True
@@ -184,8 +189,8 @@ class ZRaimundo(Enemy):
             for c in collided:
                 c.take_damage(self.damage)
             
-            rand_sound = random.randint(0, len(self.attack_sounds)-1)
-            self.attack_sounds[rand_sound].play()
+            rand_sound = random.randint(0, len(self.get_sounds(enums.AnimActions.ATTACK))-1)
+            self.get_sounds(enums.AnimActions.ATTACK)[rand_sound].play()
             
             
         
@@ -223,12 +228,13 @@ class ZRaimundo(Enemy):
     def helmet_anim(self, speed: float):
        
         self.helmet_frame += speed
-        if self.helmet_frame > len(self.helmet_frames)-1:
+        if self.helmet_frame > len(self.get_helmet_frames())-1:
             self.breaking_helmet = False
     
         
     def damage_sound(self):
-        sound = self.damage_sounds[random.randint(0, len(self.damage_sounds)-1)]
+        
+        sound = self.get_sounds(enums.AnimActions.TAKE_DAMAGE)[random.randint(0, len(self.get_sounds(enums.AnimActions.TAKE_DAMAGE))-1)]
         if not pygame.mixer.Channel(7).get_busy():
             pygame.mixer.Channel(7).play(sound)
         
@@ -238,8 +244,8 @@ class ZRaimundo(Enemy):
             if self.helmet_health > 0:
                 self.helmet_health = math.clamp(self.helmet_health - value, 0, self.start_helmet_health)
                 _popup_args = constants.POPUPS["damage"].copy()
-                rand_sound = random.randint(0, len(self.helmet_bullet_sounds)-1)
-                self.helmet_bullet_sounds[rand_sound].play()
+                rand_sound = random.randint(0, len(self.get_sounds("helmet_bullet_sounds"))-1)
+                self.get_sounds("helmet_bullet_sounds")[rand_sound].play()
                 mc.popup(Popup(f'-0', self.pos + vec(self.rect.width / 2 - 20,-30) - self.player_offset, **_popup_args))
                 if self.helmet_health == 0:
                     self.breaking_helmet = True
@@ -251,10 +257,9 @@ class ZRaimundo(Enemy):
         
         died = super().take_damage(value, attacker, head_shot)
         
-        if self.damage_sounds != None and len(self.damage_sounds) > 0:
-            self.damage_sound()
+        self.damage_sound()
         
         if died:
-            self.death_sounds[random.randint(0, len(self.death_sounds)-1)].play()
+            self.get_sounds(enums.AnimActions.DEATH)[random.randint(0, len(self.get_sounds(enums.AnimActions.DEATH))-1)].play()
         
         return died

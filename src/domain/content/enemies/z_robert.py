@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller as mc, resources
+from domain.services import game_controller, menu_controller as mc, resources, assets_manager
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -10,9 +10,9 @@ from domain.models.rectangle_sprite import Rectangle
 
 
 class ZRobert(Enemy):
-    def __init__(self, pos, wave, **kwargs):
+    def __init__(self, pos, wave,assets_manager: assets_manager.AssetsManager, **kwargs):
         kwargs["image_scale"] = 0.8
-        super().__init__(pos, enums.Enemies.Z_ROBERT,wave, **kwargs)
+        super().__init__(pos, enums.Enemies.Z_ROBERT,wave,assets_manager, **kwargs)
         
         self.damage = kwargs.pop("damage", 20)
         self.name = kwargs.pop("name", f"dog_1")
@@ -37,10 +37,6 @@ class ZRobert(Enemy):
         
         self.kill_score = 70
         self.headshot_score_multiplier = 1.5
-        
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.TAKE_DAMAGE), 1)
-        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.DEATH), 0.8)
-        self.attack_start_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_ROBERT, enums.AnimActions.ATTACK), 0.5)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/3, self.hitbox_head.rect.height - self.rect.height/2)))
@@ -107,9 +103,9 @@ class ZRobert(Enemy):
     def run_anim(self, speed: float):
        
         self.run_frame += speed
-        if self.run_frame > len(self.run_frames):
+        if self.run_frame > len(self.get_frames(enums.AnimActions.RUN)):
             self.run_frame = 0
-        self.image = game_controller.scale_image(self.run_frames[int(self.run_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.RUN)[int(self.run_frame)], self.image_scale)
         if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
@@ -117,36 +113,36 @@ class ZRobert(Enemy):
         self.attack_frame += speed
         if int(self.attack_frame) == self.hit_frame - 1 and not self.hiting:
             self.attack()
-        if self.attack_frame > len(self.attack_frames):
+        if self.attack_frame > len(self.get_frames(enums.AnimActions.ATTACK)):
             self.attack_frame = 0
             self.attacking = False
             self.hiting = False
-        self.image = game_controller.scale_image(self.attack_frames[int(self.attack_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.ATTACK)[int(self.attack_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def dying_anim(self, speed: float):
         self.death_frame += speed
-        if self.death_frame > len(self.death_frames):
+        if self.death_frame > len(self.get_frames(enums.AnimActions.DEATH)):
             self.death_time = datetime.datetime.now()
             self.death_frame = 0
         else:
-            self.image = game_controller.scale_image(self.death_frames[int(self.death_frame)], self.image_scale)
+            self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.DEATH)[int(self.death_frame)], self.image_scale)
         if self.acceleration.x > 0 and self.death_time == None:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def damage_sound(self):
-        sound = self.damage_sounds[random.randint(0, len(self.damage_sounds)-1)]
+        sound = self.get_sounds(enums.AnimActions.TAKE_DAMAGE)[random.randint(0, len(self.get_sounds(enums.AnimActions.TAKE_DAMAGE))-1)]
         if not pygame.mixer.Channel(7).get_busy():
             pygame.mixer.Channel(7).play(sound)
         
     def take_damage(self, value: float, attacker=None, head_shot=False):
         died = super().take_damage(value, attacker, head_shot)
         
-        if self.damage_sounds != None and len(self.damage_sounds) > 0:
-            self.damage_sound()
+            
+        self.damage_sound()
         
         if died:
-            self.death_sounds[random.randint(0, len(self.death_sounds)-1)].play()
+            self.get_sounds(enums.AnimActions.DEATH)[random.randint(0, len(self.get_sounds(enums.AnimActions.DEATH))-1)].play()
         
         return died

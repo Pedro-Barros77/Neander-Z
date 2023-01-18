@@ -2,7 +2,7 @@ import pygame, datetime, random
 from pygame.math import Vector2 as vec
 
 from domain.utils import colors, constants, enums, math_utillity as math
-from domain.services import game_controller, menu_controller as mc, resources
+from domain.services import game_controller, menu_controller as mc, resources, assets_manager
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
@@ -10,9 +10,9 @@ from domain.models.rectangle_sprite import Rectangle
 
 
 class ZRui(Enemy):
-    def __init__(self, pos,wave, **kwargs):
+    def __init__(self, pos,wave,assets_manager: assets_manager.AssetsManager, **kwargs):
         kwargs["image_scale"] = 2
-        super().__init__(pos, enums.Enemies.Z_RUI,wave, **kwargs)
+        super().__init__(pos, enums.Enemies.Z_RUI,wave, assets_manager, **kwargs)
         
         self.damage = kwargs.pop("damage", 15)
         self.name = kwargs.pop("name", f"boss_1")
@@ -23,7 +23,7 @@ class ZRui(Enemy):
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
         self.last_dir = self.dir.copy()
-        self.attack_distance = kwargs.pop("attack_distance", self.rect.width/2)
+        self.attack_distance = kwargs.pop("attack_distance", self.rect.width/2.2 )
         self.attack_hit_frame = 10
         self.bump_hit_frame = 4
         self.hiting = False
@@ -44,17 +44,9 @@ class ZRui(Enemy):
         self.health_bar.value_anim_speed = 0.5
         
         self.attack_frames = None
-        self.attack_frames1 = game_controller.load_sprites(resources.get_enemy_path(enums.Enemies.Z_RUI, enums.AnimActions.ATTACK) + "\\01", convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self.attack_frames2 = game_controller.load_sprites(resources.get_enemy_path(enums.Enemies.Z_RUI, enums.AnimActions.ATTACK) + "\\02", convert_type=enums.ConvertType.CONVERT_ALPHA)
         self.bumping = False
         self.bump_frame = 0
         self.bump_damage_multiplier = 0.3
-        
-        
-        self.damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.TAKE_DAMAGE), 0.4)
-        self.death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.DEATH).replace("01.mp3",""), 0.4)
-        self.attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.ATTACK), 0.4)
-        self.bump_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RUI, enums.AnimActions.BUMP), 0.5)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/8, self.hitbox_head.rect.height - self.rect.height/1.4)))
@@ -132,8 +124,8 @@ class ZRui(Enemy):
             case 1:
                 _knockback = vec(self.attack_knockback_force, 0)
                 _atk_rect = pygame.Rect((0,0), self.attack_box)
-                rand_sound = random.randint(0, len(self.attack_sounds)-1)
-                _sound = self.attack_sounds[rand_sound]
+                rand_sound = random.randint(0, len(self.get_sounds(enums.AnimActions.ATTACK))-1)
+                _sound = self.get_sounds(enums.AnimActions.ATTACK)[rand_sound]
                 _damage = self.damage
             
                 if self.dir.x < 0:
@@ -147,8 +139,8 @@ class ZRui(Enemy):
             case 2:
                 _knockback = vec(self.bump_knockback_force, self.bump_knockback_force/4)
                 _atk_rect = pygame.Rect((0,0), self.bump_box)
-                rand_sound = random.randint(0, len(self.bump_sounds)-1)
-                _sound = self.bump_sounds[rand_sound]
+                rand_sound = random.randint(0, len(self.get_sounds(enums.AnimActions.BUMP))-1)
+                _sound = self.get_sounds(enums.AnimActions.BUMP)[rand_sound]
                 _damage = self.damage * self.bump_damage_multiplier
             
                 if self.dir.x < 0:
@@ -181,9 +173,9 @@ class ZRui(Enemy):
     def run_anim(self, speed: float):
        
         self.run_frame += speed
-        if self.run_frame > len(self.run_frames)-1:
+        if self.run_frame > len(self.get_frames(enums.AnimActions.RUN))-1:
             self.run_frame = 0
-        self.image = game_controller.scale_image(self.run_frames[int(self.run_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.RUN)[int(self.run_frame)], self.image_scale)
         if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
@@ -191,11 +183,11 @@ class ZRui(Enemy):
         self.attack_frame += speed
         if int(self.attack_frame) == self.attack_hit_frame - 1 and not self.hiting:
             self.attack(1)
-        if self.attack_frame > len(self.attack_frames1)-1:
+        if self.attack_frame > len(self.get_frames("attack_frames1"))-1:
             self.attack_frame = 0
             self.attacking = False
             self.hiting = False
-        self.image = game_controller.scale_image(self.attack_frames1[int(self.attack_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames("attack_frames1")[int(self.attack_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
             
@@ -203,36 +195,35 @@ class ZRui(Enemy):
         self.bump_frame += speed
         if int(self.bump_frame) == self.bump_hit_frame - 1 and not self.hiting:
             self.attack(2)
-        if self.bump_frame > len(self.attack_frames2)-1:
+        if self.bump_frame > len(self.get_frames("attack_frames2"))-1:
             self.bump_frame = 0
             self.bumping = False
             self.hiting = False
-        self.image = game_controller.scale_image(self.attack_frames2[int(self.bump_frame)], self.image_scale)
+        self.image = game_controller.scale_image(self.get_frames("attack_frames2")[int(self.bump_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def dying_anim(self, speed: float):
         self.death_frame += speed
-        if self.death_frame > len(self.death_frames)-1:
+        if self.death_frame > len(self.get_frames(enums.AnimActions.DEATH))-1:
             self.death_time = datetime.datetime.now()
             self.death_frame = 0
         else:
-            self.image = game_controller.scale_image(self.death_frames[int(self.death_frame)], self.image_scale)
+            self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.DEATH)[int(self.death_frame)], self.image_scale)
         if self.acceleration.x > 0 and self.death_time == None:
             self.image = pygame.transform.flip(self.image, True, False)
     
     def damage_sound(self):
-        sound = self.damage_sounds[random.randint(0, len(self.damage_sounds)-1)]
+        sound = self.get_sounds(enums.AnimActions.TAKE_DAMAGE)[random.randint(0, len(self.get_sounds(enums.AnimActions.TAKE_DAMAGE))-1)]
         if not pygame.mixer.Channel(7).get_busy():
             pygame.mixer.Channel(7).play(sound)
         
     def take_damage(self, value: float, attacker=None, head_shot=False):
         died = super().take_damage(value, attacker, head_shot)
         
-        if self.damage_sounds != None and len(self.damage_sounds) > 0:
-            self.damage_sound()
+        self.damage_sound()
         
         if died:
-            self.death_sounds[random.randint(0, len(self.death_sounds)-1)].play()
+            self.get_sounds(enums.AnimActions.DEATH)[random.randint(0, len(self.get_sounds(enums.AnimActions.DEATH))-1)].play()
         
         return died

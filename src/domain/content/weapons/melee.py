@@ -103,13 +103,11 @@ class Melee(Weapon):
     def draw(self, screen: pygame.Surface, offset: vec):
         super().draw(screen, offset)
         
-        _attack_hit_rect = pygame.Rect(self.rect.center, self.attack_box)
-        if self.dir > 0:
-            _attack_hit_rect.left = self.rect.centerx + 3 * self.dir
-        elif self.dir < 0:
-            _attack_hit_rect.right = self.rect.centerx - 3 * self.dir
+        player_anchor = game_controller.point_to_angle_distance(vec(self.rect.center), -self.weapon_distance, -math.radians(self.weapon_aim_angle))
+        hit_pos = game_controller.point_to_angle_distance(player_anchor, self.weapon_distance + self.attack_box.x/2, -math.radians(self.weapon_aim_angle))
         
-        self.hit_rectangle = Rectangle(self.attack_box, _attack_hit_rect.topleft + offset)
+        self.hit_rectangle = Rectangle(self.attack_box, hit_pos - self.attack_box/2 + offset)
+        # self.hit_rectangle.draw(screen, offset)
             
     def attack(self):
         self.hiting = True
@@ -127,17 +125,18 @@ class Melee(Weapon):
         for group in game_controller.bullet_target_groups:
             collisions = pygame.sprite.spritecollide(self.hit_rectangle, group, False)
             for c in collisions:
-                if isinstance(c, Enemy) or isinstance(c, Rectangle):
+                _play_sound = True
+                if isinstance(c, Enemy) or (isinstance(c, Rectangle) and "zombie" in c.name):
                     c.take_damage(self.damage, self.player_net_id)
                     c.owner.wave.players_scores[1].bullets_shot += self.hits_count
                     c.owner.wave.players_scores[1].bullets_hit += 1
                     self.hits_count = 0
-                    _play_sound = True
                     
                     if c.name == "zombie_head" and c.owner.enemy_name == enums.Enemies.Z_RAIMUNDO and c.owner.helmet_stage < 3:
                         _play_sound = False
                     
-                return True, _play_sound
+                    return True, _play_sound
+                return False, _play_sound
         return False, False
             
     

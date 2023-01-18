@@ -289,7 +289,7 @@ def get_weapon_upgrade(weapon_type: enums.Weapons):
 
 
 WEAPONS_UPGRADES = {
-    enums.Weapons.P_1911: {
+    enums.Weapons.MACHETE: {
         "damage": [
             {
                 "id": 1,
@@ -436,74 +436,82 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
-    #     1: {
-    #        "wave_number": 1,
-    #         "wave_type": enums.WaveType.BOSS,
-    #         "max_alive_enemies": 7,
-    #         "timed_spawn_count": 3,
-    #         "spawn_timer_ms": 7000,
-    #         "wave_interval_s": 60,
-    #         "enemies":[
-    #             {
-    #                 "type": enums.Enemies.Z_RUI,
-    #                 "count": 1,
-    #                 "movement_speed": 0.08,
-    #                 "health": 500,
-    #                 "damage": 40
-    #             },
-    #             {
-    #                 "type": enums.Enemies.Z_ROGER,
-    #                 "count": 1,
-    #                 "movement_speed": 0.12,
-    #                 "health": 28,
-    #                 "damage": 15
-    #             },
-    #             {
-    #                 "type": enums.Enemies.Z_RONALDO,
-    #                 "count": 1,
-    #                 "movement_speed": 0.1,
-    #                 "health": 24,
-    #                 "damage": 20
-    #             },
-    #             {
-    #                 "type": enums.Enemies.Z_ROBERT,
-    #                 "count": 1,
-    #                 "movement_speed": 1,
-    #                 "health": 18,
-    #                 "damage": 24
-    #             },
-    #             {
-    #                 "type": enums.Enemies.Z_RAVEN,
-    #                 "count": 1,
-    #                 "movement_speed": 0.5,
-    #                 "health": 1,
-    #                 "damage": 5
-    #             }
+        1: {
+           "wave_number": 1,
+            "wave_type": enums.WaveType.BOSS,
+            "max_alive_enemies": 7,
+            "timed_spawn_count": 3,
+            "spawn_timer_ms": 7000,
+            "wave_interval_s": 60,
+            "start_delay_ms": 2000,
+            "end_delay_ms": 2000,
+            "enemies":[
+                {
+                    "type": enums.Enemies.Z_RUI,
+                    "count": 1,
+                    "movement_speed": 0.08,
+                    "health": 500,
+                    "damage": 40
+                },
+                {
+                    "type": enums.Enemies.Z_ROGER,
+                    "count": 1,
+                    "movement_speed": 0.12,
+                    "health": 28,
+                    "damage": 15
+                },
+                {
+                    "type": enums.Enemies.Z_RONALDO,
+                    "count": 1,
+                    "movement_speed": 0.1,
+                    "health": 24,
+                    "damage": 20
+                },
+                {
+                    "type": enums.Enemies.Z_ROBERT,
+                    "count": 1,
+                    "movement_speed": 1,
+                    "health": 18,
+                    "damage": 24
+                },
+                {
+                    "type": enums.Enemies.Z_RAVEN,
+                    "count": 1,
+                    "movement_speed": 0.5,
+                    "health": 1,
+                    "damage": 5
+                },
+                {
+                    "type": enums.Enemies.Z_RAIMUNDO,
+                    "count": 1,
+                    "movement_speed": 0.1,
+                    "health": 35,
+                    "damage": 18
+                },
 
-    #         ]
-    #     },
-    # }
-    # {
-
-    1: {
-        "wave_number": 1,
-        "wave_type": enums.WaveType.SIMPLE,
-        "max_alive_enemies": 10,
-        "wave_step": 1,
-        "wave_interval_s": 6000,
-        "start_delay_ms": 0,
-        "end_delay_ms": 0,
-        "enemies": [
-            {
-                "type": enums.Enemies.Z_RAIMUNDO,
-                "count": 10,
-                "movement_speed": 0.12,
-                "health": 28,
-                "damage": 15
-            }
-        ]
+            ]
+        },
     }
-}
+
+#     1: {
+#         "wave_number": 1,
+#         "wave_type": enums.WaveType.SIMPLE,
+#         "max_alive_enemies": 10,
+#         "wave_step": 1,
+#         "wave_interval_s": 6000,
+#         "start_delay_ms": 0,
+#         "end_delay_ms": 0,
+#         "enemies": [
+#             {
+#                 "type": enums.Enemies.Z_RAVEN,
+#                 "count": 10,
+#                 "movement_speed": 0.1,
+#                 "health": 28,
+#                 "damage": 15
+#             }
+#         ]
+#     }
+# }
 {
     1: {
         "wave_number": 1,
