@@ -439,11 +439,11 @@ WAVES = {
         1: {
            "wave_number": 1,
             "wave_type": enums.WaveType.BOSS,
-            "max_alive_enemies": 7,
-            "timed_spawn_count": 3,
-            "spawn_timer_ms": 7000,
+            "max_alive_enemies": 20,
+            "timed_spawn_count": 20,
+            "spawn_timer_ms": 7000, 
             "wave_interval_s": 60,
-            "start_delay_ms": 2000,
+            "start_delay_ms": 1500,
             "end_delay_ms": 2000,
             "enemies":[
                 {

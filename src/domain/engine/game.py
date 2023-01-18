@@ -532,6 +532,10 @@ class Game(Page):
     def update(self, **kwargs):
         events = kwargs.pop("events", None)
         
+        if self.current_wave != None:
+            if self.current_wave.started and not self.current_wave.loaded:
+                return
+        
         if not pygame.mixer.music.get_busy() and self.focused:
             mc.play_music(resources.get_song(resources.Songs.WAVE_1), 0.1, -1)
         
@@ -635,6 +639,11 @@ class Game(Page):
     
        
     def draw(self):
+        
+        if not self.current_wave.loaded:
+            self.screen.fill(colors.BLACK)
+            return
+        
         # Map
         self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
         

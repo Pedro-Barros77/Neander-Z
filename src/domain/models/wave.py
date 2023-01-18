@@ -1,4 +1,4 @@
-import pygame, datetime
+import pygame, datetime, threading, time
 
 from domain.services import menu_controller, resources, assets_manager
 from domain.models.rectangle_sprite import Rectangle
@@ -61,6 +61,41 @@ class Wave():
         
         self.delayed_finish_time: datetime.datetime = None
         self.assets_manager = assets_manager.AssetsManager(self.enemy_types)
+        self.loaded = False
+
+    def update(self, **kwargs):
+        if self.finished:
+            return
+        
+        if not self.loaded:
+            return
+        elif self.start_time == None:
+            self.start_time = datetime.datetime.now()
+        
+        if datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
+            return
+            
+        self.enemies_count = len(self.enemies_group.sprites())
+    
+        if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:
+            self.end_wave()
+    
+    def draw(self, screen: pygame.Surface, offset: vec):
+        for e in self.enemies_group.sprites():
+            e.draw(screen, offset)
+
+    def start(self):
+        self.started = True
+        thread = threading.Thread(target=self.load_resources)
+        thread.start()
+        
+        if self.game.client_type == enums.ClientType.SINGLE:
+            self.money_multiplier = 1
+        # menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
+
+    def load_resources(self):
+        self.assets_manager.load_resources()
+        self.loaded = True
 
 
     def get_id(self):
@@ -92,12 +127,6 @@ class Wave():
         if enemy.hitbox_body != None:
             self.enemies_hitbox_group.add(enemy.hitbox_body)
         
-    def start(self):
-        if self.game.client_type == enums.ClientType.SINGLE:
-            self.money_multiplier = 1
-        
-        self.start_time = datetime.datetime.now()
-        # menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
         
         
     def delay_end_wave(self, delay_ms: float):
@@ -119,7 +148,8 @@ class Wave():
         
     def kill_all(self):
         for e in self.enemies_group.sprites():
-            e.take_damage(99999, 1, True)
+            if e.enemy_name != enums.Enemies.Z_RUI:
+                e.take_damage(99999, 1, True)
         self.players_scores[1].bullets_shot += 1
 
     def handle_score(self, enemy: Enemy, attacker, headshot_kill = False):
@@ -149,27 +179,6 @@ class Wave():
 
 
 
-    def update(self, **kwargs):
-        if self.finished:
-            return
-        
-        if datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
-            self.started = False
-            return
-        elif not self.started:
-            self.started = True
-            self.assets_manager.load_resources()
-        
-
-        
-        self.enemies_count = len(self.enemies_group.sprites())
-    
-        if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:
-            self.end_wave()
-    
-    def draw(self, screen: pygame.Surface, offset: vec):
-        for e in self.enemies_group.sprites():
-            e.draw(screen, offset)
             
     def update_enemies(self):
         self.enemies_group.update(group_name = "enemies", game = self.game, client_type = self.game.client_type)

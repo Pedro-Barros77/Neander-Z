@@ -224,6 +224,8 @@ class Enemy(pygame.sprite.Sprite):
                 return self.assets_manager.get_assets(self.enemy_name, "attack_frames")
             case enums.AnimActions.DEATH:
                 return self.assets_manager.get_assets(self.enemy_name, "death_frames")
+            case enums.AnimActions.BUMP:
+                return self.assets_manager.get_assets(self.enemy_name, "bump_frames")
             case _:
                 return self.assets_manager.get_assets(self.enemy_name, str(anim_action))
     
@@ -235,6 +237,8 @@ class Enemy(pygame.sprite.Sprite):
                 return self.assets_manager.get_assets(self.enemy_name, "attack_sounds")
             case enums.AnimActions.DEATH:
                 return self.assets_manager.get_assets(self.enemy_name, "death_sounds")
+            case enums.AnimActions.BUMP:
+                return self.assets_manager.get_assets(self.enemy_name, "bump_sounds")
             case enums.AnimActions.DASH:
                 return self.assets_manager.get_assets(self.enemy_name, "dash_sounds")
             case _:

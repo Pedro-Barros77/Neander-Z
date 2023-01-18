@@ -29,7 +29,7 @@ class BossWave(Wave):
     def update(self, **kwargs):
         super().update(**kwargs)
 
-        if not self.started or self.finished or datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
+        if not self.started or self.finished or datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms) or not self.loaded:
             return
         
         if self.boss == None:
