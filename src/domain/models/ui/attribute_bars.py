@@ -24,6 +24,7 @@ class AttributeBar:
         self.bar_upgrade_fill_color = kwargs.pop("bar_upgrade_fill_color", colors.YELLOW)
         self.bar_downgrade_fill_color = kwargs.pop("bar_downgrade_fill_color", colors.RED)
         self.bar_border_color = kwargs.pop("bar_border_color", colors.WHITE)
+        self.start_bar_border_color = self.bar_border_color
         self.bar_border_width = kwargs.pop("bar_border_width", 1)
         self.bar_border_radius = kwargs.pop("bar_border_radius", 5)
         

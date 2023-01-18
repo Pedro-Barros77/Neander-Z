@@ -38,13 +38,15 @@ class Inventory:
             "firerate": 15,
             "reload_speed": 10,
             "range": 1000,
-            "dispersion": 90
+            "dispersion": 90,
+            "magazine_size": 50
         })
         
         self.damage_bar = None
         self.firerate_bar = None
         self.reload_bar = None
         self.range_bar = None
+        self.magazine_bar = None
         self.dispersion_bar = None
         
         self.load_inventory()
@@ -344,6 +346,7 @@ class Inventory:
                 _damage = weapon.damage
                 _range = (weapon.bullet_min_range + weapon.bullet_max_range)/2
                 _firerate = weapon.fire_rate
+                _magazine_size = weapon.magazine_size
                 match weapon.reload_type:
                     case enums.ReloadType.SINGLE_BULLET:
                         _reload_speed = 5000 / (weapon.reload_delay_ms * weapon.magazine_size)
@@ -363,32 +366,40 @@ class Inventory:
                 if weapon.bullet_type == enums.BulletType.SHOTGUN and weapon.ballin_count != None:
                     _damage = weapon.damage * weapon.ballin_count
             
+            
                 if self.damage_bar == None:
-                    self.damage_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*0), _bars_size), max_value = self.attributes_max["damage"], value = _damage, **constants.ATTRIBUTE_BARS["weapon"], upgrade_blink_ms = 300)
+                    self.damage_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*0), _bars_size), max_value = self.attributes_max["damage"], value = _damage, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.damage_bar.value = _damage
                     
                 if self.firerate_bar == None:
-                    self.firerate_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*1), _bars_size), max_value = self.attributes_max["firerate"], value = _firerate, **constants.ATTRIBUTE_BARS["weapon"], upgrade_blink_ms = 300)
+                    self.firerate_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*1), _bars_size), max_value = self.attributes_max["firerate"], value = _firerate, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.firerate_bar.value = _firerate
                     
                 if self.reload_bar == None:
-                    self.reload_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*2), _bars_size), max_value = self.attributes_max["reload_speed"], value = _reload_speed, **constants.ATTRIBUTE_BARS["weapon"], upgrade_blink_ms = 300)
+                    self.reload_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*2), _bars_size), max_value = self.attributes_max["reload_speed"], value = _reload_speed, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.reload_bar.value = _reload_speed
                     
                 if self.range_bar == None:
-                    self.range_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.attributes_max["range"], value = _range, **constants.ATTRIBUTE_BARS["weapon"], upgrade_blink_ms = 300)
+                    self.range_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.attributes_max["range"], value = _range, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.range_bar.value = _range
+                    
+                if self.magazine_bar == None:
+                    self.magazine_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*4), _bars_size), max_value = self.attributes_max["magazine_size"], value = _magazine_size, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.magazine_bar.value = _magazine_size
                     
                 _dispersion = weapon.dispersion if weapon.bullet_type == enums.BulletType.SHOTGUN else 0
                     
                 if self.dispersion_bar == None:
-                    self.dispersion_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*4), _bars_size), max_value = self.attributes_max["dispersion"], value = _dispersion, **constants.ATTRIBUTE_BARS["weapon"], upgrade_blink_ms = 300)
+                    self.dispersion_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["dispersion"], value = _dispersion, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.dispersion_bar.value = _dispersion
+
+                    
                         
                 
 
@@ -399,32 +410,39 @@ class Inventory:
                 _txt_damage_rect.left = _bar_pos.x
                 
                 
-                _txt_firerate = menu_controller.get_text_surface("Fire rate:", colors.WHITE, resources.px_font(25))
+                _txt_firerate = menu_controller.get_text_surface("Fire rate:", colors.WHITE if self.firerate_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
                 _txt_firerate_rect = _txt_firerate.get_rect()
                 _txt_firerate_rect.centery = self.firerate_bar.rect.centery
                 _txt_firerate_rect.left = _bar_pos.x
                 
-                _txt_reload_speed = menu_controller.get_text_surface("Reload speed:", colors.WHITE, resources.px_font(25))
+                _txt_reload_speed = menu_controller.get_text_surface("Reload speed:", colors.WHITE if self.reload_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
                 _txt_reload_speed_rect = _txt_reload_speed.get_rect()
                 _txt_reload_speed_rect.centery = self.reload_bar.rect.centery
                 _txt_reload_speed_rect.left = _bar_pos.x
                 
-                _txt_range = menu_controller.get_text_surface("Range:", colors.WHITE, resources.px_font(25))
+                _txt_range = menu_controller.get_text_surface("Range:", colors.WHITE if self.range_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
                 _txt_range_rect = _txt_range.get_rect()
                 _txt_range_rect.centery = self.range_bar.rect.centery
                 _txt_range_rect.left = _bar_pos.x
                 
-                _txt_dispersion = menu_controller.get_text_surface("Dispersion:", colors.WHITE, resources.px_font(25))
+                _txt_magazine = menu_controller.get_text_surface("Magazine size:", colors.WHITE if self.magazine_bar.value > 1 else colors.DARK_GRAY, resources.px_font(25))
+                _txt_magazine_rect = _txt_magazine.get_rect()
+                _txt_magazine_rect.centery = self.magazine_bar.rect.centery
+                _txt_magazine_rect.left = _bar_pos.x
+                
+                _txt_dispersion = menu_controller.get_text_surface("Dispersion:", colors.WHITE if self.dispersion_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
                 _txt_dispersion_rect = _txt_dispersion.get_rect()
                 _txt_dispersion_rect.centery = self.dispersion_bar.rect.centery
                 _txt_dispersion_rect.left = _bar_pos.x
+
                 
                 _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect]])
-                _txt_left = _txt_damage_rect.left + _max_txt_width + _bars_margin
+                _txt_left = _txt_damage_rect.left + _max_txt_width + _bars_margin + 10
                 self.damage_bar.rect.left = _txt_left
                 self.firerate_bar.rect.left = _txt_left
                 self.reload_bar.rect.left = _txt_left
                 self.range_bar.rect.left = _txt_left
+                self.magazine_bar.rect.left = _txt_left
                 self.dispersion_bar.rect.left = _txt_left
                 
                 _attribute_bars = {
@@ -432,8 +450,15 @@ class Inventory:
                     "firerate": self.firerate_bar,
                     "reload_speed": self.reload_bar,
                     "range": self.range_bar,
-                    "dispersion": self.dispersion_bar,
+                    "magazine_size": self.magazine_bar,
+                    "dispersion": self.dispersion_bar
                 }
+                
+                for b in _attribute_bars.values():
+                    if b.value == 0:
+                        b.bar_border_color = colors.DARK_GRAY
+                    else:
+                        b.bar_border_color = b.start_bar_border_color
                 
                 _weapon_upgrades = constants.get_weapon_upgrade(self.selected_card.weapon_type)
                 if _weapon_upgrades != None:
@@ -522,8 +547,13 @@ class Inventory:
                 self.range_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_range, _txt_range_rect)
 
+                self.magazine_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_magazine, _txt_magazine_rect)
+
+                #optionals
                 self.dispersion_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_dispersion, _txt_dispersion_rect)
+
         else:
             for b in _upgrade_btns:
                 b.visible = False
@@ -626,6 +656,12 @@ class Inventory:
         
         #primary cannot fit in secondary slot
         if (w1!=None and w1.is_primary) or (w2!=None and w2.is_primary):
+            _pop_dict = constants.POPUPS["error"].copy()
+            _pop_dict.pop("font")
+            _popup = Popup(f"Can only swap secondaries!", self.buttons[2].rect.topleft, name="primary_2_error", unique=True, **_pop_dict, font = resources.px_font(15))
+            _popup.rect.centerx = self.buttons[2].rect.centerx
+            _popup.rect.bottom = self.buttons[2].rect.top
+            menu_controller.popup(_popup)
             return
         
         bkp.equipped_primary = w2.weapon_type if w2 != None else None

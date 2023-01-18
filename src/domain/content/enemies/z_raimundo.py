@@ -222,7 +222,7 @@ class ZRaimundo(Enemy):
             self.death_frame = 0
         else:
             self.image = game_controller.scale_image(self.get_death_frames()[int(self.death_frame)], self.image_scale)
-        if self.acceleration.x > 0 and self.death_time == None:
+        if self.dir.x > 0 and self.death_time == None:
             self.image = pygame.transform.flip(self.image, True, False)
             
     def helmet_anim(self, speed: float):

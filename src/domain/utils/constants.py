@@ -452,6 +452,15 @@ POPUPS = {
         "padding": vec(500, 10),
         "font": resources.px_font(80)
     },
+    "wave_message": {
+        "timeout_ms": 2500,
+        "fade_in_ms": 300,
+        "fade_out_ms": 1000,
+        "text_color": colors.YELLOW,
+        "background_color": colors.set_alpha(colors.BLACK, 180),
+        "padding": vec(500, 10),
+        "font": resources.px_font(25)
+    },
     "game_over": {
         "fade_in_ms": 1500,
         "text_color": colors.RED,
@@ -462,67 +471,69 @@ POPUPS = {
 ATTRIBUTE_BARS = {
     "weapon": {
         "bars_count": 13,
-        "bar_fill_color": colors.LIGHT_BLUE
+        "bar_fill_color": colors.LIGHT_BLUE,
+        "upgrade_blink_ms": 300
     }
 }
 
 WAVES = {
-        1: {
-           "wave_number": 1,
-            "wave_type": enums.WaveType.BOSS,
-            "max_alive_enemies": 10,
-            "timed_spawn_count": 10,
-            "spawn_timer_ms": 7000, 
-            "wave_interval_s": 60,
-            "start_delay_ms": 1500,
-            "end_delay_ms": 2000,
-            "enemies":[
-                {
-                    "type": enums.Enemies.Z_RUI,
-                    "count": 1,
-                    "movement_speed": 0.08,
-                    "health": 500,
-                    "damage": 40
-                },
-                {
-                    "type": enums.Enemies.Z_ROGER,
-                    "count": 1,
-                    "movement_speed": 0.12,
-                    "health": 28,
-                    "damage": 15
-                },
-                {
-                    "type": enums.Enemies.Z_RONALDO,
-                    "count": 1,
-                    "movement_speed": 0.1,
-                    "health": 24,
-                    "damage": 20
-                },
-                {
-                    "type": enums.Enemies.Z_ROBERT,
-                    "count": 1,
-                    "movement_speed": 1,
-                    "health": 18,
-                    "damage": 24
-                },
-                {
-                    "type": enums.Enemies.Z_RAVEN,
-                    "count": 1,
-                    "movement_speed": 0.5,
-                    "health": 1,
-                    "damage": 5
-                },
-                {
-                    "type": enums.Enemies.Z_RAIMUNDO,
-                    "count": 1,
-                    "movement_speed": 0.1,
-                    "health": 35,
-                    "damage": 18
-                },
+    #     1: {
+    #        "wave_number": 1,
+    #         "wave_type": enums.WaveType.BOSS,
+    #         "wave_message": "Rui is comming!",
+    #         "max_alive_enemies": 10,
+    #         "timed_spawn_count": 10,
+    #         "spawn_timer_ms": 7000, 
+    #         "wave_interval_s": 60,
+    #         "start_delay_ms": 1500,
+    #         "end_delay_ms": 2000,
+    #         "enemies":[
+    #             {
+    #                 "type": enums.Enemies.Z_RUI,
+    #                 "count": 1,
+    #                 "movement_speed": 0.08,
+    #                 "health": 500,
+    #                 "damage": 40
+    #             },
+    #             {
+    #                 "type": enums.Enemies.Z_ROGER,
+    #                 "count": 1,
+    #                 "movement_speed": 0.12,
+    #                 "health": 28,
+    #                 "damage": 15
+    #             },
+    #             {
+    #                 "type": enums.Enemies.Z_RONALDO,
+    #                 "count": 1,
+    #                 "movement_speed": 0.1,
+    #                 "health": 24,
+    #                 "damage": 20
+    #             },
+    #             {
+    #                 "type": enums.Enemies.Z_ROBERT,
+    #                 "count": 1,
+    #                 "movement_speed": 1,
+    #                 "health": 18,
+    #                 "damage": 24
+    #             },
+    #             {
+    #                 "type": enums.Enemies.Z_RAVEN,
+    #                 "count": 1,
+    #                 "movement_speed": 0.5,
+    #                 "health": 1,
+    #                 "damage": 5
+    #             },
+    #             {
+    #                 "type": enums.Enemies.Z_RAIMUNDO,
+    #                 "count": 1,
+    #                 "movement_speed": 0.1,
+    #                 "health": 35,
+    #                 "damage": 18
+    #             },
 
-            ]
-        },
-    }
+    #         ]
+    #     },
+    # }
 
 #     1: {
 #         "wave_number": 1,
@@ -534,7 +545,7 @@ WAVES = {
 #         "end_delay_ms": 0,
 #         "enemies": [
 #             {
-#                 "type": enums.Enemies.Z_RAVEN,
+#                 "type": enums.Enemies.Z_RONALDO,
 #                 "count": 10,
 #                 "movement_speed": 0.1,
 #                 "health": 28,

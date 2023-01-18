@@ -36,6 +36,7 @@ class Wave():
         self.game = game
         self.wave_number = kwargs.pop("wave_number",0)
         self.wave_type = kwargs.pop("wave_type", enums.WaveType.SIMPLE)
+        self.wave_message = kwargs.pop("wave_message", "")
         self.enemies_current_id = 0
         self.enemies_group = pygame.sprite.Group()
         self.enemies_hitbox_group = pygame.sprite.Group()
@@ -91,7 +92,15 @@ class Wave():
         
         if self.game.client_type == enums.ClientType.SINGLE:
             self.money_multiplier = 1
-        # menu_controller.popup(Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"]), center = True)
+            
+        title_popup = Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"])
+        menu_controller.popup(title_popup, center = True)
+        
+        if len(self.wave_message) > 0:
+            message_popup = Popup(self.wave_message, vec(0,0), **constants.POPUPS["wave_message"])
+            message_popup.rect.centerx = title_popup.rect.centerx
+            message_popup.rect.top = title_popup.rect.bottom + 5
+            menu_controller.popup(message_popup)
 
     def load_resources(self):
         self.assets_manager.load_resources()

@@ -78,8 +78,7 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.P_93R)
-        self.add_weapon(enums.Weapons.SCAR)
+        self.add_weapon(enums.Weapons.MACHETE)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
