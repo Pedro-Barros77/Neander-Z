@@ -273,6 +273,37 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.reload_start_sound_burst.set_volume(0.3)
             w.reload_end_sound.set_volume(0.4)
 
+        case enums.Weapons.SCAR:
+            w = FullAuto(pos,
+                         bullet_type=enums.BulletType.ASSAULT_RIFLE,
+                         weapon_type=weapon,
+                         is_primary=True,
+                         fire_mode=enums.FireMode.FULL_AUTO,
+                         reload_type=enums.ReloadType.MAGAZINE,
+                         upgrades_dict=get_weapon_upgrade(weapon),
+                         display_name="SCAR-L",
+                         weapon_switch_ms=350,
+                         damage=10,
+                         bullet_speed=30,
+                         fire_rate=7,
+                         reload_delay_ms=1200,
+                         magazine_size=30,
+                         bullet_max_range=800,
+                         bullet_min_range=650,
+                         reload_end_frame=9,
+                         reload_speed_multiplier=4,
+                         barrel_offset=vec(0, 7),
+                         weapon_scale=1,
+                         store_scale=1.8
+                         )
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 20, 0)
+            for s in w.shoot_sounds:
+                s.set_volume(0.3)
+
+            w.empty_sound.set_volume(0.1)
+            w.reload_start_sound.set_volume(0.3)
+            w.reload_end_sound.set_volume(0.3)
+        
     w.weapon_anchor = kwargs.pop("weapon_anchor", vec(0, 0))
     w.weapon_distance = kwargs.pop("weapon_distance", 0)
     w.player_backpack = kwargs.pop("backpack", None)
@@ -439,8 +470,8 @@ WAVES = {
         1: {
            "wave_number": 1,
             "wave_type": enums.WaveType.BOSS,
-            "max_alive_enemies": 20,
-            "timed_spawn_count": 20,
+            "max_alive_enemies": 10,
+            "timed_spawn_count": 10,
             "spawn_timer_ms": 7000, 
             "wave_interval_s": 60,
             "start_delay_ms": 1500,

@@ -622,8 +622,8 @@ class Game(Page):
             self.restart_game()
 
         if self.player.pos.y > self.map.rect.height:
-            self.player.pos.y = 0
-            self.player.update_rect()
+            self.player.rect.bottom = self.map.rect.bottom - self.map.floor_y
+            self.player.pos = vec(self.player.rect.topleft)
             
         for enemy in self.current_wave.enemies_group.sprites():
             if enemy.rect.top > self.map.rect.height:

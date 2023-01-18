@@ -43,6 +43,7 @@ class Weapons(Enum):
     RPG = 'launchers\\rpg'
     SV98 = 'snipers\\sv98'
     M16 = 'rifles\\m16'
+    SCAR = 'rifles\\scar'
     
 class AnimActions(Enum):
     #players/enemies

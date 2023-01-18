@@ -48,6 +48,7 @@ class Store:
             "93r": "tags:Burst-fire, small-damage\nThe Beretta 93R is like a party in\nyour hand, except the party\nguests are zombies and the music\nis the sound of their brains\nsplattering everywhere.",
             "m16": "tags:Burst-fire, medium-damage\nThe sharpshooter's best friend.\nThis rifle will take out hordes of\nzombies with precision and control.\nMake sure every shot counts to\nsave your ammo for real threats.",
             "sv98": "tags:Collateral-damage, high-damage\nFor when you want to take out\nthe undead from a safe distance\nand give them a headache they\nwon't recover from.",
+            "scar": "tags:Auto-fire, high-damage\nWhen the zombies come knocking,\nyou don't wanna be caught holding\na peashooter. This bad boy packs\na serious punch and will make\nmincemeat out of all of them.",
             "rpg": "tags:Area-damage, high-damage\nThis bad boy is guaranteed to blow\nthose brain-hungry back to the\ngrave! Send chunks of zombie\nflying in the air! But One wrong\nmove and you'll join 'em yourself!",
             
             "first_aid_kit": "tags:Restores your health partially.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
@@ -98,6 +99,7 @@ class Store:
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93R, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.5, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93R, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.M16, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "M16", item_name = "m16", price = 800, icon_scale = 2, store_icon_scale = 1.7, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.M16, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SV98", item_name = "sv98", price = 900, icon_scale = 2.3, store_icon_scale = 1.1, bullet_type = enums.BulletType.SNIPER, weapon_type = enums.Weapons.SV98, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.SCAR, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SCAR-L", item_name = "scar", price = 1000, icon_scale = 1.9, store_icon_scale = 1.1, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.SCAR, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
