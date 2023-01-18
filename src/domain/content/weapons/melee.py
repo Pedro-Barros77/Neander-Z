@@ -116,9 +116,10 @@ class Melee(Weapon):
         
         self.hits_count += 1
         
-        collided = self.melee_collision()
+        collided, play_sound = self.melee_collision()
         
-        self.attack_sound(collided)
+        if play_sound or not collided:
+            self.attack_sound(collided)
         
         return collided
             
@@ -131,7 +132,12 @@ class Melee(Weapon):
                     c.owner.wave.players_scores[1].bullets_shot += self.hits_count
                     c.owner.wave.players_scores[1].bullets_hit += 1
                     self.hits_count = 0
-                return True
-        return False
+                    _play_sound = True
+                    
+                    if c.name == "zombie_head" and c.owner.enemy_name == enums.Enemies.Z_RAIMUNDO and c.owner.helmet_stage < 3:
+                        _play_sound = False
+                    
+                return True, _play_sound
+        return False, False
             
     

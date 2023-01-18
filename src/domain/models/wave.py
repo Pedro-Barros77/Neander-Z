@@ -13,6 +13,7 @@ from domain.content.enemies.z_robert import ZRobert
 from domain.content.enemies.z_ronaldo import ZRonaldo
 from domain.content.enemies.z_rui import ZRui
 from domain.content.enemies.z_raven import ZRaven  
+from domain.content.enemies.z_raimundo import ZRaimundo  
  
 
 class Wave():
@@ -73,6 +74,8 @@ class Wave():
                 enemy = ZRui(pos, self, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RAVEN:
                 enemy = ZRaven(pos, self, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_RAIMUNDO:
+                enemy = ZRaimundo(pos, self, **enemy_dict, id = self.get_id())
         
         return enemy
 

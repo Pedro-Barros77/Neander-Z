@@ -72,7 +72,6 @@ class ZRonaldo(Enemy):
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
             
-        
         # if self.hit_rectangle != None:
         #     self.hit_rectangle.draw(surface, offset)
         
