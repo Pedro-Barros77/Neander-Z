@@ -46,7 +46,7 @@ class Wave():
         self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
         self.wave_step = kwargs.pop("wave_step", 1)
         self.current_wave_step = kwargs.pop("current_wave_step", 0)
-        self.money_multiplier = kwargs.pop("money_multiplier", 1.8)
+        self.money_multiplier = kwargs.pop("money_multiplier", 1)
         self.wave_interval_s = kwargs.pop("wave_interval_s", 15)
         self.start_delay_ms = kwargs.pop("start_delay_ms", 2000)
         self.end_delay_ms = kwargs.pop("end_delay_ms", 1500)
@@ -78,7 +78,8 @@ class Wave():
         
         if datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
             return
-            
+
+        print(self.money_multiplier) 
         self.enemies_count = len(self.enemies_group.sprites())
     
         if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:
@@ -93,8 +94,6 @@ class Wave():
         thread = threading.Thread(target=self.load_resources)
         thread.start()
         
-        if self.game.client_type == enums.ClientType.SINGLE:
-            self.money_multiplier = 1
             
         title_popup = Popup(f"Wave {self.wave_number}", vec(0,0), **constants.POPUPS["wave_title"])
         menu_controller.popup(title_popup, center = True)

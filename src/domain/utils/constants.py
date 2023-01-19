@@ -565,6 +565,7 @@ WAVES = {
         "wave_interval_s": 60,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -584,6 +585,7 @@ WAVES = {
         "wave_interval_s": 60,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -603,6 +605,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -629,6 +632,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -662,6 +666,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -696,6 +701,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 0.8,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -737,6 +743,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 0.7,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -771,6 +778,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 0.7,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -812,6 +820,7 @@ WAVES = {
         "wave_interval_s": 30,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
+        "money_multiplier": 0.7,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
@@ -869,6 +878,7 @@ WAVES = {
         "spawn_timer_ms": 7000,
         "start_delay_ms": 2000,
         "end_delay_ms": 2500,
+        "money_multiplier": 1,
         "enemies": [
             {
                 "type": enums.Enemies.Z_RUI,
@@ -907,5 +917,395 @@ WAVES = {
             },
         ]
     },
+    11: {
+        "wave_number": 11,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 15,
+        "wave_step": 3,
+        "wave_message": "kill the remnants of the boss fight",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.2,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 26,
+                "movement_speed": 0.1,
+                "health": 32,
+                "damage": 16
+            },
+            
+        ]
+    },
+    12: {
+        "wave_number": 12,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.5,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 15,
+                "movement_speed": 0.12,
+                "health": 36,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 11,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 8,
+                "movement_speed": 0.14,
+                "afterlife_chance": 0.45,
+                "health": 26,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RAVEN,
+                "count": 6,
+                "movement_speed": 0.5,
+                "health": 1,
+                "damage": 5
+            },
+        ]
+    },
+    13: {
+        "wave_number": 13,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.6,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 15,
+                "movement_speed": 0.12,
+                "health": 36,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 11,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 8,
+                "movement_speed": 0.14,
+                "afterlife_chance": 0.45,
+                "health": 26,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 7,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 24
+            },
+        ]
+    },
+    14: {
+        "wave_number": 14,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.6,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 15,
+                "movement_speed": 0.12,
+                "health": 36,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 11,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 8,
+                "movement_speed": 0.14,
+                "afterlife_chance": 0.45,
+                "health": 26,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RAIMUNDO,
+                "count": 4,
+                "movement_speed": 0.09,
+                "health": 40,
+                "damage": 19
+            },
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 5,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 24
+            },
+            {
+                "type": enums.Enemies.Z_RAVEN,
+                "count": 3,
+                "movement_speed": 0.5,
+                "health": 1,
+                "damage": 5
+            },
+        ]
+    },
+    15: {
+        "wave_number": 15,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.6,
+        "enemies": [
+        
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 18,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 12,
+                "movement_speed": 0.14,
+                "afterlife_chance": 0.45,
+                "health": 26,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RAIMUNDO,
+                "count": 4,
+                "movement_speed": 0.09,
+                "health": 40,
+                "damage": 19
+            },
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 5,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 24
+            },
+           
+        ]
+    },
+    16: {
+        "wave_number": 16,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 20,
+        "wave_step": 2,
+        "wave_message": "Hope you've saved money so far",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.5,
+        "enemies": [
+        
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 5,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 3,
+                "movement_speed": 0.14,
+                "afterlife_chance": 0.45,
+                "health": 26,
+                "damage": 18
+            },
+            {
+                "type": enums.Enemies.Z_RAIMUNDO,
+                "count": 18,
+                "movement_speed": 0.09,
+                "health": 40,
+                "damage": 19
+            },
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 2,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 24
+            },
+           
+        ]
+    },
+    17: {
+        "wave_number": 17,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "Look who's back, but more evolved",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.5,
+        "enemies": [
+             {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 10,
+                "movement_speed": 0.15,
+                "health": 40,
+                "damage": 18
+            },
+        
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 18,
+                "movement_speed": 0.1,
+                "health": 28,
+                "damage": 22
+            },
+            
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 3,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 24
+            },
+             {
+                "type": enums.Enemies.Z_RAVEN,
+                "count": 8,
+                "movement_speed": 0.5,
+                "health": 1,
+                "damage": 5
+            },
+           
+        ]
+    },
+    18: {
+        "wave_number": 18,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 8,
+        "wave_step": 3,
+        "wave_message": "demon",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.4,
+        "enemies": [
+        
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 25,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 28
+            },
+           
+        ]
+    },
+    19: {
+        "wave_number": 19,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 16,
+        "wave_step": 3,
+        "wave_message": "",
+        "wave_interval_s": 30,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 1000,
+        "money_multiplier": 0.4,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_ROGER,
+                "count": 10,
+                "movement_speed": 0.15,
+                "health": 40,
+                "damage": 18
+            },        
+            {
+                "type": enums.Enemies.Z_RAIMUNDO,
+                "count": 6,
+                "movement_speed": 0.09,
+                "health": 45,
+                "damage": 20
+            },
+            
+           
+        ]
+    },
+    20: {
+        "wave_number": 20,
+        "wave_type": enums.WaveType.BOSS,
+        "max_alive_enemies": 13,
+        "wave_step": 3,
+        "wave_message": "RUI RETURNED AND BRING HIS TWIN BROTHER WITH HIM!",
+        "wave_interval_s": 30,
+        "timed_spawn_count": 5,
+        "spawn_timer_ms": 7000,
+        "start_delay_ms": 2000,
+        "end_delay_ms": 2500,
+        "money_multiplier": 1.2,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_RUI,
+                "count": 2,
+                "movement_speed": 0.08,
+                "health": 750,
+                "damage": 40
+            },
+            
+            
+            {
+                "type": enums.Enemies.Z_RAIMUNDO,
+                "count": 1,
+                "movement_speed": 0.09,
+                "health": 45,
+                "damage": 20
+            },
+            {
+                "type": enums.Enemies.Z_ROBERT,
+                "count": 2,
+                "movement_speed": 1,
+                "health": 18,
+                "damage": 28
+            },
+            {
+                "type": enums.Enemies.Z_RAVEN,
+                "count": 1,
+                "movement_speed": 0.5,
+                "health": 1,
+                "damage": 5
+            },
+        ]
+    },
+
     
 }
