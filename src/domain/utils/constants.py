@@ -287,7 +287,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          bullet_speed=30,
                          fire_rate=7,
                          reload_delay_ms=1200,
-                         magazine_size=30,
+                         magazine_size=25,
                          bullet_max_range=800,
                          bullet_min_range=650,
                          reload_end_frame=9,
@@ -318,6 +318,37 @@ def get_weapon_upgrade(weapon_type: enums.Weapons):
     else:
         return None
 
+ITEMS_UPGRADES = {
+    "backpack":[
+        {
+            "id": 1,
+            "max_pistol_ammo": 10,
+            "max_shotgun_ammo": 5,
+            "max_rifle_ammo": 10,
+            "max_sniper_ammo": 0,
+            "max_rocket_ammo": 1,
+            "price": 150.00
+        },
+        {
+            "id": 2,
+            "max_pistol_ammo": 10,
+            "max_shotgun_ammo": 10,
+            "max_rifle_ammo": 10,
+            "max_sniper_ammo": 5,
+            "max_rocket_ammo": 1,
+            "price": 350.00
+        },
+        {
+            "id": 3,
+            "max_pistol_ammo": 20,
+            "max_shotgun_ammo": 10,
+            "max_rifle_ammo": 20,
+            "max_sniper_ammo": 5,
+            "max_rocket_ammo": 1,
+            "price": 500.00
+        },
+    ]
+}
 
 WEAPONS_UPGRADES = {
     enums.Weapons.MACHETE: {
@@ -559,12 +590,12 @@ WAVES = {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,
-        "max_alive_enemies": 5,
+        "max_alive_enemies": 10,
         "wave_step": 3,
         "wave_message": "And so it begins...",
-        "wave_interval_s": 60,
-        "start_delay_ms": 2000,
-        "end_delay_ms": 1000,
+        "wave_interval_s": 6000,
+        "start_delay_ms": 0,
+        "end_delay_ms": 0,
         "enemies": [
             {
                 "type": enums.Enemies.Z_ROGER,
