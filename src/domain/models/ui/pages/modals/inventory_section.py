@@ -40,7 +40,7 @@ class Inventory:
             "firerate": 15,
             "reload_speed": 10,
             "range": 1000,
-            "dispersion": 90,
+            "concentration": 12,
             "magazine_size": 50
         })
         
@@ -49,7 +49,7 @@ class Inventory:
         self.reload_bar = None
         self.range_bar = None
         self.magazine_bar = None
-        self.dispersion_bar = None
+        self.concentration_bar = None
         
         self.load_inventory()
         
@@ -365,6 +365,7 @@ class Inventory:
                 _bars_size = vec(pnl_right_rect.width/2,15)
                 
                 _reload_speed = 0
+                _concentration = 0
                 _damage = weapon.damage
                 _range = (weapon.bullet_min_range + weapon.bullet_max_range)/2
                 _firerate = weapon.fire_rate
@@ -387,6 +388,7 @@ class Inventory:
                                             
                 if weapon.bullet_type == enums.BulletType.SHOTGUN and weapon.ballin_count != None:
                     _damage = weapon.damage * weapon.ballin_count
+                    _concentration = 90 / weapon.dispersion
             
             
                 if self.damage_bar == None:
@@ -414,12 +416,10 @@ class Inventory:
                 else:
                     self.magazine_bar.value = _magazine_size
                     
-                _dispersion = weapon.dispersion if weapon.bullet_type == enums.BulletType.SHOTGUN else 0
-                    
-                if self.dispersion_bar == None:
-                    self.dispersion_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["dispersion"], value = _dispersion, **constants.ATTRIBUTE_BARS["weapon"])
+                if self.concentration_bar == None:
+                    self.concentration_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["concentration"], value = _concentration, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
-                    self.dispersion_bar.value = _dispersion
+                    self.concentration_bar.value = _concentration
 
                     
                         
@@ -452,10 +452,10 @@ class Inventory:
                 _txt_magazine_rect.centery = self.magazine_bar.rect.centery
                 _txt_magazine_rect.left = _bar_pos.x
                 
-                _txt_dispersion = menu_controller.get_text_surface("Dispersion:", colors.WHITE if self.dispersion_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
-                _txt_dispersion_rect = _txt_dispersion.get_rect()
-                _txt_dispersion_rect.centery = self.dispersion_bar.rect.centery
-                _txt_dispersion_rect.left = _bar_pos.x
+                _txt_concentration = menu_controller.get_text_surface("Concentration:", colors.WHITE if self.concentration_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
+                _txt_concentration_rect = _txt_concentration.get_rect()
+                _txt_concentration_rect.centery = self.concentration_bar.rect.centery
+                _txt_concentration_rect.left = _bar_pos.x
 
                 
                 _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect]])
@@ -465,7 +465,7 @@ class Inventory:
                 self.reload_bar.rect.left = _txt_left
                 self.range_bar.rect.left = _txt_left
                 self.magazine_bar.rect.left = _txt_left
-                self.dispersion_bar.rect.left = _txt_left
+                self.concentration_bar.rect.left = _txt_left
                 
                 _attribute_bars = {
                     "damage": self.damage_bar,
@@ -473,7 +473,7 @@ class Inventory:
                     "reload_speed": self.reload_bar,
                     "range": self.range_bar,
                     "magazine_size": self.magazine_bar,
-                    "dispersion": self.dispersion_bar
+                    "concentration": self.concentration_bar
                 }
                 
                 for b in _attribute_bars.values():
@@ -500,10 +500,10 @@ class Inventory:
                         _btn_upgrade.on_click = lambda attr_name = key: self.buy_upgrade(self.selected_card.weapon_type, attr_name)
                         _upgrade_map_index = math.clamp(weapon.upgrades_map[key], 0, len(value)) if weapon.upgrades_map != None else 0
                         _has_upgrade = weapon.upgrades_map == None or _upgrade_map_index < len(value)
-                        _has_money = self.player.money >= value[_upgrade_map_index-1]["price"]
+                        _has_money = _has_upgrade and self.player.money >= value[_upgrade_map_index]["price"]
                         _btn_upgrade.enable(_has_upgrade and _has_money)
                         
-                        
+
                         def btn_upgrade_hover(btn: Button, upgrade_steps = value, bar = _bar, key = key):
                             btn.default_on_hover(btn)
                             if btn.hovered:
@@ -511,9 +511,9 @@ class Inventory:
                                     case "range":
                                         _step = self.range_bar.max_value / self.range_bar.bars_count
                                         bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])/2
-                                    case "dispersion":
-                                        _step = self.dispersion_bar.max_value / self.dispersion_bar.bars_count
-                                        bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])/2
+                                    case "concentration":
+                                        _step = self.concentration_bar.max_value / self.concentration_bar.bars_count
+                                        bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])
                                     case _:
                                         bar.upgrade_value = upgrade_steps[0]["ammount"]
                                 bar.rerender()
@@ -573,8 +573,8 @@ class Inventory:
                 pnl_right.blit(_txt_magazine, _txt_magazine_rect)
 
                 #optionals
-                self.dispersion_bar.draw(pnl_right, vec(0,0))
-                pnl_right.blit(_txt_dispersion, _txt_dispersion_rect)
+                self.concentration_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_concentration, _txt_concentration_rect)
                 
             if self.selected_card.item_name == "backpack":
                 _txt_item_title = menu_controller.get_text_surface("Backpack", colors.WHITE, resources.px_font(40))
@@ -605,8 +605,6 @@ class Inventory:
                     _rifle_ratio = max(self.rifle_ammo_icon.get_size()) / _max_size
                     _sniper_ratio = max(self.sniper_ammo_icon.get_size()) / _max_size
                     _rocket_ratio = max(self.rocket_ammo_icon.get_size()) / _max_size
-                    
-                    print(_pistol_ratio, _shotgun_ratio, _rifle_ratio, _sniper_ratio, _rocket_ratio)
                     
                     self.pistol_ammo_icon = game_controller.scale_image(self.pistol_ammo_icon, (1 / _pistol_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
                     self.shotgun_ammo_icon = game_controller.scale_image(self.shotgun_ammo_icon, (1 / _shotgun_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
@@ -831,12 +829,12 @@ class Inventory:
             for key in weapon.upgrades_map.keys():
                 weapon.upgrades_map[key] = 0
                 
-        price = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["price"]
+        price = attributes_dict[attr_name][weapon.upgrades_map[attr_name]]["price"]
         
         if price > self.player.money:
             return
         
-        ammount = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["ammount"]
+        ammount = attributes_dict[attr_name][weapon.upgrades_map[attr_name]]["ammount"]
         weapon.upgrades_map[attr_name] += 1
         
         self.purchase_sound.play()
@@ -866,9 +864,10 @@ class Inventory:
                 
                 weapon.bullet_min_range += _step * ammount/2
                 weapon.bullet_max_range += _step * ammount/2
-            case "dispersion":
-                _step = self.dispersion_bar.max_value / self.dispersion_bar.bars_count
-                weapon.dispersion -= _step * ammount
+            case "concentration":
+                weapon.dispersion = 90 / (self.concentration_bar.value + ammount)
+            case "magazine_size":
+                weapon.magazine_size += ammount
                 
     def swap_weapon_slots(self):
         bkp = self.player.backpack

@@ -56,7 +56,6 @@ class ZRonald(Enemy):
         if not self.is_alive and self.death_time != None and self.check_spawn_ronaldo:
             self.check_spawn_ronaldo = False
             _rand_value = random.random()
-            print(_rand_value, self.afterlife_chance)
             if _rand_value < self.afterlife_chance:
                 _enemy = ZRonaldo(vec(self.rect.topleft), self.wave, self.assets_manager,
                         damage = self.damage,
