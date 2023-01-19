@@ -25,7 +25,7 @@ class ZRaimundo(Enemy):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
-        self.last_dir = self.dir.copy()
+        self.last_frame_dir = self.dir.copy()
         self.attack_distance = kwargs.pop("attack_distance", 30)
         self.hit_frame = 8
         self.hiting = False

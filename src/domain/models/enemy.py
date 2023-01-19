@@ -21,8 +21,9 @@ class Enemy(pygame.sprite.Sprite):
         self.damage = 1
         self.enemy_name = enemy_name
         self.image_scale = kwargs.pop("image_scale", 1)
-        self.movement_speed = kwargs.pop("movement_speed", 5)
+        self.movement_speed = kwargs.pop("movement_speed", 0.1)
         self.health = kwargs.pop("health", 30)
+        self.start_health = self.health
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.attack_targets = game_controller.enemy_target_groups
         self.client_type = enums.ClientType.UNDEFINED
@@ -40,7 +41,7 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = vec(0,0)
         self.acceleration: vec = vec(0,0)
         self.dir: vec = vec(0,0)
-        self.last_dir: vec = self.dir.copy()
+        self.last_frame_dir: vec = self.dir.copy()
         self.grounded = False
         
         self.is_alive = True
@@ -101,9 +102,9 @@ class Enemy(pygame.sprite.Sprite):
         def flip():
             self.image = pygame.transform.flip(self.image, True, False)
             
-        if self.last_dir.x > self.dir.x:
+        if self.last_frame_dir.x > self.dir.x:
             flip()
-        if self.last_dir.x < self.dir.x:
+        if self.last_frame_dir.x < self.dir.x:
             flip()
             
         if abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top:
@@ -121,17 +122,17 @@ class Enemy(pygame.sprite.Sprite):
         
         def flip():
             self.image = pygame.transform.flip(self.image, True, False)
-            self.last_dir = self.dir.copy()
+            self.last_frame_dir = self.dir.copy()
             self.speed.x = 0
         
         
         if player_center.x < self.rect.centerx - self.image_flip_margin:
             self.dir.x = -1
-            if self.last_dir.x > self.dir.x:
+            if self.last_frame_dir.x > self.dir.x:
                 flip()
         elif player_center.x > self.rect.centerx + self.image_flip_margin:
             self.dir.x = 1
-            if self.last_dir.x < self.dir.x:
+            if self.last_frame_dir.x < self.dir.x:
                 flip()
         else:
             self.dir.x = 0

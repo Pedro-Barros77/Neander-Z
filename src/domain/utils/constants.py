@@ -535,25 +535,25 @@ WAVES = {
     #     },
     # }
 
-#     1: {
-#         "wave_number": 1,
-#         "wave_type": enums.WaveType.SIMPLE,
-#         "max_alive_enemies": 10,
-#         "wave_step": 1,
-#         "wave_interval_s": 6000,
-#         "start_delay_ms": 0,
-#         "end_delay_ms": 0,
-#         "enemies": [
-#             {
-#                 "type": enums.Enemies.Z_RONALDO,
-#                 "count": 10,
-#                 "movement_speed": 0.1,
-#                 "health": 28,
-#                 "damage": 15
-#             }
-#         ]
-#     }
-# }
+    1: {
+        "wave_number": 1,
+        "wave_type": enums.WaveType.SIMPLE,
+        "max_alive_enemies": 1,
+        "wave_step": 1,
+        "wave_interval_s": 6000,
+        "start_delay_ms": 0,
+        "end_delay_ms": 0,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_RONALD,
+                "count": 10,
+                "movement_speed": 0.14,
+                "health": 28,
+                "damage": 15
+            }
+        ]
+    }
+}
 {
     1: {
         "wave_number": 1,

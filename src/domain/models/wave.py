@@ -14,6 +14,7 @@ from domain.content.enemies.z_ronaldo import ZRonaldo
 from domain.content.enemies.z_rui import ZRui
 from domain.content.enemies.z_raven import ZRaven  
 from domain.content.enemies.z_raimundo import ZRaimundo  
+from domain.content.enemies.z_ronald import ZRonald  
  
 
 class Wave():
@@ -30,6 +31,8 @@ class Wave():
             _type = _d.pop("type", enums.Enemies.Z_ROGER)
             if _type not in self.enemy_types:
                 self.enemy_types.append(_type)
+                if _type == enums.Enemies.Z_RONALD and enums.Enemies.Z_RONALDO not in self.enemy_types:
+                    self.enemy_types.append(enums.Enemies.Z_RONALDO)
             for _ in range(_count):
                 self.enemies.append(e.copy())
         
@@ -126,6 +129,8 @@ class Wave():
                 enemy = ZRaven(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
             case enums.Enemies.Z_RAIMUNDO:
                 enemy = ZRaimundo(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
+            case enums.Enemies.Z_RONALD:
+                enemy = ZRonald(pos, self, self.assets_manager, **enemy_dict, id = self.get_id())
         
         return enemy
 

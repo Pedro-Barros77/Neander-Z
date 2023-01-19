@@ -22,7 +22,7 @@ class ZRaven(Enemy):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
-        self.last_dir = self.dir.copy()
+        self.last_frame_dir = self.dir.copy()
         self.attack_distance = kwargs.pop("attack_distance", 30)
         self.dive_attack_distance = kwargs.pop("dive_attack_distance", 200)
         self.hit_frame = 7
@@ -100,7 +100,7 @@ class ZRaven(Enemy):
         
         def flip():
             self.image = pygame.transform.flip(self.image, True, False)
-            self.last_dir = self.dir.copy()
+            self.last_frame_dir = self.dir.copy()
             self.speed.x = 0
             
         
@@ -121,7 +121,7 @@ class ZRaven(Enemy):
                     if self.speed.x < _turn_margin:
                         self.dir.x = -1
                         self.hover_dir = -1
-                        if self.last_dir.x > self.dir.x:
+                        if self.last_frame_dir.x > self.dir.x:
                             self.changed_hover_dir = True
                             flip()
                     
@@ -131,7 +131,7 @@ class ZRaven(Enemy):
                     if self.speed.x > -_turn_margin:
                         self.dir.x = 1
                         self.hover_dir = 1
-                        if self.last_dir.x < self.dir.x:
+                        if self.last_frame_dir.x < self.dir.x:
                             self.changed_hover_dir = True
                             flip()
             
@@ -256,17 +256,17 @@ class ZRaven(Enemy):
         
         def flip():
             self.image = pygame.transform.flip(self.image, True, False)
-            self.last_dir = self.dir.copy()
+            self.last_frame_dir = self.dir.copy()
             self.speed.x = 0
         
         # flip
         if target.centerx < self.rect.centerx - self.image_flip_margin:
             self.dir.x = -1
-            if self.last_dir.x > self.dir.x:
+            if self.last_frame_dir.x > self.dir.x:
                 flip()
         elif target.centerx > self.rect.centerx + self.image_flip_margin:
             self.dir.x = 1
-            if self.last_dir.x < self.dir.x:
+            if self.last_frame_dir.x < self.dir.x:
                 flip()
         else:
             self.dir.x = 0

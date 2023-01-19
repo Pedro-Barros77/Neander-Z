@@ -40,6 +40,11 @@ class AssetsManager:
         self.z_raimundo_damage_sounds, self.z_raimundo_death_sounds, self.z_raimundo_attack_sounds, self.z_raimundo_helmet_bullet_sounds = None, None, None, None
         #endregion
         
+        #region z_roger
+        self.z_ronald_damage_sounds, self.z_ronald_death_sounds, self.z_ronald_attack_sounds = None, None, None
+        self.z_ronald_run_frames, self.z_ronald_attack_frames, self.z_ronald_death_frames = None, None, None
+        #endregion
+        
     
     def get_assets(self, enemy_type: enums.Enemies, attr_name: str):
         return getattr(self, f'{enemy_type.value}_{attr_name}')
@@ -60,6 +65,8 @@ class AssetsManager:
                     self.load_raimundo()
                 case enums.Enemies.Z_RAVEN:
                     self.load_raven()
+                case enums.Enemies.Z_RONALD:
+                    self.load_ronald()
         
         
     
@@ -167,4 +174,20 @@ class AssetsManager:
         self.z_raimundo_attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RAIMUNDO, enums.AnimActions.ATTACK), 0.2)
         self.z_raimundo_helmet_bullet_sounds = game_controller.load_sounds(f'{resources.SOUNDS_PATH}sound_effects\\enemies\\{str(enums.Enemies.Z_RAIMUNDO.value)}\\helmet_bullet_hit\\', 0.2)
         
-    
+    def load_ronald(self):
+        run_folder = resources.get_enemy_path(enums.Enemies.Z_RONALD, enums.AnimActions.RUN)
+        self.z_ronald_run_frames = game_controller.load_sprites(run_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        
+        attack_folder = resources.get_enemy_path(enums.Enemies.Z_RONALD, enums.AnimActions.ATTACK)
+        self.z_ronald_attack_frames = game_controller.load_sprites(attack_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        
+        death_folder = resources.get_enemy_path(enums.Enemies.Z_RONALD, enums.AnimActions.DEATH)
+        self.z_ronald_death_frames = game_controller.load_sprites(death_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        
+        self.z_ronald_damage_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALD, enums.AnimActions.TAKE_DAMAGE), 0.1)
+        self.z_ronald_death_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALD, enums.AnimActions.DEATH), 0.2)
+        self.z_ronald_attack_sounds = game_controller.load_sounds(resources.get_enemy_sfx(enums.Enemies.Z_RONALD, enums.AnimActions.ATTACK), 0.2)
+
+
+
+

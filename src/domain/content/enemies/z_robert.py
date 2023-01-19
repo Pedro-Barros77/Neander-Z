@@ -22,7 +22,7 @@ class ZRobert(Enemy):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
-        self.last_dir = self.dir.copy()
+        self.last_frame_dir = self.dir.copy()
         self.hit_frame = 8
         self.hiting = False
         self.attack_box = vec(50,30)

@@ -22,7 +22,7 @@ class ZRui(Enemy):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
-        self.last_dir = self.dir.copy()
+        self.last_frame_dir = self.dir.copy()
         self.attack_distance = kwargs.pop("attack_distance", self.rect.width/2.2 )
         self.attack_hit_frame = 10
         self.bump_hit_frame = 4
