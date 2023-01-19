@@ -2,6 +2,10 @@ from domain.utils import enums
 
 class BackPack:
     def __init__(self):
+        
+        self.upgrade_step: int = 0
+        """Upgrades that the player bought for the backpack."""
+        
         self.max_pistol_ammo = 50
         self.max_shotgun_ammo = 20
         self.max_rifle_ammo = 90

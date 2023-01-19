@@ -23,6 +23,37 @@ HOLD_TRIGGER_FIREMODES = [enums.FireMode.FULL_AUTO, enums.FireMode.MELEE]
 def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
     w: Weapon = None
     match weapon:
+        case enums.Weapons.MACHETE:
+            w = Melee(pos,
+                      bullet_type=enums.BulletType.MELEE,
+                      weapon_type=weapon,
+                      is_primary=False,
+                      fire_mode=enums.FireMode.MELEE,
+                      reload_type=enums.ReloadType.NO_RELOAD,
+                      upgrades_dict=get_weapon_upgrade(weapon),
+                      display_name="Machete",
+                      weapon_switch_ms=150,
+                      damage=3,
+                      bullet_speed=0,
+                      fire_rate=2,
+                      reload_delay_ms=0,
+                      magazine_size=0,
+                      bullet_max_range=1,
+                      bullet_min_range=1,
+                      reload_end_frame=0,
+                      barrel_offset=vec(0, 0),
+                      hit_frame=8,
+                      attack_box=vec(50, 20),
+                      weapon_scale=0.08,
+                      store_scale=0.2,
+                      )
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 30, 0)
+            for s in w.swipe_sounds:
+                s.set_volume(0.5)
+
+            for h in w.hit_sounds:
+                h.set_volume(0.5)
+                
         case enums.Weapons.P_1911:
             w = SemiAuto(pos,
                          bullet_type=enums.BulletType.PISTOL,
@@ -113,62 +144,31 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.reload_start_sound.set_volume(0.3)
             w.reload_end_sound.set_volume(0.3)
 
-        case enums.Weapons.MACHETE:
-            w = Melee(pos,
-                      bullet_type=enums.BulletType.MELEE,
-                      weapon_type=weapon,
-                      is_primary=False,
-                      fire_mode=enums.FireMode.MELEE,
-                      reload_type=enums.ReloadType.NO_RELOAD,
-                      upgrades_dict=get_weapon_upgrade(weapon),
-                      display_name="Machete",
-                      weapon_switch_ms=150,
-                      damage=3,
-                      bullet_speed=0,
-                      fire_rate=2,
-                      reload_delay_ms=0,
-                      magazine_size=0,
-                      bullet_max_range=1,
-                      bullet_min_range=1,
-                      reload_end_frame=0,
-                      barrel_offset=vec(0, 0),
-                      hit_frame=8,
-                      attack_box=vec(50, 20),
-                      weapon_scale=0.08,
-                      store_scale=0.2,
-                      )
-            w.bullet_spawn_offset = vec(w.rect.width/2 + 30, 0)
-            for s in w.swipe_sounds:
-                s.set_volume(0.5)
-
-            for h in w.hit_sounds:
-                h.set_volume(0.5)
-
         case enums.Weapons.RPG:
             w = Launcher(pos,
-                         bullet_type=enums.BulletType.ROCKET,
-                         weapon_type=weapon,
-                         is_primary=True,
-                         fire_mode=enums.FireMode.SINGLE_SHOT,
-                         reload_type=enums.ReloadType.SINGLE_BULLET,
-                         upgrades_dict=get_weapon_upgrade(weapon),
-                         display_name="RPG",
-                         weapon_switch_ms=500,
-                         damage=50,
-                         bullet_speed=15,
-                         fire_rate=1,
-                         reload_delay_ms=3000,
-                         magazine_size=1,
-                         bullet_max_range=800,
-                         bullet_min_range=790,
-                         explosion_min_radius=100,
-                         explosion_max_radius=200,
-                         reload_start_frame=12,
-                         reload_end_frame=17,
-                         reload_speed_multiplier=2,
-                         barrel_offset=vec(-15, 3),
-                         store_scale=2.2
-                         )
+                    bullet_type=enums.BulletType.ROCKET,
+                    weapon_type=weapon,
+                    is_primary=True,
+                    fire_mode=enums.FireMode.SINGLE_SHOT,
+                    reload_type=enums.ReloadType.SINGLE_BULLET,
+                    upgrades_dict=get_weapon_upgrade(weapon),
+                    display_name="RPG",
+                    weapon_switch_ms=500,
+                    damage=50,
+                    bullet_speed=15,
+                    fire_rate=1,
+                    reload_delay_ms=3000,
+                    magazine_size=1,
+                    bullet_max_range=800,
+                    bullet_min_range=790,
+                    explosion_min_radius=100,
+                    explosion_max_radius=200,
+                    reload_start_frame=12,
+                    reload_end_frame=17,
+                    reload_speed_multiplier=2,
+                    barrel_offset=vec(-15, 3),
+                    store_scale=2.2
+                    )
             w.bullet_spawn_offset = vec(
                 w.rect.width/2, -10) + vec(w.barrel_offset)
             w.shoot_sound.set_volume(0.1)
@@ -178,28 +178,28 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
 
         case enums.Weapons.SV98:
             w = Sniper(pos,
-                       bullet_type=enums.BulletType.SNIPER,
-                       weapon_type=weapon,
-                       is_primary=True,
-                       fire_mode=enums.FireMode.BOLT_ACTION,
-                       reload_type=enums.ReloadType.MAGAZINE,
-                       upgrades_dict=get_weapon_upgrade(weapon),
-                       display_name="SV98",
-                       weapon_switch_ms=400,
-                       damage=30,
-                       bullet_speed=35,
-                       fire_rate=1,
-                       reload_delay_ms=1500,
-                       magazine_size=5,
-                       bullet_max_range=1200,
-                       bullet_min_range=1000,
-                       reload_end_frame=17,
-                       reload_speed_multiplier=9,
-                       barrel_offset=vec(10, -5),
-                       pierce_damage_multiplier=0.5,
-                       max_pierce_targets=5,
-                       weapon_scale=1.1,
-                       store_scale=2.3
+                    bullet_type=enums.BulletType.SNIPER,
+                    weapon_type=weapon,
+                    is_primary=True,
+                    fire_mode=enums.FireMode.BOLT_ACTION,
+                    reload_type=enums.ReloadType.MAGAZINE,
+                    upgrades_dict=get_weapon_upgrade(weapon),
+                    display_name="SV98",
+                    weapon_switch_ms=400,
+                    damage=25,
+                    bullet_speed=35,
+                    fire_rate=1,
+                    reload_delay_ms=1500,
+                    magazine_size=5,
+                    bullet_max_range=1200,
+                    bullet_min_range=1000,
+                    reload_end_frame=17,
+                    reload_speed_multiplier=9,
+                    barrel_offset=vec(10, -5),
+                    pierce_damage_multiplier=0.5,
+                    max_pierce_targets=5,
+                    weapon_scale=1.1,
+                    store_scale=2.3
                        )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 20, -3)
             w.shoot_sound.set_volume(0.5)
@@ -218,15 +218,15 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                           upgrades_dict=get_weapon_upgrade(weapon),
                           display_name="M16",
                           weapon_switch_ms=350,
-                          damage=6,
+                          damage=10,
                           bullet_speed=35,
                           fire_rate=4,
                           burst_fire_rate=12,
                           burst_count=3,
                           reload_delay_ms=2500,
                           magazine_size=20,
-                          bullet_max_range=900,
-                          bullet_min_range=700,
+                          bullet_max_range=800,
+                          bullet_min_range=600,
                           reload_start_frame=5,
                           reload_end_frame=10,
                           reload_speed_multiplier=12,
@@ -287,9 +287,9 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          bullet_speed=30,
                          fire_rate=7,
                          reload_delay_ms=1200,
-                         magazine_size=30,
-                         bullet_max_range=800,
-                         bullet_min_range=650,
+                         magazine_size=25,
+                         bullet_max_range=750,
+                         bullet_min_range=600,
                          reload_end_frame=9,
                          reload_speed_multiplier=4,
                          barrel_offset=vec(0, 7),
@@ -318,6 +318,37 @@ def get_weapon_upgrade(weapon_type: enums.Weapons):
     else:
         return None
 
+ITEMS_UPGRADES = {
+    "backpack":[
+        {
+            "id": 1,
+            "max_pistol_ammo": 10,
+            "max_shotgun_ammo": 5,
+            "max_rifle_ammo": 10,
+            "max_sniper_ammo": 0,
+            "max_rocket_ammo": 1,
+            "price": 150.00
+        },
+        {
+            "id": 2,
+            "max_pistol_ammo": 10,
+            "max_shotgun_ammo": 10,
+            "max_rifle_ammo": 10,
+            "max_sniper_ammo": 5,
+            "max_rocket_ammo": 1,
+            "price": 350.00
+        },
+        {
+            "id": 3,
+            "max_pistol_ammo": 20,
+            "max_shotgun_ammo": 10,
+            "max_rifle_ammo": 20,
+            "max_sniper_ammo": 5,
+            "max_rocket_ammo": 1,
+            "price": 500.00
+        },
+    ]
+}
 
 WEAPONS_UPGRADES = {
     enums.Weapons.MACHETE: {
@@ -325,89 +356,602 @@ WEAPONS_UPGRADES = {
             {
                 "id": 1,
                 "ammount": 2,
-                "price": 10.00
+                "price": 80.00
             },
             {
                 "id": 2,
                 "ammount": 2,
-                "price": 20.0
+                "price": 150.0
             },
             {
                 "id": 3,
+                "ammount": 3,
+                "price": 220.0
+            },
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 80.0
+            },
+        ],
+    },
+    enums.Weapons.P_1911: {
+        "damage": [
+            {
+                "id": 1,
                 "ammount": 2,
-                "price": 30.0
+                "price": 150.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 210.0
             }
         ],
         "firerate": [
             {
                 "id": 1,
-                "ammount": 2,
-                "price": 10.0
+                "ammount": 0.5,
+                "price": 70.0
             },
             {
                 "id": 2,
-                "ammount": 2,
-                "price": 20.0
+                "ammount": 0.5,
+                "price": 95.0
             },
             {
                 "id": 3,
-                "ammount": 2,
-                "price": 10.0
-            }
+                "ammount": 1,
+                "price": 120.0
+            },
         ],
         "reload_speed": [
             {
                 "id": 1,
-                "ammount": 2,
-                "price": 10.0
+                "ammount": 0.5,
+                "price": 30.0
             },
             {
                 "id": 2,
-                "ammount": 2,
-                "price": 20.0
+                "ammount": 0.5,
+                "price": 55.0
             },
             {
                 "id": 3,
-                "ammount": 2,
-                "price": 30.0
+                "ammount": 0.5,
+                "price": 70.0
             }
         ],
         "range": [
             {
                 "id": 1,
-                "ammount": 2,
-                "price": 10.0
+                "ammount": 1,
+                "price": 70.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 100.0
+            },
+            {
+                "id": 3,
+                "ammount": 1.3,
+                "price": 155.0
+            },
+            {
+                "id": 4,
+                "ammount": 1.1,
+                "price": 195.0
+            }
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 3,
+                "price": 95.0
             },
             {
                 "id": 2,
                 "ammount": 2,
-                "price": 20.0
+                "price": 215.0
             },
             {
                 "id": 3,
-                "ammount": 2,
-                "price": 30.0
+                "ammount": 3,
+                "price": 310.0
+            }
+        ]
+    },
+    enums.Weapons.SHORT_BARREL: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 200.0
+            },
+            {
+                "id": 2,
+                "ammount": 1,
+                "price": 230.0
+            },
+            {
+                "id": 3,
+                "ammount": 1,
+                "price": 285.0
             }
         ],
-        # "dispersion": [
-        #     {
-        #         "id": 1,
-        #         "ammount": 2,
-        #         "price": 10.0
-        #     },
-        #     {
-        #         "id": 2,
-        #         "ammount": 2,
-        #         "price": 20.0
-        #     },
-        #     {
-        #         "id": 3,
-        #         "ammount": 2,
-        #         "price": 30.0
-        #     }
-        # ],
-    }
-
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 90.0
+            },
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 130.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.5,
+                "price": 155.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.5,
+                "price": 270.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 0.8,
+                "price": 75.0
+            },
+            {
+                "id": 2,
+                "ammount": 1,
+                "price": 110.0
+            },
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 95.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 130.0
+            },
+        ],
+        "concentration": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 140.0
+            },
+            {
+                "id": 2,
+                "ammount": 1,
+                "price": 195.0
+            },
+            {
+                "id": 3,
+                "ammount": 1,
+                "price": 245.0
+            }
+        ],
+    },
+    enums.Weapons.UZI: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 120.0
+            },
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.7,
+                "price": 90.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.7,
+                "price": 115.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.5,
+                "price": 170.0
+            },
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.8,
+                "price": 80.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.8,
+                "price": 115.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.8,
+                "price": 135.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 150.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.6,
+                "price": 185.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 210.0
+            },
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 3,
+                "price": 100.0
+            },
+            {
+                "id": 2,
+                "ammount": 3,
+                "price": 130.0
+            },
+            {
+                "id": 2,
+                "ammount": 4,
+                "price": 145.0
+            },
+        ],
+    },
+    enums.Weapons.RPG: {
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.8,
+                "price": 80.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.8,
+                "price": 115.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 60.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.6,
+                "price": 75.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 100.0
+            },
+        ],
+    },
+    enums.Weapons.SV98: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 2.5,
+                "price": 145.0
+            },
+            {
+                "id": 3,
+                "ammount": 2.5,
+                "price": 180.0
+            },
+            {
+                "id": 4,
+                "ammount": 3,
+                "price": 220.0
+            }
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.7,
+                "price": 80.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.7,
+                "price": 95.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.5,
+                "price": 120.0
+            },
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.8,
+                "price": 125.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.8,
+                "price": 150.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.8,
+                "price": 190.0
+            }
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 180.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 235.0
+            },
+        ],
+    },
+    enums.Weapons.M16: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 150.0
+            },
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.65,
+                "price": 100.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.9,
+                "price": 125.0
+            },
+            {
+                "id": 3,
+                "ammount": 1,
+                "price": 170.0
+            },
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.4,
+                "price": 95.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.4,
+                "price": 120.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.4,
+                "price": 140.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.6,
+                "price": 165.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 200.0
+            },
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 3,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 3,
+                "price": 155.0
+            },
+            {
+                "id": 2,
+                "ammount": 4,
+                "price": 170.0
+            },
+        ],
+    },
+    enums.Weapons.P_93R: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 115.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 135.0
+            },
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 100.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.2,
+                "price": 125.0
+            }
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.4,
+                "price": 110
+            },
+            {
+                "id": 2,
+                "ammount": 0.4,
+                "price": 125.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.4,
+                "price": 150.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 165.0
+            },
+            {
+                "id": 2,
+                "ammount": 1,
+                "price": 200.0
+            },
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 3,
+                "price": 120.0
+            },
+            {
+                "id": 2,
+                "ammount": 3,
+                "price": 155.0
+            },
+            {
+                "id": 2,
+                "ammount": 4,
+                "price": 170.0
+            },
+        ],
+    },
+    enums.Weapons.SCAR: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 180.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 245.0
+            },
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.65,
+                "price": 100.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.9,
+                "price": 125.0
+            }
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.4,
+                "price": 150.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.4,
+                "price": 185.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 125.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.4,
+                "price": 180.0
+            }
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 3,
+                "price": 145.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 205.0
+            },
+        ],
+    },
 }
 
 POPUPS = {

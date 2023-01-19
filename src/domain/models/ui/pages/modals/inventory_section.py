@@ -1,4 +1,4 @@
-import pygame
+import pygame, datetime
 from pygame.math import Vector2 as vec
 
 from domain.models.player import Player
@@ -24,12 +24,14 @@ class Inventory:
         
         self.image: pygame.Surface = None
         self.on_return = kwargs.pop("on_return", lambda: None)
+        self.start_time = datetime.datetime.now()
         
         self.selected_card: StoreItem = None
         self.selected_weapon: Weapon = None
         self.card_size = vec(100,100)
         
         self.weapons: list[StoreItem] = []
+        self.items:list[StoreItem] = []
         self.cards_list = []
         self.buttons: list[Button] = []
         
@@ -38,7 +40,7 @@ class Inventory:
             "firerate": 15,
             "reload_speed": 10,
             "range": 1000,
-            "dispersion": 90,
+            "concentration": 12,
             "magazine_size": 50
         })
         
@@ -47,7 +49,7 @@ class Inventory:
         self.reload_bar = None
         self.range_bar = None
         self.magazine_bar = None
-        self.dispersion_bar = None
+        self.concentration_bar = None
         
         self.load_inventory()
         
@@ -59,27 +61,17 @@ class Inventory:
             # StoreItem(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png', pygame.Rect((0,0), self.card_size), "Rocket Ammo", item_name = "rocket_ammo", price = 80, count =1, bullet_type = enums.BulletType.ROCKET, **cards_dict)
         ]
         
-        self.items:list[StoreItem] = [
-            # StoreItem(f'{resources.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
-            # StoreItem(f'{resources.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
-            # StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
-            # StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
-        ]
         
-        # self.weapons:list[StoreItem] = [
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80, store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 650, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93r, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.5, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93r, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.M16, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "M16", item_name = "m16", price = 800, icon_scale = 2, store_icon_scale = 1.7, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.M16, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SV98", item_name = "sv98", price = 900, icon_scale = 2.3, store_icon_scale = 1.1, bullet_type = enums.BulletType.SNIPER, weapon_type = enums.Weapons.SV98, **cards_dict),
-        #     StoreItem(f'{resources.get_weapon_path(enums.Weapons.RPG, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "RPG", item_name = "rpg", price = 1200, icon_scale = 2.2, store_icon_scale = 0.14, bullet_type = enums.BulletType.ROCKET, weapon_type = enums.Weapons.RPG, **cards_dict),
-        #     StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
-        # ]
+        self.pistol_ammo_icon = None
+        self.shotgun_ammo_icon = None
+        self.rifle_ammo_icon = None
+        self.sniper_ammo_icon = None
+        self.rocket_ammo_icon = None
         
             
     def load_inventory(self):
         self.weapons.clear()
+        self.items.clear()
         self.cards_list.clear()
         self.buttons.clear()
         
@@ -95,6 +87,9 @@ class Inventory:
             if len(btns_hovered) > 0 or len(scroll_bars_held) > 0:
                 return
             
+            for b in self.buttons:
+                if b.name.startswith("btn_upgrade"):
+                    b.visible = False
             
             card.default_on_blur()
             if self.selected_card != None and self.selected_card.item_name == card.item_name:
@@ -113,14 +108,19 @@ class Inventory:
                 StoreItem(f'{resources.get_weapon_path(w.weapon_type, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), w.display_name, item_name = str(w.weapon_type.value), price = 0, icon_scale = w.store_scale, bullet_type = w.bullet_type, weapon_type = w.weapon_type, **cards_dict)
             )
             
+        self.items.append(
+            StoreItem(f'{resources.IMAGES_PATH}items\\backpack.png', pygame.Rect((0,0), self.card_size), "Backpack", item_name = "backpack", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
+        )
+            
         #Cards
-        self.cards_list = [*self.weapons]#*self.ammos, *self.items, 
+        self.cards_list = [*self.weapons, *self.items]#*self.ammos,
         
         #Buttons
         self.buttons = [
                 Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = self.on_return),
                 Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text="", text_color = colors.BLACK, text_font = resources.px_font(25), scale = 2, name="sell_weapon", on_click = lambda: self.sell_weapon(self.selected_card.weapon_type)),
                 Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\swap.png', scale = 1, name="swap_slots", on_click = self.swap_weapon_slots),
+                Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text="Upgrade for $0.00", text_color = colors.BLACK, text_font = resources.px_font(23), scale = 2, name="upgrade_backpack", on_click = self.upgrade_backpack),
             ]
         
         weapons_btn_dict = {
@@ -147,6 +147,8 @@ class Inventory:
         events = kwargs.pop("events", [])
         
         
+        
+        
         for e in events:
             if self.inv_v_scrollbar != None:
                 self.inv_v_scrollbar.event_handler(e)
@@ -154,16 +156,36 @@ class Inventory:
                 
         if self.selected_card != None:
             self.buttons[1].visible = True
+            if self.selected_card.item_name == "backpack":
+                self.buttons[3].visible = True
+            else:
+                self.buttons[3].visible = False
         else:
             self.buttons[1].visible = False
+            self.buttons[3].visible = False
                 
         for b in self.buttons:
             b.update()
             
         bkp = self.player.backpack
         
+        btn_upgrade_backpack = self.buttons[3]
+        _has_bkp_upgrade = bkp.upgrade_step < len(constants.ITEMS_UPGRADES["backpack"])
+        if _has_bkp_upgrade:
+            btn_upgrade_backpack.set_text(f'Upgrade for ${constants.ITEMS_UPGRADES["backpack"][bkp.upgrade_step]["price"]:.2f}')
+        if not _has_bkp_upgrade or (self.player.money < constants.ITEMS_UPGRADES["backpack"][bkp.upgrade_step]["price"] and btn_upgrade_backpack.enabled):
+            btn_upgrade_backpack.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
+            btn_upgrade_backpack.hovered = False
+            if not _has_bkp_upgrade:
+                btn_upgrade_backpack.set_text("MAX")
+            btn_upgrade_backpack.default_on_hover(btn_upgrade_backpack)
+            btn_upgrade_backpack.enable(False)
+        elif not btn_upgrade_backpack.enabled and self.player.money >= constants.ITEMS_UPGRADES["backpack"][bkp.upgrade_step]["price"] and _has_bkp_upgrade:
+            btn_upgrade_backpack.set_image(f'{resources.IMAGES_PATH}ui\\btn_small_green.png')
+            btn_upgrade_backpack.default_on_hover(btn_upgrade_backpack)
+            btn_upgrade_backpack.enable(True)
+
         for card in self.cards_list:
-        
             #if the item is a weapon
             if card.weapon_type != None:
                 btn_equip_prim = [b for b in self.buttons if b.name == f"equip-primary_{card.weapon_type.value}"][0]
@@ -199,7 +221,7 @@ class Inventory:
                         btn_equip_prim.set_text("Equip as primary")
                         btn_equip_sec.set_text("Equip as secondary")
                         btn_equip_sec.visible = True
-                
+            
             card.update(self.panel_margin/2, self.player.money)
 
         
@@ -343,6 +365,7 @@ class Inventory:
                 _bars_size = vec(pnl_right_rect.width/2,15)
                 
                 _reload_speed = 0
+                _concentration = 0
                 _damage = weapon.damage
                 _range = (weapon.bullet_min_range + weapon.bullet_max_range)/2
                 _firerate = weapon.fire_rate
@@ -365,6 +388,7 @@ class Inventory:
                                             
                 if weapon.bullet_type == enums.BulletType.SHOTGUN and weapon.ballin_count != None:
                     _damage = weapon.damage * weapon.ballin_count
+                    _concentration = 90 / weapon.dispersion
             
             
                 if self.damage_bar == None:
@@ -392,12 +416,10 @@ class Inventory:
                 else:
                     self.magazine_bar.value = _magazine_size
                     
-                _dispersion = weapon.dispersion if weapon.bullet_type == enums.BulletType.SHOTGUN else 0
-                    
-                if self.dispersion_bar == None:
-                    self.dispersion_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["dispersion"], value = _dispersion, **constants.ATTRIBUTE_BARS["weapon"])
+                if self.concentration_bar == None:
+                    self.concentration_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["concentration"], value = _concentration, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
-                    self.dispersion_bar.value = _dispersion
+                    self.concentration_bar.value = _concentration
 
                     
                         
@@ -430,10 +452,10 @@ class Inventory:
                 _txt_magazine_rect.centery = self.magazine_bar.rect.centery
                 _txt_magazine_rect.left = _bar_pos.x
                 
-                _txt_dispersion = menu_controller.get_text_surface("Dispersion:", colors.WHITE if self.dispersion_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
-                _txt_dispersion_rect = _txt_dispersion.get_rect()
-                _txt_dispersion_rect.centery = self.dispersion_bar.rect.centery
-                _txt_dispersion_rect.left = _bar_pos.x
+                _txt_concentration = menu_controller.get_text_surface("Concentration:", colors.WHITE if self.concentration_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
+                _txt_concentration_rect = _txt_concentration.get_rect()
+                _txt_concentration_rect.centery = self.concentration_bar.rect.centery
+                _txt_concentration_rect.left = _bar_pos.x
 
                 
                 _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect]])
@@ -443,7 +465,7 @@ class Inventory:
                 self.reload_bar.rect.left = _txt_left
                 self.range_bar.rect.left = _txt_left
                 self.magazine_bar.rect.left = _txt_left
-                self.dispersion_bar.rect.left = _txt_left
+                self.concentration_bar.rect.left = _txt_left
                 
                 _attribute_bars = {
                     "damage": self.damage_bar,
@@ -451,7 +473,7 @@ class Inventory:
                     "reload_speed": self.reload_bar,
                     "range": self.range_bar,
                     "magazine_size": self.magazine_bar,
-                    "dispersion": self.dispersion_bar
+                    "concentration": self.concentration_bar
                 }
                 
                 for b in _attribute_bars.values():
@@ -478,10 +500,10 @@ class Inventory:
                         _btn_upgrade.on_click = lambda attr_name = key: self.buy_upgrade(self.selected_card.weapon_type, attr_name)
                         _upgrade_map_index = math.clamp(weapon.upgrades_map[key], 0, len(value)) if weapon.upgrades_map != None else 0
                         _has_upgrade = weapon.upgrades_map == None or _upgrade_map_index < len(value)
-                        _has_money = self.player.money >= value[_upgrade_map_index-1]["price"]
+                        _has_money = _has_upgrade and self.player.money >= value[_upgrade_map_index]["price"]
                         _btn_upgrade.enable(_has_upgrade and _has_money)
                         
-                        
+
                         def btn_upgrade_hover(btn: Button, upgrade_steps = value, bar = _bar, key = key):
                             btn.default_on_hover(btn)
                             if btn.hovered:
@@ -489,9 +511,9 @@ class Inventory:
                                     case "range":
                                         _step = self.range_bar.max_value / self.range_bar.bars_count
                                         bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])/2
-                                    case "dispersion":
-                                        _step = self.dispersion_bar.max_value / self.dispersion_bar.bars_count
-                                        bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])/2
+                                    case "concentration":
+                                        _step = self.concentration_bar.max_value / self.concentration_bar.bars_count
+                                        bar.upgrade_value = (_step * upgrade_steps[0]["ammount"])
                                     case _:
                                         bar.upgrade_value = upgrade_steps[0]["ammount"]
                                 bar.rerender()
@@ -551,9 +573,190 @@ class Inventory:
                 pnl_right.blit(_txt_magazine, _txt_magazine_rect)
 
                 #optionals
-                self.dispersion_bar.draw(pnl_right, vec(0,0))
-                pnl_right.blit(_txt_dispersion, _txt_dispersion_rect)
+                self.concentration_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_concentration, _txt_concentration_rect)
+                
+            if self.selected_card.item_name == "backpack":
+                _txt_item_title = menu_controller.get_text_surface("Backpack", colors.WHITE, resources.px_font(40))
+                _txt_item_title_rect = _txt_item_title.get_rect()
+                _txt_item_title_rect.top = 5
+                _txt_item_title_rect.centerx = pnl_right_rect.width/2
+                
+                _lbls_margin = vec(5, 10)
+                
+                self.buttons[3].rect.left = self.panel_margin.x/2 + pnl_right_rect.left + 20
+                self.buttons[3].rect.bottom = self.panel_margin.y/2 + pnl_right_rect.top + pnl_right_rect.height - 20
+                self.buttons[3].set_pos(vec(self.buttons[3].rect.topleft))
+                
+                
+                #icons
+                if self.pistol_ammo_icon == None:
+                    self.pistol_ammo_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\pistol_ammo_icon.png')
+                    self.shotgun_ammo_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\shotgun_ammo_icon.png')
+                    self.rifle_ammo_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\rifle_ammo_icon.png')
+                    self.sniper_ammo_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\sniper_ammo_icon.png')
+                    self.rocket_ammo_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png')
+                    
+                    _icons = [self.pistol_ammo_icon, self.shotgun_ammo_icon, self.rifle_ammo_icon, self.sniper_ammo_icon, self.rocket_ammo_icon]
+                    _max_size = max([max(i.get_size()) for i in _icons])
+                    
+                    _pistol_ratio = max(self.pistol_ammo_icon.get_size()) / _max_size
+                    _shotgun_ratio = max(self.shotgun_ammo_icon.get_size()) / _max_size
+                    _rifle_ratio = max(self.rifle_ammo_icon.get_size()) / _max_size
+                    _sniper_ratio = max(self.sniper_ammo_icon.get_size()) / _max_size
+                    _rocket_ratio = max(self.rocket_ammo_icon.get_size()) / _max_size
+                    
+                    self.pistol_ammo_icon = game_controller.scale_image(self.pistol_ammo_icon, (1 / _pistol_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
+                    self.shotgun_ammo_icon = game_controller.scale_image(self.shotgun_ammo_icon, (1 / _shotgun_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
+                    self.rifle_ammo_icon = game_controller.scale_image(self.rifle_ammo_icon, (1 / _rifle_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
+                    self.sniper_ammo_icon = game_controller.scale_image(self.sniper_ammo_icon, (1 / _sniper_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
+                    self.rocket_ammo_icon = game_controller.scale_image(self.rocket_ammo_icon, (1 / _rocket_ratio) * 2.5, enums.ConvertType.CONVERT_ALPHA)
+                
+                
+                _icons = [self.pistol_ammo_icon, self.shotgun_ammo_icon, self.rifle_ammo_icon, self.sniper_ammo_icon, self.rocket_ammo_icon]
+                _max_icon_width = max([i.get_width() for i in _icons])
+                _bkp_upgrade_step = math.clamp(bkp.upgrade_step, 0, len(constants.ITEMS_UPGRADES['backpack'])-1)
+                
+                #region pistol ammo
+                _pistol_icon_rect = self.pistol_ammo_icon.get_rect()
+                _pistol_icon_rect.top = _txt_item_title_rect.bottom + 30
+                _pistol_icon_rect.left = _lbls_margin.x *2
+                
+                _lbl_max_pistol = menu_controller.get_text_surface("Max pistol ammo:", colors.WHITE, resources.px_font(25))
+                _lbl_max_pistol_rect = _lbl_max_pistol.get_rect()
+                _lbl_max_pistol_rect.left = _max_icon_width + _lbls_margin.x*4
+                _lbl_max_pistol_rect.centery = _pistol_icon_rect.centery
+                
+                _txt_max_pistol = menu_controller.get_text_surface(str(bkp.max_pistol_ammo), colors.LIGHT_BLUE, resources.px_font(25))
+                _txt_max_pistol_rect = _txt_max_pistol.get_rect()
+                _txt_max_pistol_rect.left = _lbl_max_pistol_rect.right + _lbls_margin.x
+                _txt_max_pistol_rect.centery = _lbl_max_pistol_rect.centery
+                
+                _txt_pistol_upgrade = menu_controller.get_text_surface(f'+{constants.ITEMS_UPGRADES["backpack"][_bkp_upgrade_step]["max_pistol_ammo"]}', colors.GREEN, resources.px_font(22))
+                _txt_pistol_upgrade_rect = _txt_pistol_upgrade.get_rect()
+                _txt_pistol_upgrade_rect.left = _txt_max_pistol_rect.right + _lbls_margin.x
+                _txt_pistol_upgrade_rect.centery = _txt_max_pistol_rect.centery
+                #endregion
+                
+                #region shotgun ammo
+                _shotgun_icon_rect = self.shotgun_ammo_icon.get_rect()
+                _shotgun_icon_rect.top = _pistol_icon_rect.bottom + _lbls_margin.y
+                _shotgun_icon_rect.centerx = _pistol_icon_rect.centerx
+                
+                _lbl_max_shotgun = menu_controller.get_text_surface("Max shotgun ammo:", colors.WHITE, resources.px_font(25))
+                _lbl_max_shotgun_rect = _lbl_max_shotgun.get_rect()
+                _lbl_max_shotgun_rect.left = _lbl_max_pistol_rect.left
+                _lbl_max_shotgun_rect.centery = _shotgun_icon_rect.centery
+                
+                _txt_max_shotgun = menu_controller.get_text_surface(str(bkp.max_shotgun_ammo), colors.LIGHT_BLUE, resources.px_font(25))
+                _txt_max_shotgun_rect = _txt_max_shotgun.get_rect()
+                _txt_max_shotgun_rect.topleft = _lbl_max_shotgun_rect.topright + vec(_lbls_margin.x, 0)
+                
+                _txt_shotgun_upgrade = menu_controller.get_text_surface(f'+{constants.ITEMS_UPGRADES["backpack"][_bkp_upgrade_step]["max_shotgun_ammo"]}', colors.GREEN, resources.px_font(22))
+                _txt_shotgun_upgrade_rect = _txt_shotgun_upgrade.get_rect()
+                _txt_shotgun_upgrade_rect.left = _txt_max_shotgun_rect.right + _lbls_margin.x
+                _txt_shotgun_upgrade_rect.centery = _txt_max_shotgun_rect.centery
+                #endregion
+                
+                #region rifle ammo
+                _rifle_icon_rect = self.rifle_ammo_icon.get_rect()
+                _rifle_icon_rect.top = _shotgun_icon_rect.bottom + _lbls_margin.y
+                _rifle_icon_rect.centerx = _shotgun_icon_rect.centerx
+                
+                _lbl_max_rifle = menu_controller.get_text_surface("Max rifle ammo:", colors.WHITE, resources.px_font(25))
+                _lbl_max_rifle_rect = _lbl_max_rifle.get_rect()
+                _lbl_max_rifle_rect.left = _lbl_max_pistol_rect.left
+                _lbl_max_rifle_rect.centery = _rifle_icon_rect.centery
+                
+                _txt_max_rifle = menu_controller.get_text_surface(str(bkp.max_rifle_ammo), colors.LIGHT_BLUE, resources.px_font(25))
+                _txt_max_rifle_rect = _txt_max_rifle.get_rect()
+                _txt_max_rifle_rect.topleft = _lbl_max_rifle_rect.topright + vec(_lbls_margin.x, 0)
+                
+                _txt_rifle_upgrade = menu_controller.get_text_surface(f'+{constants.ITEMS_UPGRADES["backpack"][_bkp_upgrade_step]["max_rifle_ammo"]}', colors.GREEN, resources.px_font(22))
+                _txt_rifle_upgrade_rect = _txt_rifle_upgrade.get_rect()
+                _txt_rifle_upgrade_rect.left = _txt_max_rifle_rect.right + _lbls_margin.x
+                _txt_rifle_upgrade_rect.centery = _txt_max_rifle_rect.centery
+                #endregion
+                
+                #region sniper ammo
+                _sniper_icon_rect = self.sniper_ammo_icon.get_rect()
+                _sniper_icon_rect.top = _rifle_icon_rect.bottom + _lbls_margin.y
+                _sniper_icon_rect.centerx = _rifle_icon_rect.centerx
+                
+                _lbl_max_sniper = menu_controller.get_text_surface("Max sniper ammo:", colors.WHITE, resources.px_font(25))
+                _lbl_max_sniper_rect = _lbl_max_sniper.get_rect()
+                _lbl_max_sniper_rect.left = _lbl_max_pistol_rect.left
+                _lbl_max_sniper_rect.centery = _sniper_icon_rect.centery
+                
+                _txt_max_sniper = menu_controller.get_text_surface(str(bkp.max_sniper_ammo), colors.LIGHT_BLUE, resources.px_font(25))
+                _txt_max_sniper_rect = _txt_max_sniper.get_rect()
+                _txt_max_sniper_rect.topleft = _lbl_max_sniper_rect.topright + vec(_lbls_margin.x, 0)
 
+                _txt_sniper_upgrade = menu_controller.get_text_surface(f'+{constants.ITEMS_UPGRADES["backpack"][_bkp_upgrade_step]["max_sniper_ammo"]}', colors.GREEN, resources.px_font(22))
+                _txt_sniper_upgrade_rect = _txt_sniper_upgrade.get_rect()
+                _txt_sniper_upgrade_rect.left = _txt_max_sniper_rect.right + _lbls_margin.x
+                _txt_sniper_upgrade_rect.centery = _txt_max_sniper_rect.centery
+                #endregion
+                
+                #region rocket ammo
+                _rocket_icon_rect = self.rocket_ammo_icon.get_rect()
+                _rocket_icon_rect.top = _sniper_icon_rect.bottom + _lbls_margin.y
+                _rocket_icon_rect.centerx = _sniper_icon_rect.centerx
+                
+                _lbl_max_rocket = menu_controller.get_text_surface("Max rocket ammo:", colors.WHITE, resources.px_font(25))
+                _lbl_max_rocket_rect = _lbl_max_rocket.get_rect()
+                _lbl_max_rocket_rect.left = _lbl_max_pistol_rect.left
+                _lbl_max_rocket_rect.centery = _rocket_icon_rect.centery
+                
+                _txt_max_rocket = menu_controller.get_text_surface(str(bkp.max_rocket_ammo), colors.LIGHT_BLUE, resources.px_font(25))
+                _txt_max_rocket_rect = _txt_max_rocket.get_rect()
+                _txt_max_rocket_rect.topleft = _lbl_max_rocket_rect.topright + vec(_lbls_margin.x, 0)
+
+                _txt_rocket_upgrade = menu_controller.get_text_surface(f'+{constants.ITEMS_UPGRADES["backpack"][_bkp_upgrade_step]["max_rocket_ammo"]}', colors.GREEN, resources.px_font(22))
+                _txt_rocket_upgrade_rect = _txt_rocket_upgrade.get_rect()
+                _txt_rocket_upgrade_rect.left = _txt_max_rocket_rect.right + _lbls_margin.x
+                _txt_rocket_upgrade_rect.centery = _txt_max_rocket_rect.centery
+                #endregion
+                
+                
+                _has_bkp_upgrade = bkp.upgrade_step < len(constants.ITEMS_UPGRADES["backpack"])
+                _btn_upgrade_bkp = self.buttons[3]
+                
+                _now = datetime.datetime.now()
+                if _btn_upgrade_bkp.hovered:
+                    _elapsed = _now - self.start_time
+                    _ms = _elapsed.microseconds/1000 - _elapsed.seconds/1000
+                    _show = (_ms > 300)
+                    if _show and _has_bkp_upgrade:
+                        pnl_right.blit(_txt_pistol_upgrade, _txt_pistol_upgrade_rect)
+                        pnl_right.blit(_txt_shotgun_upgrade, _txt_shotgun_upgrade_rect)
+                        pnl_right.blit(_txt_rifle_upgrade, _txt_rifle_upgrade_rect)
+                        pnl_right.blit(_txt_sniper_upgrade, _txt_sniper_upgrade_rect)
+                        pnl_right.blit(_txt_rocket_upgrade, _txt_rocket_upgrade_rect)
+                
+                pnl_right.blit(_txt_item_title, _txt_item_title_rect)
+                
+                pnl_right.blit(self.pistol_ammo_icon, _pistol_icon_rect)
+                pnl_right.blit(_lbl_max_pistol, _lbl_max_pistol_rect)
+                pnl_right.blit(_txt_max_pistol, _txt_max_pistol_rect)
+                
+                pnl_right.blit(self.shotgun_ammo_icon, _shotgun_icon_rect)
+                pnl_right.blit(_lbl_max_shotgun, _lbl_max_shotgun_rect)
+                pnl_right.blit(_txt_max_shotgun, _txt_max_shotgun_rect)
+                
+                pnl_right.blit(self.rifle_ammo_icon, _rifle_icon_rect)
+                pnl_right.blit(_lbl_max_rifle, _lbl_max_rifle_rect)
+                pnl_right.blit(_txt_max_rifle, _txt_max_rifle_rect)
+                
+                pnl_right.blit(self.sniper_ammo_icon, _sniper_icon_rect)
+                pnl_right.blit(_lbl_max_sniper, _lbl_max_sniper_rect)
+                pnl_right.blit(_txt_max_sniper, _txt_max_sniper_rect)
+                
+                pnl_right.blit(self.rocket_ammo_icon, _rocket_icon_rect)
+                pnl_right.blit(_lbl_max_rocket, _lbl_max_rocket_rect)
+                pnl_right.blit(_txt_max_rocket, _txt_max_rocket_rect)
+                
+                _btn_upgrade_bkp.draw(pnl_right, vec(-self.panel_margin.x/2 - pnl_right_rect.left, -self.panel_margin.y/2 - pnl_right_rect.top))
         else:
             for b in _upgrade_btns:
                 b.visible = False
@@ -578,6 +781,23 @@ class Inventory:
         
         return constants.get_weapon(weapon_type, vec(0,0), load_content = False)
     
+    def upgrade_backpack(self):
+        bkp = self.player.backpack
+        step = constants.ITEMS_UPGRADES["backpack"][bkp.upgrade_step]
+        
+        if self.player.money < step["price"]:
+            return
+        
+        bkp.max_pistol_ammo += step["max_pistol_ammo"]
+        bkp.max_shotgun_ammo += step["max_shotgun_ammo"]
+        bkp.max_rifle_ammo += step["max_rifle_ammo"]
+        bkp.max_sniper_ammo += step["max_sniper_ammo"]
+        bkp.max_rocket_ammo += step["max_rocket_ammo"]
+        
+        bkp.upgrade_step += 1
+        self.purchase_sound.play()
+        self.player.money -= step['price']
+        menu_controller.popup(Popup(f"-${step['price']:.2f}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))
         
     def equip_weapon(self, weapon_type: enums.Weapons, as_primary = False):
         bkp = self.player.backpack
@@ -609,12 +829,12 @@ class Inventory:
             for key in weapon.upgrades_map.keys():
                 weapon.upgrades_map[key] = 0
                 
-        price = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["price"]
+        price = attributes_dict[attr_name][weapon.upgrades_map[attr_name]]["price"]
         
         if price > self.player.money:
             return
         
-        ammount = attributes_dict[attr_name][weapon.upgrades_map[attr_name]-1]["ammount"]
+        ammount = attributes_dict[attr_name][weapon.upgrades_map[attr_name]]["ammount"]
         weapon.upgrades_map[attr_name] += 1
         
         self.purchase_sound.play()
@@ -644,9 +864,10 @@ class Inventory:
                 
                 weapon.bullet_min_range += _step * ammount/2
                 weapon.bullet_max_range += _step * ammount/2
-            case "dispersion":
-                _step = self.dispersion_bar.max_value / self.dispersion_bar.bars_count
-                weapon.dispersion -= _step * ammount
+            case "concentration":
+                weapon.dispersion = 90 / (self.concentration_bar.value + ammount)
+            case "magazine_size":
+                weapon.magazine_size += ammount
                 
     def swap_weapon_slots(self):
         bkp = self.player.backpack

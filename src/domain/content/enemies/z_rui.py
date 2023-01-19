@@ -41,7 +41,7 @@ class ZRui(Enemy):
         _health_rect.width = self.rect.width * 0.4
         _health_rect.bottom = 0
         self.health_bar.set_rect(_health_rect)
-        self.health_bar.value_anim_speed = 0.5
+        self.health_bar.value_anim_speed = 0.55
         
         self.attack_frames = None
         self.bumping = False
