@@ -37,8 +37,8 @@ class ZRaimundo(Enemy):
         _health_rect.width = self.rect.width * 0.6
         self.health_bar.set_rect(_health_rect)
         
-        self.kill_score = 53
-        self.headshot_score_multiplier = 1.5
+        self.kill_score = 80
+        self.headshot_score_multiplier = 2
         
         self.body_damage_multiplier = kwargs.pop("body_damage_multiplier", 0.2)
         

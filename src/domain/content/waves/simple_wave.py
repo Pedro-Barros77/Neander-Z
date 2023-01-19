@@ -75,9 +75,6 @@ class SimpleWave(Wave):
             _enemy_dict = self.get_random_enemy()
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
-            #debug
-            rand_x = 50
-            
             enemy = self.create_enemy(_type, (rand_x,floor_y), _enemy_dict)
             
             if enemy != None:

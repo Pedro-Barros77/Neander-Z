@@ -32,7 +32,7 @@ class ZRonald(Enemy):
         
         self.afterlife_chance = kwargs.pop("afterlife_chance", 0.45)
         
-        self.kill_score = 53
+        self.kill_score = 60
         self.headshot_score_multiplier = 1.5
         
         _health_rect = self.health_bar.rect.copy()
