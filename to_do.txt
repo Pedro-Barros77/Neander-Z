@@ -8,6 +8,15 @@ Robô montável que atira automaticamente nos inimigos
 (até passar um certo tempo, acabar a munição ou levar muito dano)
 Será considerada como um target para os inimigos na função get_closest_player()
 
+> Zumbi em chamas:
+Zumbi pegando fogo que CORRE até você, se te acertar te coloca fogo por alguns segundos
+
+> Zumbi cemitério:
+Spawna perto do player, cavando e saindo do chão
+
+> Rolagem tática:
+Habilidade de rolar para frente, com cool down. Desvia de ataques
+
 
 
 

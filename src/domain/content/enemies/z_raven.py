@@ -187,7 +187,6 @@ class ZRaven(Enemy):
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
         
-        
         # self.blit_debug = True
         # self.draw_blit_debug(surface, offset)
     

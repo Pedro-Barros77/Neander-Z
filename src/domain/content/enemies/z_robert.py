@@ -43,6 +43,8 @@ class ZRobert(Enemy):
         
         self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, False), name = "zombie_body", id = self.id, owner = self)
         self.hitbox_body.set_rect(pygame.Rect((0,0),(self.hitbox_body.rect.width, self.hitbox_body.rect.height - self.hitbox_head.rect.height)))
+
+        self.playing_attack_sound = False
  
         
     def update(self, **kwargs):
@@ -66,6 +68,8 @@ class ZRobert(Enemy):
             
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
+        
+        
         
         # self.blit_debug(surface, offset)
         # pygame.draw.rect(surface, colors.RED, math.rect_offset(self.rect, -offset), 5)
@@ -111,12 +115,18 @@ class ZRobert(Enemy):
     
     def attcking_anim(self, speed: float):
         self.attack_frame += speed
+        if int(self.attack_frame) == 0 and not self.playing_attack_sound:
+            rand_sound = random.randint(0, len(self.get_sounds(enums.AnimActions.ATTACK))-1)
+            self.get_sounds(enums.AnimActions.ATTACK)[rand_sound].play()
+            self.playing_attack_sound = True
+        
         if int(self.attack_frame) == self.hit_frame - 1 and not self.hiting:
             self.attack()
         if self.attack_frame > len(self.get_frames(enums.AnimActions.ATTACK)):
             self.attack_frame = 0
             self.attacking = False
             self.hiting = False
+            self.playing_attack_sound = False
         self.image = game_controller.scale_image(self.get_frames(enums.AnimActions.ATTACK)[int(self.attack_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)

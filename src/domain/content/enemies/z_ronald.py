@@ -22,10 +22,10 @@ class ZRonald(Enemy):
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
         self.last_frame_dir = self.dir.copy()
-        self.attack_distance = kwargs.pop("attack_distance", 30)
+        self.attack_distance = kwargs.pop("attack_distance", 40)
         self.hit_frame = 8
         self.hiting = False
-        self.attack_box = vec(15,15)
+        self.attack_box = vec(35,15)
         self.hit_rectangle = None
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.check_spawn_ronaldo = True
@@ -105,7 +105,11 @@ class ZRonald(Enemy):
 
     def attack(self):
         self.hiting = True
-        self.hit_rectangle = Rectangle(self.attack_box, vec(self.rect.center) + vec(20 * self.dir.x,-20))
+        
+        _rect = pygame.Rect((0,0), self.attack_box)
+        _rect.centerx = self.rect.centerx + (30*self.dir.x)
+        _rect.top = self.rect.centery - 20
+        self.hit_rectangle = Rectangle(_rect.size, _rect.topleft)
        
         collided = self.attack_collision(self.hit_rectangle)
         if len(collided) > 0:

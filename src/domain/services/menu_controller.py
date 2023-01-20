@@ -13,7 +13,7 @@ playing = False
 player_state = {
     "state_name": "player",
     "character": enums.Characters.CARLOS,
-    "movement_speed": 0.5,
+    "movement_speed": 0.49,
     "jump_force": 9,
     "max_health": 100
 }

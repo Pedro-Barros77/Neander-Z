@@ -29,7 +29,7 @@ class ZRaimundo(Enemy):
         self.attack_distance = kwargs.pop("attack_distance", 30)
         self.hit_frame = 8
         self.hiting = False
-        self.attack_box = vec(15,15)
+        self.attack_box = vec(30,30)
         self.hit_rectangle = None
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
@@ -128,6 +128,8 @@ class ZRaimundo(Enemy):
         super().draw(surface, offset)
         _now = datetime.datetime.now()
         
+        
+        
         #helmet
         if self.helmet_break_pos != None and self.helmet_break_time != None and _now < self.helmet_break_time + datetime.timedelta(milliseconds=self.helmet_timeout_ms):
             _helmet = game_controller.scale_image(self.get_helmet_frames()[int(self.helmet_frame)], self.image_scale)
@@ -182,7 +184,10 @@ class ZRaimundo(Enemy):
 
     def attack(self):
         self.hiting = True
-        self.hit_rectangle = Rectangle(self.attack_box, vec(self.rect.center) + vec(20 * self.dir.x,-20))
+        _rect = pygame.Rect((0,0), self.attack_box)
+        _rect.centerx = self.rect.centerx + (10*self.dir.x)
+        _rect.centery = self.rect.centery - 20
+        self.hit_rectangle = Rectangle(_rect.size, _rect.topleft)
        
         collided = self.attack_collision(self.hit_rectangle)
         if len(collided) > 0:

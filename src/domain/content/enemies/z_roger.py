@@ -23,7 +23,7 @@ class ZRoger(Enemy):
         self.attack_distance = kwargs.pop("attack_distance", 30)
         self.hit_frame = 8
         self.hiting = False
-        self.attack_box = vec(15,15)
+        self.attack_box = vec(50,15)
         self.hit_rectangle = None
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
@@ -52,12 +52,16 @@ class ZRoger(Enemy):
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
         
+        
 
 
     def attack(self):
         self.hiting = True
-        self.hit_rectangle = Rectangle(self.attack_box, vec(self.rect.center) + vec(20 * self.dir.x,-20))
-       
+        _rect = pygame.Rect((0,0), self.attack_box)
+        _rect.centerx = self.rect.centerx + 12 + (5*self.dir.x)
+        _rect.top = self.rect.centery - 20
+        self.hit_rectangle = Rectangle(_rect.size, _rect.topleft)
+
         collided = self.attack_collision(self.hit_rectangle)
         if len(collided) > 0:
             for c in collided:

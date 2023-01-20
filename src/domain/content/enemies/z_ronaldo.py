@@ -23,10 +23,10 @@ class ZRonaldo(Enemy):
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         self.dir: vec = vec(-1,0)
         self.last_frame_dir = self.dir.copy()
-        self.attack_distance = kwargs.pop("attack_distance", 30)
+        self.attack_distance = kwargs.pop("attack_distance", 35)
         self.hit_frame = 6
         self.hiting = False
-        self.attack_box = vec(30,40)
+        self.attack_box = vec(30,30)
         self.hit_rectangle = None
         self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
@@ -67,15 +67,12 @@ class ZRonaldo(Enemy):
     def draw(self, surface: pygame.Surface, offset: vec): 
         super().draw(surface, offset)
             
-        # if self.hit_rectangle != None:
-        #     self.hit_rectangle.draw(surface, offset)
-        
         # pygame.draw.line(surface, colors.GREEN, vec(self.rect.centerx, self.rect.bottom + 20) - offset ,vec(self.rect.centerx, self.rect.top - 20) - offset)
 
     def attack(self):
         self.hiting = True
         _hit_rect = pygame.Rect((0,0),self.attack_box)
-        _hit_rect.bottom = self.rect.centery
+        _hit_rect.bottom = self.rect.centery + self.rect.height/8
         match self.dir.x:
             case -1:
                 _hit_rect.left = self.rect.left

@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         """The ID of this player in the network."""
         self.jump_force = kwargs.pop("jump_force", 9)
         """The force of the player for jumping."""
-        self.movement_speed = kwargs.pop("movement_speed", 0.5)
+        self.movement_speed = kwargs.pop("movement_speed", 0.49)
         """The movement speed of the player."""
         self.health = 100
         """The current health of the player."""
