@@ -15,9 +15,6 @@ class SimpleWave(Wave):
         
         self.wave_type = enums.WaveType.SIMPLE
         self.wave_number = kwargs.pop("wave_number", 1)
-        self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
-        self.wave_step = kwargs.pop("wave_step", 3)
-        self.current_wave_step = self.wave_step
         self.wave_interval_s = kwargs.pop("wave_interval_s", 60)
         
         self.health_rand_margin = 0.3
@@ -34,17 +31,40 @@ class SimpleWave(Wave):
             if self.enemies_count == 0:
                 self.delay_end_wave(self.end_delay_ms)
         
-        elif self.current_wave_step >= self.wave_step:
-            self.current_wave_step = 0
+        if (self.last_spawn_time == None or datetime.datetime.now() >= self.last_spawn_time + datetime.timedelta(milliseconds=self.spawn_timer_ms))\
+            or len(self.enemies_group.sprites()) == 0:
             self.spawn()
+            self.last_spawn_time = datetime.datetime.now()
 
     def start(self):
         super().start()
         
 
-    def get_random_enemy(self) -> dict:
-        e_dict = self.enemies[random.randint(0, len(self.enemies)-1)].copy()
+    def get_random_enemy(self) -> dict | None:
+        _choice, _type = None, None
+        
+        while (_choice == None or len(_choice) == 0):
+            if len(self.enemies_spawn_chances.keys()) == 0:
+                return None
+            
+            _type = random.choices(population=list(self.enemies_spawn_chances.keys()), weights=list(self.enemies_spawn_chances.values()))[0]
+            _choice = [e for e in self.enemies if e["type"] == _type]
+            _max = self.enemies_max[_type]
+            
+            #if there's no enemy of that type to spawn, remove from chances and start over
+            if len(_choice) == 0:
+                self.enemies_spawn_chances.pop(_type)
+
+            #if that enemy type has reached MAX
+            if len([e for e in self.enemies_group.sprites() if e.enemy_name == _type]) >= _max:
+                _choice = None
+                #if it's the only type left to spawn, return
+                if len(self.enemies_spawn_chances.keys()) <= 1:
+                    return None
+        
+        e_dict = _choice[0].copy()
         self.enemies.remove(e_dict)
+        
         
         _health_margin = e_dict["health"]*self.health_rand_margin
         _health = e_dict["health"]
@@ -62,8 +82,14 @@ class SimpleWave(Wave):
 
     def spawn(self):
         #if alive zumbi is smaller than max 
-        while self.enemies_count < self.max_alive_enemies and self.spawn_count < self.total_enemies:
+        if self.spawn_count >= self.total_enemies:
+            return
+        
+        _count = self.timed_spawn_count
+        if self.spawn_count + _count > self.total_enemies:
+            _count = self.total_enemies - self.spawn_count
             
+        for _ in range(_count):
             floor_y = self.game.map.rect.bottom - self.game.map.floor_y
             can_spawn = False
             min_distance = 500
@@ -73,6 +99,9 @@ class SimpleWave(Wave):
                 can_spawn = vec(self.game.player.rect.centerx, floor_y).distance_to(vec(rand_x, floor_y)) > min_distance
 
             _enemy_dict = self.get_random_enemy()
+            if _enemy_dict == None:
+                return
+            
             _type = _enemy_dict.pop("type", enums.Enemies.Z_ROGER)
             
             enemy = self.create_enemy(_type, (rand_x,floor_y), _enemy_dict)

@@ -14,7 +14,7 @@ class BackPack:
         
         self.pistol_ammo = 0
         self.shotgun_ammo = 0
-        self.rifle_ammo = 990
+        self.rifle_ammo = 0
         self.sniper_ammo = 0
         self.rocket_ammo = 0
         

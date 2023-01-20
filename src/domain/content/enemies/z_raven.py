@@ -29,7 +29,7 @@ class ZRaven(Enemy):
         self.hiting = False
         self.attack_box = vec(15,15)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
         self.hover_height = 400
         self.hovering = True
@@ -41,8 +41,8 @@ class ZRaven(Enemy):
         self.attack_chance = kwargs.pop("attack_chance", 0.3)
         self.last_attack_attempt = datetime.datetime.now()
         
-        self.kill_score = 20
-        self.headshot_score_multiplier = 1.8
+        self.kill_score = kwargs.pop("kill_score", 20)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 1.8)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/5, self.hitbox_head.rect.height/5)))

@@ -30,12 +30,12 @@ class ZRui(Enemy):
         self.attack_box = vec(220,60)
         self.bump_box = vec(100,200)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.bump_knockback_force = 50
         self.attack_knockback_force = 20
         
-        self.kill_score = 310
-        self.headshot_score_multiplier = 2
+        self.kill_score = kwargs.pop("kill_score", 310)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 2)
         
         _health_rect = self.health_bar.rect.copy()
         _health_rect.width = self.rect.width * 0.4

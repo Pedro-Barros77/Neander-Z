@@ -31,14 +31,14 @@ class ZRaimundo(Enemy):
         self.hiting = False
         self.attack_box = vec(15,15)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
         _health_rect = self.health_bar.rect.copy()
         _health_rect.width = self.rect.width * 0.6
         self.health_bar.set_rect(_health_rect)
         
-        self.kill_score = 80
-        self.headshot_score_multiplier = 2
+        self.kill_score = kwargs.pop("kill_score", 80)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 2)
         
         self.body_damage_multiplier = kwargs.pop("body_damage_multiplier", 0.2)
         

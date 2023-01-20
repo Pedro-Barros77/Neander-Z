@@ -6,9 +6,6 @@ from domain.services import game_controller, menu_controller as mc, resources, a
 from domain.models.enemy import Enemy
 from domain.models.rectangle_sprite import Rectangle
 
-
-
-
 class ZRoger(Enemy):
     def __init__(self, pos,wave, assets_manager: assets_manager.AssetsManager, **kwargs):
         kwargs["image_scale"] = 2
@@ -28,10 +25,10 @@ class ZRoger(Enemy):
         self.hiting = False
         self.attack_box = vec(15,15)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
-        self.kill_score = 53
-        self.headshot_score_multiplier = 1.5
+        self.kill_score = kwargs.pop("kill_score", 53)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 1.5)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width, self.hitbox_head.rect.height - self.rect.height/1.5)))

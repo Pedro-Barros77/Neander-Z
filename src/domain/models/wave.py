@@ -1,4 +1,4 @@
-import pygame, datetime, threading, time
+import pygame, datetime, threading, random
 
 from domain.services import menu_controller, resources, assets_manager
 from domain.models.rectangle_sprite import Rectangle
@@ -23,19 +23,24 @@ class Wave():
         _enemies_dict: list[dict] = kwargs.pop("enemies", [])
         self.total_enemies = sum([e["count"] for e in _enemies_dict])
         self.enemy_types: list[enums.Enemies] = []
-        
+        _total_spawn_chance = sum([e["spawn_chance_multiplier"] for e in _enemies_dict])
         self.enemies: list[dict] = []
+        self.enemies_spawn_chances: dict = {}
+        self.enemies_max: dict = {}
         for e in _enemies_dict:
             _d = e.copy()
             _count = _d.pop("count", 0)
             _type = _d.pop("type", enums.Enemies.Z_ROGER)
+            self.enemies_spawn_chances[_type] = (e["spawn_chance_multiplier"] * 100 / _total_spawn_chance)/100
+            self.enemies_max[_type] = e["max_alive"]
+            
             if _type not in self.enemy_types:
                 self.enemy_types.append(_type)
                 if _type == enums.Enemies.Z_RONALD and enums.Enemies.Z_RONALDO not in self.enemy_types:
                     self.enemy_types.append(enums.Enemies.Z_RONALDO)
             for _ in range(_count):
                 self.enemies.append(e.copy())
-        
+                
         self.game = game
         self.wave_number = kwargs.pop("wave_number",0)
         self.wave_type = kwargs.pop("wave_type", enums.WaveType.SIMPLE)
@@ -43,20 +48,20 @@ class Wave():
         self.enemies_current_id = 0
         self.enemies_group = pygame.sprite.Group()
         self.enemies_hitbox_group = pygame.sprite.Group()
-        self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
-        self.wave_step = kwargs.pop("wave_step", 1)
-        self.current_wave_step = kwargs.pop("current_wave_step", 0)
         self.money_multiplier = kwargs.pop("money_multiplier", 1)
         self.wave_interval_s = kwargs.pop("wave_interval_s", 15)
         self.start_delay_ms = kwargs.pop("start_delay_ms", 2000)
         self.end_delay_ms = kwargs.pop("end_delay_ms", 1500)
+        self.spawn_timer_ms = kwargs.pop("spawn_timer_ms", 5000)
+        self.timed_spawn_count = kwargs.pop("timed_spawn_count", 1)
        
         self.spawn_count = 0
         self.enemies_count = 0
         self.killed_enemies_count = 0
         self.started = False
         self.finished = False
-
+        
+        self.last_spawn_time: datetime = None
         self.start_time: datetime.datetime = None
 
         self.players_scores = {

@@ -258,7 +258,6 @@ class Enemy(pygame.sprite.Sprite):
     def kill(self, attacker):
         self.wave.handle_score(self, attacker, self.headshot_kill)
         self.wave.enemies_count -= 1
-        self.wave.current_wave_step += 1
         if self.hitbox_head != None:
             self.hitbox_head.kill()
         if self.hitbox_body != None:

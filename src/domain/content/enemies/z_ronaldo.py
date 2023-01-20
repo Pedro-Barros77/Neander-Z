@@ -28,14 +28,14 @@ class ZRonaldo(Enemy):
         self.hiting = False
         self.attack_box = vec(30,40)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         
         _health_rect = self.health_bar.rect.copy()
         _health_rect.width = self.rect.width * 0.6
         self.health_bar.set_rect(_health_rect)
         
-        self.kill_score = 60
-        self.headshot_score_multiplier = 1.2
+        self.kill_score = kwargs.pop("kill_score", 60)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 1.2)
         
         self.hitbox_head: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.YELLOW, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value, attacker, True), name = "zombie_head", id = self.id, owner = self)
         self.hitbox_head.set_rect(pygame.Rect((0,0),(self.hitbox_head.rect.width/3, self.hitbox_head.rect.height - self.rect.height/3)))

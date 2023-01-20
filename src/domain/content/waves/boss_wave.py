@@ -12,16 +12,10 @@ class BossWave(Wave):
         
         self.wave_type = enums.WaveType.BOSS
         self.wave_number = kwargs.pop("wave_number", 1)
-        self.max_alive_enemies = kwargs.pop("max_alive_enemies", 5)
-        self.current_wave_step = self.wave_step
         self.wave_interval_s = kwargs.pop("wave_interval_s", 60)
-        self.spawn_timer_ms = kwargs.pop("spawn_timer_ms", 5000)
-        self.timed_spawn_count = kwargs.pop("timed_spawn_count", 1)
         
         self.boss: Enemy = None
-        
-        self.last_spawn_time: datetime = None
-        
+                
         self.health_rand_margin = 0.3
         self.speed_rand_margin = 0.2
         self.damage_rand_margin = 0.3
@@ -39,7 +33,6 @@ class BossWave(Wave):
                 self.delay_end_wave(1500)
             
             elif (self.last_spawn_time == None or datetime.datetime.now() >= self.last_spawn_time + datetime.timedelta(milliseconds=self.spawn_timer_ms)) and self.boss.is_alive:
-                self.current_wave_step = 0
                 self.spawn()
                 self.last_spawn_time = datetime.datetime.now()
 
@@ -81,7 +74,7 @@ class BossWave(Wave):
                 rand_x = random.randint(0, self.game.map.rect.width - 50)
                 can_spawn = vec(self.game.player.rect.centerx, floor_y).distance_to(vec(rand_x, floor_y)) > min_distance
 
-            if self.boss == None:
+            if self.boss == None or self.boss.enemy_name in [e["type"] for e in self.enemies]:
                 _enemy_dict = self.enemies[0]
                 self.enemies = self.enemies[1:]
             else:

@@ -27,13 +27,13 @@ class ZRonald(Enemy):
         self.hiting = False
         self.attack_box = vec(15,15)
         self.hit_rectangle = None
-        self.head_shot_multiplier = 2
+        self.head_shot_multiplier = kwargs.pop("head_shot_multiplier", 2)
         self.check_spawn_ronaldo = True
         
         self.afterlife_chance = kwargs.pop("afterlife_chance", 0.45)
         
-        self.kill_score = 60
-        self.headshot_score_multiplier = 1.5
+        self.kill_score = kwargs.pop("kill_score", 60)
+        self.headshot_score_multiplier = kwargs.pop("headshot_score_multiplier", 1.5)
         
         _health_rect = self.health_bar.rect.copy()
         _health_rect.width = self.rect.width * 0.4
