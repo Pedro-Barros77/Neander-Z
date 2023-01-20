@@ -45,6 +45,9 @@ class BossWave(Wave):
 
     def start(self):
         super().start()
+    
+    def on_boss_death(self, e):
+        self.total_enemies = self.killed_enemies_count + self.enemies_count
         
 
     def get_random_enemy(self) -> dict:
@@ -95,6 +98,4 @@ class BossWave(Wave):
                 self.spawn_enemy(enemy)
                 if self.boss == None:
                     self.boss = enemy
-            
-            self.spawn_count += 1
-            self.enemies_count += 1
+                    self.boss.death_callback = self.on_boss_death

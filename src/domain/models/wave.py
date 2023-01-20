@@ -53,6 +53,7 @@ class Wave():
        
         self.spawn_count = 0
         self.enemies_count = 0
+        self.killed_enemies_count = 0
         self.started = False
         self.finished = False
 
@@ -79,7 +80,6 @@ class Wave():
         if datetime.datetime.now() < self.start_time + datetime.timedelta(milliseconds=self.start_delay_ms):
             return
 
-        print(self.money_multiplier) 
         self.enemies_count = len(self.enemies_group.sprites())
     
         if self.delayed_finish_time != None and datetime.datetime.now() >= self.delayed_finish_time:
@@ -139,6 +139,9 @@ class Wave():
             self.enemies_hitbox_group.add(enemy.hitbox_head)
         if enemy.hitbox_body != None:
             self.enemies_hitbox_group.add(enemy.hitbox_body)
+            
+        self.spawn_count += 1
+        self.enemies_count += 1
         
         
         
@@ -154,7 +157,9 @@ class Wave():
             self.players_scores[2].player_character = self.game.player2.character
         
         self.players_scores[1].wave_interval_s = self.wave_interval_s
+        self.players_scores[1].wave_number = self.wave_number
         self.players_scores[2].wave_interval_s = self.wave_interval_s
+        self.players_scores[2].wave_number = self.wave_number
 
         self.game.end_wave(self.players_scores)
         self.finished = True
@@ -186,6 +191,7 @@ class Wave():
             if self.game.client_type != enums.ClientType.SINGLE:
                 self.game.player2.score += _new_score
 
+        self.killed_enemies_count += 1
         self.players_scores[attacker].score += _new_score
         
     

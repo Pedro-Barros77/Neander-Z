@@ -71,6 +71,7 @@ class ZRonald(Enemy):
                 _enemy.start_pos = _enemy.pos.copy()
                 
                 self.wave.spawn_enemy(_enemy)
+                self.wave.total_enemies += 1
                 self.kill(self.killer)
                 return
         

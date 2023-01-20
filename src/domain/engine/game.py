@@ -101,7 +101,7 @@ class Game(Page):
         """Starts the game.
         """
         
-        self.current_wave = self.create_wave(constants.WAVES[1])
+        self.current_wave = self.create_wave(constants.WAVES[10])
         self.start_wave()
         self.map = Map(self.screen, f"{resources.IMAGES_PATH}map_graveyard.png", floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
@@ -232,6 +232,18 @@ class Game(Page):
         _txt_score_rect.centery = _head_rect.centery
         _txt_score_rect.left = _txt_money_rect.right + _horizontal_margin*2
         
+        _skull = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\skull.png'), 0.8, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        _skull_rect = _skull.get_rect()
+        _skull_rect.top = _txt_score_rect.bottom + _top_margin/2
+        _skull_rect.right = self.screen.get_width() - _horizontal_margin
+        
+        _has_boss = type(self.current_wave) == BossWave and (self.current_wave.boss == None or self.current_wave.boss.is_alive)
+        _txt_enemies_count = mc.get_text_surface(f"{self.current_wave.killed_enemies_count}/{'-' if _has_boss else self.current_wave.total_enemies}", colors.LIGHT_GRAY, resources.px_font(18))
+        _txt_enemies_rect = _txt_enemies_count.get_rect()
+        _txt_enemies_rect.centery = _skull_rect.centery
+        _txt_enemies_rect.right = _skull_rect.left - _horizontal_margin
+        
+        
         _ammo_icon = self.get_ammo_icon(self.player.current_weapon.bullet_type)
         _ammo_icon_rect = _ammo_icon.get_rect()
         _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
@@ -262,6 +274,10 @@ class Game(Page):
         self.screen.blit(self._money_icon, _money_icon_rect)
         self.screen.blit(_txt_money, _txt_money_rect) 
         self.screen.blit(_txt_score, _txt_score_rect)
+        _enemies_bg = pygame.Rect(_txt_enemies_rect.topleft - vec(5,2), vec(_txt_enemies_rect.size) + vec(self.screen.get_width() - _skull_rect.right + _skull_rect.width + _horizontal_margin, 0) + vec(10,3))
+        pygame.draw.rect(self.screen, colors.MEDIUM_GRAY, _enemies_bg)
+        self.screen.blit(_skull, _skull_rect)
+        self.screen.blit(_txt_enemies_count, _txt_enemies_rect)
         
         self.screen.blit(_ammo_icon, _ammo_icon_rect)
         if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:

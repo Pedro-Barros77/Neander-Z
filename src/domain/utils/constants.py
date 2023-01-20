@@ -23,6 +23,37 @@ HOLD_TRIGGER_FIREMODES = [enums.FireMode.FULL_AUTO, enums.FireMode.MELEE]
 def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
     w: Weapon = None
     match weapon:
+        case enums.Weapons.DEBUG:
+            w = FullAuto(pos,
+                         bullet_type=enums.BulletType.ASSAULT_RIFLE,
+                         weapon_type=weapon,
+                         is_primary=False,
+                         fire_mode=enums.FireMode.FULL_AUTO,
+                         reload_type=enums.ReloadType.MAGAZINE,
+                         upgrades_dict=get_weapon_upgrade(weapon),
+                         display_name="DEV'S weapon",
+                         weapon_switch_ms=5,
+                         damage=9999,
+                         bullet_speed=30,
+                         fire_rate=7,
+                         reload_delay_ms=50,
+                         magazine_size=99999,
+                         bullet_max_range=2000,
+                         bullet_min_range=1900,
+                         reload_end_frame=9,
+                         reload_speed_multiplier=4,
+                         barrel_offset=vec(0, 7),
+                         weapon_scale=1,
+                         store_scale=1.8
+                         )
+            w.bullet_spawn_offset = vec(w.rect.width/2 + 20, 0)
+            for s in w.shoot_sounds:
+                s.set_volume(0.3)
+
+            w.empty_sound.set_volume(0.1)
+            w.reload_start_sound.set_volume(0.3)
+            w.reload_end_sound.set_volume(0.3)
+        
         case enums.Weapons.MACHETE:
             w = Melee(pos,
                       bullet_type=enums.BulletType.MELEE,

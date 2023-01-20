@@ -36,6 +36,7 @@ class Enemy(pygame.sprite.Sprite):
         self.death_time: datetime.datetime = None
         self.fade_out_ms = 1000
         self.image_alpha = 255
+        self.death_callback: function = kwargs.pop("death_callback", None)
         
         self.pos: vec = vec((pos))
         self.speed = vec(0,0)
@@ -262,6 +263,8 @@ class Enemy(pygame.sprite.Sprite):
             self.hitbox_head.kill()
         if self.hitbox_body != None:
             self.hitbox_body.kill()
+        if self.death_callback != None:
+            self.death_callback(self)
         super().kill()
         
     

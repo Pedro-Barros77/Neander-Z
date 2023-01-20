@@ -45,6 +45,7 @@ class Weapons(Enum):
     SV98 = 'snipers\\sv98'
     M16 = 'rifles\\m16'
     SCAR = 'rifles\\scar'
+    DEBUG = 'rifles\\scar'
     
 class AnimActions(Enum):
     #players/enemies

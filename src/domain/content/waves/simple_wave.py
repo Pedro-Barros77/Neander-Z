@@ -82,6 +82,3 @@ class SimpleWave(Wave):
                 enemy.pos = vec(enemy.rect.topleft)
                 enemy.start_pos = enemy.pos.copy()
                 self.spawn_enemy(enemy)
-            
-            self.spawn_count += 1
-            self.enemies_count += 1
