@@ -22,7 +22,7 @@ class ProgressBar(pygame.sprite.Sprite):
         self.value_ratio = self.max_value / self.rect.width
         """The amount of pixels to draw per value."""
         
-        self.bar_color = kwargs.pop("max_color", colors.RED)
+        self.bar_color = kwargs.pop("bar_color", colors.RED)
         """The color of the bar."""
         self.back_color = kwargs.pop("back_color", colors.BLACK)
         """The background color of the bar."""

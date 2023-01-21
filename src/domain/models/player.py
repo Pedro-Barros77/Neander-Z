@@ -26,11 +26,21 @@ class Player(pygame.sprite.Sprite):
         self.jump_force = kwargs.pop("jump_force", 9)
         """The force of the player for jumping."""
         self.movement_speed = kwargs.pop("movement_speed", 0.49)
+        self.start_movement_speed = self.movement_speed
         """The movement speed of the player."""
         self.health = 100
         """The current health of the player."""
         self.max_health = self.health
         """The maximum health of the player."""
+        self.stamina = kwargs.pop("stamina", 800)
+        """The stamina of the player. Drains when running, jumping and attacking."""
+        self.max_stamina = self.stamina
+        self.stamina_regen_delay_ms = kwargs.pop("stamina_regen_delay_ms", 1000)
+        self.stamina_regen_rate = kwargs.pop("stamina_regen_rate", 3)
+        self.sprint_stamina_drain = kwargs.pop("run_stamina_drain", 3)
+        self.jump_stamina_drain = kwargs.pop("jump_stamina_drain", 4)
+        self.attack_stamina_drain = kwargs.pop("attack_stamina_drain", 1)
+        self.last_stamina_use = datetime.datetime.now()
 
         self.score = 0
         """The amount of points of the player""" 
@@ -43,6 +53,9 @@ class Player(pygame.sprite.Sprite):
         
         self.is_alive = True
         """If the player is still alive."""
+        
+        self.sprinting = False
+        self.sprint_speed_multiplier = kwargs.pop("sprint_speed_multiplier", 1.3)
         
         self.pos: vec = vec((pos))
         """The X and Y position coordinates of the player."""
@@ -91,7 +104,7 @@ class Player(pygame.sprite.Sprite):
         self.turn_frames = game_controller.load_sprites(turn_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the turning animation."""
         
-        self.jumping = False
+        self.jumping_sideways = False
         """If the jumping animation is running."""
         self.jumping_frame = 0
         """The current frame index of the jumping animation."""
@@ -99,6 +112,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_frames = game_controller.load_sprites(jump_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
         """The frames of the jumping animation."""
         self.jump_frames.append(self.jump_frames[-1])
+        self.jumping = False
         
         self.running = False
         """If the running animation is running."""
@@ -131,6 +145,8 @@ class Player(pygame.sprite.Sprite):
         
         self.health_bar: ProgressBar = None
         """The health bar of the player."""
+        self.stamina_bar = ProgressBar(self.max_stamina, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 6)), border_width = 1, bar_color = colors.YELLOW,use_animation = False)
+        """The health bar of the player."""
         
         self.survived_wave = 0
         
@@ -149,9 +165,9 @@ class Player(pygame.sprite.Sprite):
         self.reload_popup: Popup = None
         
         if self.is_player1:
-            self.health_bar = ProgressBar(self.health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
+            self.health_bar = ProgressBar(self.max_health, pygame.Rect((10, 10), (game_controller.screen_size.x/2, 20)), hide_on_full = False)
         else:
-            self.health_bar = ProgressBar(self.health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)), border_width = 1)
+            self.health_bar = ProgressBar(self.max_health, pygame.Rect((self.rect.left, self.rect.top), (self.rect.width * 1.3, 8)), border_width = 1)
     
     def change_weapon(self, slot: int = None):
         _now = datetime.datetime.now()
@@ -207,8 +223,39 @@ class Player(pygame.sprite.Sprite):
         game = kwargs.pop("game", None)
         
         self.movement(game)
+        _now = datetime.datetime.now()
+        
+        if self.sprinting:
+            self.movement_speed = self.start_movement_speed * self.sprint_speed_multiplier
+            self.stamina_bar.remove_value(self.sprint_stamina_drain * mc.dt)
+            self.last_stamina_use = _now
+        else:
+            self.movement_speed = self.start_movement_speed 
+            
+        if self.jumping and self.speed.y < 0:
+            self.stamina_bar.remove_value(self.jump_stamina_drain * mc.dt)
+            self.last_stamina_use = _now
+        
+        _is_melee = self.current_weapon.fire_mode == enums.FireMode.MELEE
+        if _is_melee and self.stamina < self.attack_stamina_drain:
+            self.current_weapon.has_stamina = False
+        elif self.stamina >= self.attack_stamina_drain:
+            self.current_weapon.has_stamina = True
+            
+        _attacking = _is_melee and self.current_weapon.firing
+        
+        if _attacking:
+            self.stamina_bar.remove_value((self.attack_stamina_drain + self.current_weapon.stamina_use) * mc.dt)
+            self.last_stamina_use = _now
+
+        if not self.sprinting and not self.jumping and not _attacking and _now > self.last_stamina_use + datetime.timedelta(milliseconds=self.stamina_regen_delay_ms):
+            self.stamina_bar.add_value(self.stamina_regen_rate * mc.dt)
+            
+        self.stamina = self.stamina_bar.value
+            
         
         self.health_bar.update()
+        self.stamina_bar.update()
         self.current_weapon.update()
         
         if self.is_player1:
@@ -219,6 +266,9 @@ class Player(pygame.sprite.Sprite):
             _offset_camera_target = vec(0,0)
             self.health_bar.rect.centerx = self.rect.centerx
             self.health_bar.rect.top = self.rect.top - 15
+            
+        self.stamina_bar.rect.centerx = self.rect.centerx
+        self.stamina_bar.rect.top = self.rect.top - 15
 
         #region Weapon Animation
         
@@ -258,7 +308,7 @@ class Player(pygame.sprite.Sprite):
             self.fall_ground_anim(0.2 * mc.dt)
         if self.running:
             self.run_anim(abs(self.speed.x / 26.4) * mc.dt)
-        if self.jumping:
+        if self.jumping_sideways:
             self.jump_anim(0.2 * mc.dt)
         if self.changing_weapon:
             self.change_weapon_anim()
@@ -296,6 +346,9 @@ class Player(pygame.sprite.Sprite):
         if not self.is_player1:
             self.health_bar.draw(surface, _target_offset)
             
+        self.stamina_bar.draw(surface, self.offset_camera)
+        
+            
         # pygame.draw.rect(surface, colors.BLUE, math.rect_offset(self.feet_collider.rect, -offset), 3)
         
     
@@ -311,6 +364,7 @@ class Player(pygame.sprite.Sprite):
         pressing_left = pygame.K_a in game.pressed_keys
         was_pressing_right = pygame.K_d in game.last_pressed_keys
         was_pressing_left = pygame.K_a in game.last_pressed_keys
+        self.sprinting = pygame.K_LSHIFT in game.pressed_keys and self.running and self.stamina > self.sprint_stamina_drain
             
         # Move right
         if pressing_right:
@@ -367,19 +421,21 @@ class Player(pygame.sprite.Sprite):
         _was_grounded = self.grounded
         self.grounded = self.collision(game, game.jumpable_group, enums.Orientation.VERTICAL, self.feet_collider)
         if not _was_grounded and self.grounded:
+            self.jumping_sideways = False
             self.jumping = False
             self.falling_ground = True
             self.fall_sound.play()
             if pressing_left != pressing_right:
                 self.running = True
         
-        if (pygame.K_SPACE in game.pressed_keys or pygame.K_w in game.pressed_keys) and self.grounded:
+        if (pygame.K_SPACE in game.pressed_keys or pygame.K_w in game.pressed_keys) and self.grounded and self.stamina > self.jump_stamina_drain:
             self.speed.y = -self.jump_force
             self.jump_sounds.play()
+            self.jumping = True
             if pressing_left != pressing_right:
                 self.falling_ground = False
                 self.running = False
-                self.jumping = True
+                self.jumping_sideways = True
                 
             if pygame.K_SPACE in game.pressed_keys:
                 game.pressed_keys.remove(pygame.K_SPACE)
@@ -450,7 +506,7 @@ class Player(pygame.sprite.Sprite):
     def jump_anim(self, speed: float):
         if self.jumping_frame > len(self.jump_frames)-1:
             self.jumping_frame = 0
-            self.jumping = False
+            self.jumping_sideways = False
         self.image = game_controller.scale_image(self.jump_frames[int(self.jumping_frame)], self.image_scale)
         if self.acceleration.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)

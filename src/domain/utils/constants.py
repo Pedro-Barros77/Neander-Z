@@ -77,6 +77,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                       attack_box=vec(50, 20),
                       weapon_scale=0.08,
                       store_scale=0.2,
+                      stamina_use = 2
                       )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 30, 0)
             for s in w.swipe_sounds:
@@ -419,6 +420,23 @@ WEAPONS_UPGRADES = {
                 "ammount": 0.5,
                 "price": 200.0
             },
+        ],
+        "stamina": [
+            {
+                "id": 1,
+                "ammount": 0.75,
+                "price": 150.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.7,
+                "price": 220.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.7,
+                "price": 220.0
+            }
         ],
     },
     enums.Weapons.P_1911: {
@@ -1070,6 +1088,31 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
+    1: {
+        "wave_number": 1,
+        "wave_type": enums.WaveType.SIMPLE,
+        "wave_message": "And so it begins...",
+        "timed_spawn_count": 10,
+        "spawn_timer_ms": 8000,
+        "wave_interval_s": 6000,
+        "start_delay_ms": 0,
+        "end_delay_ms": 0,
+        "money_multiplier": 1,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 10,
+                "movement_speed": 0.1,
+                "health": 24,
+                "damage": 20,
+                "max_alive": 99,
+                "spawn_chance_multiplier": 1
+            }
+        ]
+    }
+}
+
+{
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,

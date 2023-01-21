@@ -41,7 +41,8 @@ class Inventory:
             "reload_speed": 10,
             "range": 1000,
             "concentration": 12,
-            "magazine_size": 50
+            "magazine_size": 50,
+            "stamina": 6
         })
         
         self.damage_bar = None
@@ -50,6 +51,7 @@ class Inventory:
         self.range_bar = None
         self.magazine_bar = None
         self.concentration_bar = None
+        self.stamina_bar = None
         
         self.load_inventory()
         
@@ -366,6 +368,7 @@ class Inventory:
                 
                 _reload_speed = 0
                 _concentration = 0
+                _stamina_skill = 0
                 _damage = weapon.damage
                 _range = (weapon.bullet_min_range + weapon.bullet_max_range)/2
                 _firerate = weapon.fire_rate
@@ -381,6 +384,7 @@ class Inventory:
                 match weapon.fire_mode:
                     case enums.FireMode.MELEE:
                         _range = 0
+                        _stamina_skill = 6 / weapon.stamina_use
                     case enums.FireMode.BURST:
                         _firerate = (weapon.burst_fire_rate + weapon.fire_rate) / 2
                     case _:
@@ -421,6 +425,11 @@ class Inventory:
                 else:
                     self.concentration_bar.value = _concentration
 
+                if self.stamina_bar == None:
+                    self.stamina_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*6), _bars_size), max_value = self.attributes_max["stamina"], value = _stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.stamina_bar.value = _stamina_skill
+
                     
                         
                 
@@ -457,6 +466,11 @@ class Inventory:
                 _txt_concentration_rect.centery = self.concentration_bar.rect.centery
                 _txt_concentration_rect.left = _bar_pos.x
 
+                _txt_stamina = menu_controller.get_text_surface("Stamina skill:", colors.WHITE if self.stamina_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
+                _txt_stamina_rect = _txt_stamina.get_rect()
+                _txt_stamina_rect.centery = self.stamina_bar.rect.centery
+                _txt_stamina_rect.left = _bar_pos.x
+
                 
                 _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect]])
                 _txt_left = _txt_damage_rect.left + _max_txt_width + _bars_margin + 10
@@ -466,6 +480,7 @@ class Inventory:
                 self.range_bar.rect.left = _txt_left
                 self.magazine_bar.rect.left = _txt_left
                 self.concentration_bar.rect.left = _txt_left
+                self.stamina_bar.rect.left = _txt_left
                 
                 _attribute_bars = {
                     "damage": self.damage_bar,
@@ -473,7 +488,8 @@ class Inventory:
                     "reload_speed": self.reload_bar,
                     "range": self.range_bar,
                     "magazine_size": self.magazine_bar,
-                    "concentration": self.concentration_bar
+                    "concentration": self.concentration_bar,
+                    "stamina": self.stamina_bar
                 }
                 
                 for b in _attribute_bars.values():
@@ -575,6 +591,9 @@ class Inventory:
                 #optionals
                 self.concentration_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_concentration, _txt_concentration_rect)
+                
+                self.stamina_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_stamina, _txt_stamina_rect)
                 
             if self.selected_card.item_name == "backpack":
                 _txt_item_title = menu_controller.get_text_surface("Backpack", colors.WHITE, resources.px_font(40))
@@ -868,6 +887,8 @@ class Inventory:
                 weapon.dispersion = 90 / (self.concentration_bar.value + ammount)
             case "magazine_size":
                 weapon.magazine_size += ammount
+            case "stamina":
+                weapon.stamina_use = 6 / (self.stamina_bar.value + ammount)
                 
     def swap_weapon_slots(self):
         bkp = self.player.backpack

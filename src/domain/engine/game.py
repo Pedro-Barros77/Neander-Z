@@ -308,7 +308,7 @@ class Game(Page):
                 player_aim_angle = self.player.current_weapon.weapon_aim_angle,
                 player_falling_ground = self.player.falling_ground,
                 player_running = self.player.running,
-                player_jumping = self.player.jumping,
+                player_jumping = self.player.jumping_sideways,
                 player_turning_dir = self.player.turning_dir,
                 player_firing = self.player.current_weapon.firing
             )
@@ -365,7 +365,7 @@ class Game(Page):
         
         self.player2.falling_ground = data.player_falling_ground
         self.player2.running = data.player_running
-        self.player2.jumping = data.player_jumping
+        self.player2.jumping_sideways = data.player_jumping
         self.player2.turning_dir = data.player_turning_dir
         if data.player_firing:
             self.player2.firing = True

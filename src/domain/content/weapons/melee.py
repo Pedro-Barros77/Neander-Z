@@ -19,6 +19,8 @@ class Melee(Weapon):
         self.hit_rectangle: Rectangle = None
         self.attack_box = kwargs.pop("attack_box", vec(10,10))
         self.magazine_bullets = 1
+        self.has_stamina = True
+        self.stamina_use = kwargs.pop("stamina_use", 1)
         
         load_content = kwargs.pop("load_content", True)
         
@@ -70,6 +72,9 @@ class Melee(Weapon):
             self.current_frame = pygame.transform.flip(self.current_frame, False, True)
     
     def can_shoot(self):
+        if not self.has_stamina:
+            return False
+        
         _now = datetime.datetime.now()
         
         if self.last_shot_time == None:
