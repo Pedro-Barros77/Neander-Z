@@ -12,7 +12,7 @@ class BackPack:
         self.max_sniper_ammo = 15
         self.max_rocket_ammo = 5
         
-        self.pistol_ammo = 0
+        self.pistol_ammo = 3
         self.shotgun_ammo = 0
         self.rifle_ammo = 0
         self.sniper_ammo = 0
@@ -126,6 +126,3 @@ class BackPack:
 
             case enums.BulletType.ROCKET:
                 return self.max_rocket_ammo
-            
-    def can_carry_ammo(self, value:int, ammo_type: enums.BulletType):
-        return self.get_ammo(ammo_type) + value <= self.get_max_ammo(ammo_type)

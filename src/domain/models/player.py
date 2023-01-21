@@ -530,6 +530,7 @@ class Player(pygame.sprite.Sprite):
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.DEBUG:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+                weapon_type = enums.Weapons.SCAR
             
         if weapon == None:
             return None, False

@@ -168,7 +168,7 @@ class Store:
             
         
             
-        bck = self.player.backpack
+        bkp = self.player.backpack
         
         #if there is any item selected
         if self.selected_card != None:
@@ -179,11 +179,11 @@ class Store:
             if self.selected_card.owned:
                 #if the item is a weapon
                 if self.selected_card.weapon_type != None:
-                    weapon = bck.get_weapon(self.selected_card.weapon_type)
+                    weapon = bkp.get_weapon(self.selected_card.weapon_type)
                     #if player really has this weapon
                     if weapon != None:
                         #if this weapon is the equiped primary or secondary
-                        if bck.equipped_primary == self.selected_card.weapon_type or bck.equipped_secondary == self.selected_card.weapon_type:
+                        if bkp.equipped_primary == self.selected_card.weapon_type or bkp.equipped_secondary == self.selected_card.weapon_type:
                             btn_text = "Equiped"
                             _card_equiped = True
                         else: #otherwise it's just in the inventory
@@ -192,8 +192,19 @@ class Store:
                     btn_text = "Purchased"
 
             else: #player doesn't have the item
-                
-                btn_text = f'Buy{" +" + str(self.selected_card.count) if self.selected_card.count > 0 else ""}'
+                if self.selected_card.count > 0:
+                    if "_ammo" in self.selected_card.item_name:
+                        _diff = bkp.get_max_ammo(self.selected_card.bullet_type) - bkp.get_ammo(self.selected_card.bullet_type)
+                        if _diff == 0:
+                            btn_text = "Full"
+                        elif _diff > self.selected_card.count:
+                            btn_text = f'Buy +{self.selected_card.count}'
+                        else:
+                            btn_text = f'Buy +{_diff}'
+                    else:
+                        btn_text = f'Buy +{self.selected_card.count}'
+                else:
+                    btn_text = f'Buy'
                 
             btn_buy.set_text(btn_text)
             #if the player can afford to buy the item
@@ -203,7 +214,7 @@ class Store:
             btn_buy.enable((_has_money or self.selected_card.owned) and not _card_equiped and not (self.selected_card.item_name.endswith("kit") and self.player.health >= self.player.max_health))
 
         for card in self.cards_list:
-            if card.weapon_type != None and bck.get_weapon(card.weapon_type) != None:
+            if card.weapon_type != None and bkp.get_weapon(card.weapon_type) != None:
                 card.owned = True
             else:
                 card.owned = False
@@ -488,25 +499,32 @@ class Store:
             
     def buy_ammo(self, ammo_type: enums.BulletType):
         item = self.selected_card
-        b = self.player.backpack
+        bkp = self.player.backpack
+        _max = bkp.get_max_ammo(ammo_type)
+        _current = bkp.get_ammo(ammo_type)
+        if _current + item.count > _max:
+            _diff = _max - _current
+            _percentage = (_diff * 100 / item.count) / 100
+            if _diff == 0:
+                return False, 0
+            bkp.set_ammo(bkp.get_ammo(ammo_type) + _diff, ammo_type)
+            return True, item.price * _percentage
+        else:
+            bkp.set_ammo(bkp.get_ammo(ammo_type) + item.count, ammo_type)
+            return True, item.price
         
-        if not b.can_carry_ammo(item.count, ammo_type):
-            return False
-        
-        b.set_ammo(b.get_ammo(ammo_type) + item.count, ammo_type)
-        
-        return True
                 
             
     def process_purchase(self):
         item = self.selected_card
         bought = False
+        price = item.price
         
         if self.player.money < item.price and not item.owned:
             return
         
         if item.item_name.endswith("ammo"):
-            bought = self.buy_ammo(item.bullet_type)
+            bought, price = self.buy_ammo(item.bullet_type)
         
         if item.weapon_type != None:
             if item.owned:
@@ -526,4 +544,4 @@ class Store:
             self.player.money -= item.price
             self.purchase_sound.play()
             
-            menu_controller.popup(Popup(f"-${item.price}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))
+            menu_controller.popup(Popup(f"-${price:.2f}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))
