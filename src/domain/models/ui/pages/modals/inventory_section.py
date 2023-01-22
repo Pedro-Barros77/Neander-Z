@@ -35,16 +35,30 @@ class Inventory:
         self.cards_list = []
         self.buttons: list[Button] = []
         
-        self.attributes_max = kwargs.pop("attributes_max",{
+        self.weapon_attributes_max = kwargs.pop("weapon_attributes_max",{
             "damage": 50,
             "firerate": 15,
-            "reload_speed": 10,
+            "reload_speed": 10,#5000
             "range": 1000,
-            "concentration": 12,
+            "concentration": 12,#90
             "magazine_size": 50,
-            "stamina": 6
+            "stamina": 6 #6
         })
         
+        self.player_attributes_max = kwargs.pop("player_attributes_max",{
+            "max_health": 360,
+            "movement_speed": 0.7,
+            "sprint_speed": 1.3,
+            "jump_force": 11,
+            "max_stamina": 1500,
+            "stamina_regen_rate": 9,
+            "stamina_regen_haste": 18,#5000
+            "jump_stamina_skill": 50,#100
+            "sprint_stamina_skill": 60,#100
+            "attack_stamina_skill": 100 #10
+        })
+        
+        #weapons
         self.damage_bar = None
         self.firerate_bar = None
         self.reload_bar = None
@@ -52,6 +66,19 @@ class Inventory:
         self.magazine_bar = None
         self.concentration_bar = None
         self.stamina_bar = None
+        
+        #player
+        self.max_health_bar = None
+        self.movement_speed_bar = None
+        self.sprint_speed_bar = None
+        self.jump_force_bar = None
+        
+        self.max_stamina_bar = None
+        self.stamina_regen_rate_bar = None
+        self.stamina_regen_haste_bar = None
+        self.jump_stamina_skill_bar = None
+        self.sprint_stamina_skill_bar = None
+        self.attack_stamina_skill_bar = None
         
         self.load_inventory()
         
@@ -110,9 +137,10 @@ class Inventory:
                 StoreItem(f'{resources.get_weapon_path(w.weapon_type, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), w.display_name, item_name = str(w.weapon_type.value), price = 0, icon_scale = w.store_scale, bullet_type = w.bullet_type, weapon_type = w.weapon_type, **cards_dict)
             )
             
-        self.items.append(
+        self.items.extend([
             StoreItem(f'{resources.IMAGES_PATH}items\\backpack.png', pygame.Rect((0,0), self.card_size), "Backpack", item_name = "backpack", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
-        )
+            StoreItem(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png', pygame.Rect((0,0), self.card_size), "Player", item_name = "player", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
+        ])
             
         #Cards
         self.cards_list = [*self.weapons, *self.items]#*self.ammos,
@@ -140,16 +168,17 @@ class Inventory:
         )
         
         #Upgrades buttons
-        for att in self.attributes_max.keys():
+        for att in self.weapon_attributes_max.keys():
             self.buttons.append(
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\plus.png', on_click = lambda: print("click"), text_font = resources.px_font(20),name = f'btn_upgrade_{att}', text_color = colors.BLACK, scale = 0.5, visible = False)
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\plus.png', on_click = lambda: print("click"), text_font = resources.px_font(20),name = f'btn_upgrade_weapon_{att}', text_color = colors.BLACK, scale = 0.5, visible = False)
+            )
+        for att in self.player_attributes_max.keys():
+            self.buttons.append(
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\plus.png', on_click = lambda: print("click"), text_font = resources.px_font(20),name = f'btn_upgrade_player_{att}', text_color = colors.BLACK, scale = 0.5, visible = False)
             )
         
     def update(self, **kwargs):
         events = kwargs.pop("events", [])
-        
-        
-        
         
         for e in events:
             if self.inv_v_scrollbar != None:
@@ -226,11 +255,6 @@ class Inventory:
             
             card.update(self.panel_margin/2, self.player.money)
 
-        
-        
-        
-        
-        
             
     def draw(self, screen: pygame.Surface):
         screen_rect = screen.get_rect()
@@ -350,7 +374,8 @@ class Inventory:
             self.image.blit(secondary_icon, secondary_icon_rect)
             
         # self.buttons[0].draw(self.image, -self.panel_margin/2)
-        _upgrade_btns = [b for b in self.buttons if b.name.startswith("btn_upgrade")]
+        _weapon_upgrade_btns = [b for b in self.buttons if b.name.startswith("btn_upgrade_weapon")]
+        _player_upgrade_btns = [b for b in self.buttons if b.name.startswith("btn_upgrade_player")]
         if self.selected_card != None:
             if self.selected_card.weapon_type != None:
                 if self.selected_weapon == None or self.selected_weapon.weapon_type != self.selected_card.weapon_type:
@@ -394,52 +419,48 @@ class Inventory:
                     _damage = weapon.damage * weapon.ballin_count
                     _concentration = 90 / weapon.dispersion
             
-            
+                #region Weapon bars
                 if self.damage_bar == None:
-                    self.damage_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*0), _bars_size), max_value = self.attributes_max["damage"], value = _damage, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.damage_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*0), _bars_size), max_value = self.weapon_attributes_max["damage"], value = _damage, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.damage_bar.value = _damage
                     
                 if self.firerate_bar == None:
-                    self.firerate_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*1), _bars_size), max_value = self.attributes_max["firerate"], value = _firerate, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.firerate_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*1), _bars_size), max_value = self.weapon_attributes_max["firerate"], value = _firerate, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.firerate_bar.value = _firerate
                     
                 if self.reload_bar == None:
-                    self.reload_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*2), _bars_size), max_value = self.attributes_max["reload_speed"], value = _reload_speed, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.reload_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*2), _bars_size), max_value = self.weapon_attributes_max["reload_speed"], value = _reload_speed, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.reload_bar.value = _reload_speed
                     
                 if self.range_bar == None:
-                    self.range_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.attributes_max["range"], value = _range, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.range_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.weapon_attributes_max["range"], value = _range, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.range_bar.value = _range
                     
                 if self.magazine_bar == None:
-                    self.magazine_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*4), _bars_size), max_value = self.attributes_max["magazine_size"], value = _magazine_size, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.magazine_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*4), _bars_size), max_value = self.weapon_attributes_max["magazine_size"], value = _magazine_size, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.magazine_bar.value = _magazine_size
                     
                 if self.concentration_bar == None:
-                    self.concentration_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.attributes_max["concentration"], value = _concentration, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.concentration_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.weapon_attributes_max["concentration"], value = _concentration, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.concentration_bar.value = _concentration
 
                 if self.stamina_bar == None:
-                    self.stamina_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*6), _bars_size), max_value = self.attributes_max["stamina"], value = _stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
+                    self.stamina_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*6), _bars_size), max_value = self.weapon_attributes_max["stamina"], value = _stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
                 else:
                     self.stamina_bar.value = _stamina_skill
-
-                    
-                        
+            #endregion
                 
-
-                #attribute labels
+                #region Weapon attribute labels
                 _txt_damage = menu_controller.get_text_surface("Damage:", colors.WHITE, resources.px_font(25))
                 _txt_damage_rect = _txt_damage.get_rect()
                 _txt_damage_rect.centery = self.damage_bar.rect.centery
                 _txt_damage_rect.left = _bar_pos.x
-                
                 
                 _txt_firerate = menu_controller.get_text_surface("Fire rate:", colors.WHITE if self.firerate_bar.value > 0 else colors.DARK_GRAY, resources.px_font(25))
                 _txt_firerate_rect = _txt_firerate.get_rect()
@@ -470,10 +491,9 @@ class Inventory:
                 _txt_stamina_rect = _txt_stamina.get_rect()
                 _txt_stamina_rect.centery = self.stamina_bar.rect.centery
                 _txt_stamina_rect.left = _bar_pos.x
-
                 
-                _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect]])
-                _txt_left = _txt_damage_rect.left + _max_txt_width + _bars_margin + 10
+                _max_txt_width = max([x.width for x in [_txt_damage_rect, _txt_firerate_rect, _txt_reload_speed_rect, _txt_range_rect, _txt_magazine_rect, _txt_concentration_rect, _txt_stamina_rect]])
+                _txt_left = _txt_damage_rect.left + _max_txt_width + _bars_margin/2
                 self.damage_bar.rect.left = _txt_left
                 self.firerate_bar.rect.left = _txt_left
                 self.reload_bar.rect.left = _txt_left
@@ -500,12 +520,12 @@ class Inventory:
                 
                 _weapon_upgrades = constants.get_weapon_upgrade(self.selected_card.weapon_type)
                 if _weapon_upgrades != None:
-                    _unused_btns = [b for b in _upgrade_btns if b.name not in _weapon_upgrades.keys()]
+                    _unused_btns = [b for b in _weapon_upgrade_btns if b.name not in _weapon_upgrades.keys()]
                     for b in _unused_btns:
                         b.visible = False
                     
                     for key, value in _weapon_upgrades.items():
-                        _btn_upgrade = [b for b in _upgrade_btns if key in b.name]
+                        _btn_upgrade = [b for b in _weapon_upgrade_btns if key in b.name]
                         _bar = _attribute_bars[key]
                         if len(_btn_upgrade) <= 0 or _bar == None:
                             continue
@@ -513,13 +533,12 @@ class Inventory:
                         _btn_upgrade.rect.left = _bar.rect.right + self.panel_margin.x/2 + pnl_right_rect.left
                         _btn_upgrade.rect.centery = _bar.rect.centery + self.panel_margin.y/2 + pnl_right_rect.top
                         _btn_upgrade.visible = True
-                        _btn_upgrade.on_click = lambda attr_name = key: self.buy_upgrade(self.selected_card.weapon_type, attr_name)
+                        _btn_upgrade.on_click = lambda attr_name = key: self.buy_weapon_upgrade(self.selected_card.weapon_type, attr_name)
                         _upgrade_map_index = math.clamp(weapon.upgrades_map[key], 0, len(value)) if weapon.upgrades_map != None else 0
                         _has_upgrade = weapon.upgrades_map == None or _upgrade_map_index < len(value)
                         _has_money = _has_upgrade and self.player.money >= value[_upgrade_map_index]["price"]
                         _btn_upgrade.enable(_has_upgrade and _has_money)
                         
-
                         def btn_upgrade_hover(btn: Button, upgrade_steps = value, bar = _bar, key = key):
                             btn.default_on_hover(btn)
                             if btn.hovered:
@@ -536,8 +555,6 @@ class Inventory:
                             else:
                                 bar.upgrade_value = 0
                                 bar.rerender()
-                                
-                                
                             
                         _btn_upgrade.on_hover =btn_upgrade_hover
                         if _has_upgrade:
@@ -552,11 +569,10 @@ class Inventory:
                         _txt_upgrade_price_rect.left = _bar.rect.right + _btn_upgrade.rect.width + 5
                         pnl_right.blit(_txt_upgrade_price, _txt_upgrade_price_rect)
                 else:
-                    for b in _upgrade_btns:
+                    for b in _weapon_upgrade_btns:
                         b.visible = False
-                        
                     
-                for b in _upgrade_btns:
+                for b in _weapon_upgrade_btns:
                     b.draw(pnl_right, vec(0,0))
                     
                 btn_sell_weapon = self.buttons[1]
@@ -588,12 +604,13 @@ class Inventory:
                 self.magazine_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_magazine, _txt_magazine_rect)
 
-                #optionals
                 self.concentration_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_concentration, _txt_concentration_rect)
                 
                 self.stamina_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_stamina, _txt_stamina_rect)
+                #endregion
+                ...
                 
             if self.selected_card.item_name == "backpack":
                 _txt_item_title = menu_controller.get_text_surface("Backpack", colors.WHITE, resources.px_font(40))
@@ -776,8 +793,246 @@ class Inventory:
                 pnl_right.blit(_txt_max_rocket, _txt_max_rocket_rect)
                 
                 _btn_upgrade_bkp.draw(pnl_right, vec(-self.panel_margin.x/2 - pnl_right_rect.left, -self.panel_margin.y/2 - pnl_right_rect.top))
+            elif self.selected_card.item_name == "player":
+                _txt_item_title = menu_controller.get_text_surface("Player", colors.WHITE, resources.px_font(40))
+                _txt_item_title_rect = _txt_item_title.get_rect()
+                _txt_item_title_rect.top = 5
+                _txt_item_title_rect.centerx = pnl_right_rect.width/2
+                
+                _bar_pos = vec(10, _txt_item_title_rect.bottom + 10)
+                _bars_margin = 10
+                _bars_size = vec(pnl_right_rect.width/2,15)
+                
+                _max_health = self.player.max_health
+                _movement_speed = self.player.start_movement_speed
+                _sprint_speed = self.player.sprint_speed_weight
+                _jump_force = self.player.jump_force
+                _max_stamina = self.player.max_stamina
+                _stamina_regen_rate = self.player.stamina_regen_rate
+                _stamina_regen_haste = 5000 / self.player.stamina_regen_delay_ms
+                _jump_stamina_skill = 100 / self.player.jump_stamina_drain
+                _sprint_stamina_skill = 100 / self.player.sprint_stamina_drain
+                _attack_stamina_skill = 10 / self.player.attack_stamina_drain
+                
+                #region Player bars
+                
+                if self.max_health_bar == None:
+                    self.max_health_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*0), _bars_size), max_value = self.player_attributes_max["max_health"], value = _max_health, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.max_health_bar.value = _max_health
+                    
+                if self.movement_speed_bar == None:
+                    self.movement_speed_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*1), _bars_size), max_value = self.player_attributes_max["movement_speed"], value = _movement_speed, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.movement_speed_bar.value = _movement_speed
+
+                if self.sprint_speed_bar == None:
+                    self.sprint_speed_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*2), _bars_size), max_value = self.player_attributes_max["sprint_speed"], value = _sprint_speed, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.sprint_speed_bar.value = _sprint_speed
+
+                if self.jump_force_bar == None:
+                    self.jump_force_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*3), _bars_size), max_value = self.player_attributes_max["jump_force"], value = _jump_force, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.jump_force_bar.value = _jump_force
+                    
+                if self.max_stamina_bar == None:
+                    self.max_stamina_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*4), _bars_size), max_value = self.player_attributes_max["max_stamina"], value = _max_stamina, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.max_stamina_bar.value = _max_stamina
+
+                if self.stamina_regen_rate_bar == None:
+                    self.stamina_regen_rate_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*5), _bars_size), max_value = self.player_attributes_max["stamina_regen_rate"], value = _stamina_regen_rate, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.stamina_regen_rate_bar.value = _stamina_regen_rate
+
+                if self.stamina_regen_haste_bar == None:
+                    self.stamina_regen_haste_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*6), _bars_size), max_value = self.player_attributes_max["stamina_regen_haste"], value = _stamina_regen_haste, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.stamina_regen_haste_bar.value = _stamina_regen_haste
+
+                if self.jump_stamina_skill_bar == None:
+                    self.jump_stamina_skill_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*7), _bars_size), max_value = self.player_attributes_max["jump_stamina_skill"], value = _jump_stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.jump_stamina_skill_bar.value = _jump_stamina_skill
+
+                if self.sprint_stamina_skill_bar == None:
+                    self.sprint_stamina_skill_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*8), _bars_size), max_value = self.player_attributes_max["sprint_stamina_skill"], value = _sprint_stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.sprint_stamina_skill_bar.value = _sprint_stamina_skill
+
+                if self.attack_stamina_skill_bar == None:
+                    self.attack_stamina_skill_bar = AttributeBar(pygame.Rect(_bar_pos + vec(0,(_bars_size.y + _bars_margin)*9), _bars_size), max_value = self.player_attributes_max["attack_stamina_skill"], value = _attack_stamina_skill, **constants.ATTRIBUTE_BARS["weapon"])
+                else:
+                    self.attack_stamina_skill_bar.value = _attack_stamina_skill
+                #endregion
+                
+                _lbls_margin = vec(5, 10)
+                
+                _txt_max_health = menu_controller.get_text_surface("Max health:", colors.WHITE, resources.px_font(25))
+                _txt_max_health_rect = _txt_max_health.get_rect()
+                _txt_max_health_rect.centery = self.max_health_bar.rect.centery
+                _txt_max_health_rect.left = _bar_pos.x
+                
+                _txt_movement_speed = menu_controller.get_text_surface("Movement speed:", colors.WHITE, resources.px_font(25))
+                _txt_movement_speed_rect = _txt_movement_speed.get_rect()
+                _txt_movement_speed_rect.centery = self.movement_speed_bar.rect.centery
+                _txt_movement_speed_rect.left = _bar_pos.x
+                
+                _txt_sprint_speed = menu_controller.get_text_surface("Sprint speed:", colors.WHITE, resources.px_font(25))
+                _txt_sprint_speed_rect = _txt_sprint_speed.get_rect()
+                _txt_sprint_speed_rect.centery = self.sprint_speed_bar.rect.centery
+                _txt_sprint_speed_rect.left = _bar_pos.x
+                
+                _txt_jump_force = menu_controller.get_text_surface("Jump force:", colors.WHITE, resources.px_font(25))
+                _txt_jump_force_rect = _txt_jump_force.get_rect()
+                _txt_jump_force_rect.centery = self.jump_force_bar.rect.centery
+                _txt_jump_force_rect.left = _bar_pos.x
+                
+                _txt_max_stamina = menu_controller.get_text_surface("Max stamina:", colors.WHITE, resources.px_font(25))
+                _txt_max_stamina_rect = _txt_max_stamina.get_rect()
+                _txt_max_stamina_rect.centery = self.max_stamina_bar.rect.centery
+                _txt_max_stamina_rect.left = _bar_pos.x
+
+                _txt_stamina_regen = menu_controller.get_text_surface("Stamina regen:", colors.WHITE, resources.px_font(25))
+                _txt_stamina_regen_rect = _txt_stamina_regen.get_rect()
+                _txt_stamina_regen_rect.centery = self.stamina_regen_rate_bar.rect.centery
+                _txt_stamina_regen_rect.left = _bar_pos.x
+                
+                _txt_stamina_haste = menu_controller.get_text_surface("Stamina haste:", colors.WHITE, resources.px_font(25))
+                _txt_stamina_haste_rect = _txt_stamina_haste.get_rect()
+                _txt_stamina_haste_rect.centery = self.stamina_regen_haste_bar.rect.centery
+                _txt_stamina_haste_rect.left = _bar_pos.x
+                
+                _txt_jump_stamina = menu_controller.get_text_surface("Jump stamina:", colors.WHITE, resources.px_font(25))
+                _txt_jump_stamina_rect = _txt_jump_stamina.get_rect()
+                _txt_jump_stamina_rect.centery = self.jump_stamina_skill_bar.rect.centery
+                _txt_jump_stamina_rect.left = _bar_pos.x
+
+                _txt_sprint_stamina = menu_controller.get_text_surface("Sprint stamina:", colors.WHITE, resources.px_font(25))
+                _txt_sprint_stamina_rect = _txt_sprint_stamina.get_rect()
+                _txt_sprint_stamina_rect.centery = self.sprint_stamina_skill_bar.rect.centery
+                _txt_sprint_stamina_rect.left = _bar_pos.x
+
+                _txt_attack_stamina = menu_controller.get_text_surface("Attack stamina:", colors.WHITE, resources.px_font(25))
+                _txt_attack_stamina_rect = _txt_attack_stamina.get_rect()
+                _txt_attack_stamina_rect.centery = self.attack_stamina_skill_bar.rect.centery
+                _txt_attack_stamina_rect.left = _bar_pos.x
+                
+                _max_txt_width = max([x.width for x in [_txt_max_health_rect, _txt_movement_speed_rect, _txt_sprint_speed_rect, _txt_jump_force_rect, _txt_max_stamina_rect, _txt_stamina_regen_rect, _txt_stamina_haste_rect, _txt_jump_stamina_rect, _txt_sprint_stamina_rect, _txt_attack_stamina_rect]])
+                _txt_left = _txt_max_health_rect.left + _max_txt_width + _bars_margin/2
+                self.max_health_bar.rect.left = _txt_left
+                self.movement_speed_bar.rect.left = _txt_left
+                self.sprint_speed_bar.rect.left = _txt_left
+                self.jump_force_bar.rect.left = _txt_left
+                self.max_stamina_bar.rect.left = _txt_left
+                self.stamina_regen_rate_bar.rect.left = _txt_left
+                self.stamina_regen_haste_bar.rect.left = _txt_left
+                self.jump_stamina_skill_bar.rect.left = _txt_left
+                self.sprint_stamina_skill_bar.rect.left = _txt_left
+                self.attack_stamina_skill_bar.rect.left = _txt_left
+                
+                _attribute_bars = {
+                    "max_health": self.max_health_bar,
+                    "movement_speed": self.movement_speed_bar,
+                    "sprint_speed": self.sprint_speed_bar,
+                    "jump_force": self.jump_force_bar,
+                    "max_stamina": self.max_stamina_bar,
+                    "stamina_regen_rate": self.stamina_regen_rate_bar,
+                    "stamina_regen_haste": self.stamina_regen_haste_bar,
+                    "jump_stamina_skill": self.jump_stamina_skill_bar,
+                    "sprint_stamina_skill": self.sprint_stamina_skill_bar,
+                    "attack_stamina_skill": self.attack_stamina_skill_bar
+                }
+                
+                for b in _attribute_bars.values():
+                    if b.value == 0:
+                        b.bar_border_color = colors.DARK_GRAY
+                    else:
+                        b.bar_border_color = b.start_bar_border_color
+                
+                _player_upgrades = constants.get_player_upgrade(self.player.character)
+                if _player_upgrades != None:
+                    _unused_btns = [b for b in _player_upgrade_btns if b.name not in _player_upgrades.keys()]
+                    for b in _unused_btns:
+                        b.visible = False
+                    
+                    for key, value in _player_upgrades.items():
+                        _btn_upgrade = [b for b in _player_upgrade_btns if key in b.name]
+                        _bar = _attribute_bars[key]
+                        if len(_btn_upgrade) <= 0 or _bar == None:
+                            continue
+                        _btn_upgrade = _btn_upgrade[0]
+                        _btn_upgrade.rect.left = _bar.rect.right + self.panel_margin.x/2 + pnl_right_rect.left
+                        _btn_upgrade.rect.centery = _bar.rect.centery + self.panel_margin.y/2 + pnl_right_rect.top
+                        _btn_upgrade.visible = True
+                        _btn_upgrade.on_click = lambda attr_name = key: self.buy_player_upgrade(self.player.character, attr_name)
+                        _upgrade_map_index = math.clamp(self.player.upgrades_map[key], 0, len(value)) if self.player.upgrades_map != None else 0
+                        _has_upgrade = self.player.upgrades_map == None or _upgrade_map_index < len(value)
+                        _has_money = _has_upgrade and self.player.money >= value[_upgrade_map_index]["price"]
+                        _btn_upgrade.enable(_has_upgrade and _has_money)
+                        
+                        def btn_upgrade_hover(btn: Button, upgrade_steps = value, bar = _bar, key = key):
+                            btn.default_on_hover(btn)
+                            if btn.hovered:
+                                bar.upgrade_value = upgrade_steps[0]["ammount"]
+                                bar.rerender()
+                            else:
+                                bar.upgrade_value = 0
+                                bar.rerender()
+                            
+                        _btn_upgrade.on_hover =btn_upgrade_hover
+                        if _has_upgrade:
+                            _upgrade_price_text = f'$ {value[_upgrade_map_index]["price"]:.2f}'
+                        else:
+                            _upgrade_price_text = "MAX"
+                            _bar.upgrade_value = 0
+                            
+                        _txt_upgrade_price = menu_controller.get_text_surface(_upgrade_price_text, colors.WHITE if _has_money else colors.RED, resources.px_font(18))
+                        _txt_upgrade_price_rect = _txt_upgrade_price.get_rect()
+                        _txt_upgrade_price_rect.centery = _bar.rect.centery
+                        _txt_upgrade_price_rect.left = _bar.rect.right + _btn_upgrade.rect.width + 5
+                        pnl_right.blit(_txt_upgrade_price, _txt_upgrade_price_rect)
+                else:
+                    for b in _player_upgrade_btns:
+                        b.visible = False
+                    
+                for b in _player_upgrade_btns:
+                    b.draw(pnl_right, vec(0,0))
+                
+                pnl_right.blit(_txt_item_title, _txt_item_title_rect)
+                
+                self.max_health_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_max_health, _txt_max_health_rect)
+                
+                self.movement_speed_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_movement_speed, _txt_movement_speed_rect)
+                
+                self.sprint_speed_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_sprint_speed, _txt_sprint_speed_rect)
+
+                self.jump_force_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_jump_force, _txt_jump_force_rect)
+
+                self.max_stamina_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_max_stamina, _txt_max_stamina_rect)
+
+                self.stamina_regen_rate_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_stamina_regen, _txt_stamina_regen_rect)
+
+                self.stamina_regen_haste_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_stamina_haste, _txt_stamina_haste_rect)
+
+                self.jump_stamina_skill_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_jump_stamina, _txt_jump_stamina_rect)
+
+                self.sprint_stamina_skill_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_sprint_stamina, _txt_sprint_stamina_rect)
+
+                self.attack_stamina_skill_bar.draw(pnl_right, vec(0,0))
+                pnl_right.blit(_txt_attack_stamina, _txt_attack_stamina_rect)
         else:
-            for b in _upgrade_btns:
+            for b in _player_upgrade_btns:
                 b.visible = False
         
         
@@ -837,7 +1092,7 @@ class Inventory:
             
         self.player.current_weapon = bkp.equip_weapon(weapon_type, as_primary)
         
-    def buy_upgrade(self, weapon_type: enums.Weapons, attr_name):
+    def buy_weapon_upgrade(self, weapon_type: enums.Weapons, attr_name):
         
         bpk = self.player.backpack
         weapon = bpk.get_weapon(weapon_type)
@@ -889,6 +1144,54 @@ class Inventory:
                 weapon.magazine_size += ammount
             case "stamina":
                 weapon.stamina_use = 6 / (self.stamina_bar.value + ammount)
+                
+    def buy_player_upgrade(self, character_name: enums.Characters, attr_name):
+        
+        p = self.player
+        attributes_dict = constants.get_player_upgrade(character_name)
+        
+        if p.upgrades_map == None:
+            p.upgrades_map = constants.get_player_upgrade(character_name).copy()
+            for key in p.upgrades_map.keys():
+                p.upgrades_map[key] = 0
+                
+        price = attributes_dict[attr_name][p.upgrades_map[attr_name]]["price"]
+        
+        if price > self.player.money:
+            return
+        
+        ammount = attributes_dict[attr_name][p.upgrades_map[attr_name]]["ammount"]
+        p.upgrades_map[attr_name] += 1
+        
+        self.purchase_sound.play()
+        self.player.money -= price
+        menu_controller.popup(Popup(f"-${price:.2f}", vec(self.money_rect.topleft), **constants.POPUPS["damage"]))
+        
+        match attr_name:
+            case "max_health":
+                p.max_health += ammount
+                p.health_bar.set_max_value(p.max_health)
+            case "movement_speed":
+                p.start_movement_speed += ammount
+            case "sprint_speed":
+                p.sprint_speed_weight += ammount
+                p.sprint_speed_multiplier = (p.sprint_speed_weight*0.7) / p.movement_speed
+            case "jump_force":
+                p.jump_force += ammount
+            case "max_stamina":
+                p.max_stamina += ammount
+                p.stamina_bar.set_max_value(p.max_stamina)
+            case "stamina_regen_rate":
+                p.stamina_regen_rate += ammount
+                
+            case "stamina_regen_haste":
+                p.stamina_regen_delay_ms = 5000 / (self.stamina_regen_haste_bar.value + ammount)
+            case "jump_stamina_skill":
+                p.jump_stamina_drain = 100 / (self.jump_stamina_skill_bar.value + ammount)
+            case "sprint_stamina_skill":
+                p.sprint_stamina_drain = 100 / (self.sprint_stamina_skill_bar.value + ammount)
+            case "attack_stamina_skill":
+                p.attack_stamina_drain = 10 / (self.attack_stamina_skill_bar.value + ammount)
                 
     def swap_weapon_slots(self):
         bkp = self.player.backpack

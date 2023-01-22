@@ -28,10 +28,10 @@ class Player(pygame.sprite.Sprite):
         self.movement_speed = kwargs.pop("movement_speed", 0.49)
         self.start_movement_speed = self.movement_speed
         """The movement speed of the player."""
-        self.health = 100
-        """The current health of the player."""
-        self.max_health = self.health
+        self.max_health = kwargs.pop("max_health", 100)
         """The maximum health of the player."""
+        self.health = kwargs.pop("health", self.max_health)
+        """The current health of the player."""
         self.stamina = kwargs.pop("stamina", 800)
         """The stamina of the player. Drains when running, jumping and attacking."""
         self.max_stamina = self.stamina
@@ -55,7 +55,8 @@ class Player(pygame.sprite.Sprite):
         """If the player is still alive."""
         
         self.sprinting = False
-        self.sprint_speed_multiplier = kwargs.pop("sprint_speed_multiplier", 1.3)
+        self.sprint_speed_weight = kwargs.pop("sprint_speed_weight", 0.95)
+        self.sprint_speed_multiplier = kwargs.pop("sprint_speed_multiplier", (self.sprint_speed_weight*0.7) / self.movement_speed) #(self.sprint_speed_weight*0.7) / self.movement_speed
         
         self.pos: vec = vec((pos))
         """The X and Y position coordinates of the player."""
@@ -85,6 +86,8 @@ class Player(pygame.sprite.Sprite):
         """The mouse position of the other player."""
         self.player2_rect: pygame.Rect = pygame.Rect(0,0,1,1)
         
+        self.upgrades_map: dict = kwargs.pop("upgrades_map", None)
+        """Upgrades that the player bought for this character."""
         
         self.backpack = BackPack()
         
@@ -209,7 +212,11 @@ class Player(pygame.sprite.Sprite):
     def load_state(self, state: dict):
         self.character = state["character"]
         self.max_health = state["max_health"]
+        self.health = self.max_health
+        self.health_bar.set_max_value(self.max_health)
+        self.health_bar.set_value(self.max_health)
         self.movement_speed = state["movement_speed"]
+        self.start_movement_speed = self.movement_speed
         self.jump_force = state["jump_force"]
     
     # called each frame

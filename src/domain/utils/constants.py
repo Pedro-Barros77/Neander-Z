@@ -25,27 +25,27 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
     match weapon:
         case enums.Weapons.DEBUG:
             w = FullAuto(pos,
-                    bullet_type=enums.BulletType.ASSAULT_RIFLE,
-                    weapon_type=enums.Weapons.SCAR,
-                    is_primary=False,
-                    fire_mode=enums.FireMode.FULL_AUTO,
-                    reload_type=enums.ReloadType.MAGAZINE,
-                    upgrades_dict=get_weapon_upgrade(weapon),
-                    display_name="DEV'S weapon",
-                    weapon_switch_ms=5,
-                    damage=9999,
-                    bullet_speed=30,
-                    fire_rate=7,
-                    reload_delay_ms=50,
-                    magazine_size=99999,
-                    bullet_max_range=2000,
-                    bullet_min_range=1900,
-                    reload_end_frame=9,
-                    reload_speed_multiplier=4,
-                    barrel_offset=vec(0, 7),
-                    weapon_scale=1,
-                    store_scale=1.8
-                    )
+                         bullet_type=enums.BulletType.ASSAULT_RIFLE,
+                         weapon_type=enums.Weapons.SCAR,
+                         is_primary=False,
+                         fire_mode=enums.FireMode.FULL_AUTO,
+                         reload_type=enums.ReloadType.MAGAZINE,
+                         upgrades_dict=get_weapon_upgrade(weapon),
+                         display_name="DEV'S weapon",
+                         weapon_switch_ms=5,
+                         damage=9999,
+                         bullet_speed=30,
+                         fire_rate=7,
+                         reload_delay_ms=50,
+                         magazine_size=99999,
+                         bullet_max_range=2000,
+                         bullet_min_range=1900,
+                         reload_end_frame=9,
+                         reload_speed_multiplier=4,
+                         barrel_offset=vec(0, 7),
+                         weapon_scale=1,
+                         store_scale=1.8
+                         )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 20, 0)
             for s in w.shoot_sounds:
                 s.set_volume(0.3)
@@ -53,7 +53,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound.set_volume(0.3)
             w.reload_end_sound.set_volume(0.3)
-        
+
         case enums.Weapons.MACHETE:
             w = Melee(pos,
                       bullet_type=enums.BulletType.MELEE,
@@ -77,7 +77,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                       attack_box=vec(50, 20),
                       weapon_scale=0.08,
                       store_scale=0.2,
-                      stamina_use = 2
+                      stamina_use=2
                       )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 30, 0)
             for s in w.swipe_sounds:
@@ -85,7 +85,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
 
             for h in w.hit_sounds:
                 h.set_volume(0.5)
-                
+
         case enums.Weapons.P_1911:
             w = SemiAuto(pos,
                          bullet_type=enums.BulletType.PISTOL,
@@ -178,29 +178,29 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
 
         case enums.Weapons.RPG:
             w = Launcher(pos,
-                    bullet_type=enums.BulletType.ROCKET,
-                    weapon_type=weapon,
-                    is_primary=True,
-                    fire_mode=enums.FireMode.SINGLE_SHOT,
-                    reload_type=enums.ReloadType.SINGLE_BULLET,
-                    upgrades_dict=get_weapon_upgrade(weapon),
-                    display_name="RPG",
-                    weapon_switch_ms=500,
-                    damage=50,
-                    bullet_speed=15,
-                    fire_rate=1,
-                    reload_delay_ms=3000,
-                    magazine_size=1,
-                    bullet_max_range=800,
-                    bullet_min_range=790,
-                    explosion_min_radius=100,
-                    explosion_max_radius=200,
-                    reload_start_frame=12,
-                    reload_end_frame=17,
-                    reload_speed_multiplier=2,
-                    barrel_offset=vec(-15, 3),
-                    store_scale=2.2
-                    )
+                         bullet_type=enums.BulletType.ROCKET,
+                         weapon_type=weapon,
+                         is_primary=True,
+                         fire_mode=enums.FireMode.SINGLE_SHOT,
+                         reload_type=enums.ReloadType.SINGLE_BULLET,
+                         upgrades_dict=get_weapon_upgrade(weapon),
+                         display_name="RPG",
+                         weapon_switch_ms=500,
+                         damage=50,
+                         bullet_speed=15,
+                         fire_rate=1,
+                         reload_delay_ms=3000,
+                         magazine_size=1,
+                         bullet_max_range=800,
+                         bullet_min_range=790,
+                         explosion_min_radius=100,
+                         explosion_max_radius=200,
+                         reload_start_frame=12,
+                         reload_end_frame=17,
+                         reload_speed_multiplier=2,
+                         barrel_offset=vec(-15, 3),
+                         store_scale=2.2
+                         )
             w.bullet_spawn_offset = vec(
                 w.rect.width/2, -10) + vec(w.barrel_offset)
             w.shoot_sound.set_volume(0.1)
@@ -210,28 +210,28 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
 
         case enums.Weapons.SV98:
             w = Sniper(pos,
-                    bullet_type=enums.BulletType.SNIPER,
-                    weapon_type=weapon,
-                    is_primary=True,
-                    fire_mode=enums.FireMode.BOLT_ACTION,
-                    reload_type=enums.ReloadType.MAGAZINE,
-                    upgrades_dict=get_weapon_upgrade(weapon),
-                    display_name="SV98",
-                    weapon_switch_ms=400,
-                    damage=25,
-                    bullet_speed=35,
-                    fire_rate=1,
-                    reload_delay_ms=1500,
-                    magazine_size=5,
-                    bullet_max_range=1200,
-                    bullet_min_range=1000,
-                    reload_end_frame=17,
-                    reload_speed_multiplier=9,
-                    barrel_offset=vec(10, -5),
-                    pierce_damage_multiplier=0.5,
-                    max_pierce_targets=5,
-                    weapon_scale=1.1,
-                    store_scale=2.3
+                       bullet_type=enums.BulletType.SNIPER,
+                       weapon_type=weapon,
+                       is_primary=True,
+                       fire_mode=enums.FireMode.BOLT_ACTION,
+                       reload_type=enums.ReloadType.MAGAZINE,
+                       upgrades_dict=get_weapon_upgrade(weapon),
+                       display_name="SV98",
+                       weapon_switch_ms=400,
+                       damage=25,
+                       bullet_speed=35,
+                       fire_rate=1,
+                       reload_delay_ms=1500,
+                       magazine_size=5,
+                       bullet_max_range=1200,
+                       bullet_min_range=1000,
+                       reload_end_frame=17,
+                       reload_speed_multiplier=9,
+                       barrel_offset=vec(10, -5),
+                       pierce_damage_multiplier=0.5,
+                       max_pierce_targets=5,
+                       weapon_scale=1.1,
+                       store_scale=2.3
                        )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 20, -3)
             w.shoot_sound.set_volume(0.5)
@@ -335,7 +335,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound.set_volume(0.3)
             w.reload_end_sound.set_volume(0.3)
-        
+
     w.weapon_anchor = kwargs.pop("weapon_anchor", vec(0, 0))
     w.weapon_distance = kwargs.pop("weapon_distance", 0)
     w.player_backpack = kwargs.pop("backpack", None)
@@ -349,9 +349,16 @@ def get_weapon_upgrade(weapon_type: enums.Weapons):
         return WEAPONS_UPGRADES[weapon_type]
     else:
         return None
+    
+def get_player_upgrade(character_name: enums.Characters):
+    if character_name in ITEMS_UPGRADES.keys():
+        return ITEMS_UPGRADES[character_name]
+    else:
+        return None
+
 
 ITEMS_UPGRADES = {
-    "backpack":[
+    "backpack": [
         {
             "id": 1,
             "max_pistol_ammo": 10,
@@ -397,7 +404,79 @@ ITEMS_UPGRADES = {
             "max_rocket_ammo": 1,
             "price": 1200.00
         },
-    ]
+    ],
+    enums.Characters.CARLOS: {
+        "max_health": [#half: 15
+            {
+                "id": 1,
+                "ammount": 15,
+                "price": 150.00
+            },
+        ],
+        "movement_speed": [#half: 0.29
+            {
+                "id": 1,
+                "ammount": 0.029,
+                "price": 150.00
+            },
+        ],
+        "sprint_speed": [#half: 0.054
+            {
+                "id": 1,
+                "ammount": 0.054,
+                "price": 150.00
+            },
+        ],
+        "jump_force": [#half: 0.46
+            {
+                "id": 1,
+                "ammount": 0.46,
+                "price": 150.00
+            },
+        ],
+        "max_stamina": [#half: 62.5
+            {
+                "id": 1,
+                "ammount": 62.5,
+                "price": 150.00
+            },
+        ],
+        "stamina_regen_rate": [#half: 0.375
+            {
+                "id": 1,
+                "ammount": 0.375,
+                "price": 150.00
+            },
+        ],
+        "stamina_regen_haste": [#half: 0.75
+            {
+                "id": 1,
+                "ammount": 0.75,
+                "price": 150.00
+            },
+        ],
+        "jump_stamina_skill": [#half: 2.08
+            {
+                "id": 1,
+                "ammount": 2.08,
+                "price": 150.00
+            },
+        ],
+        "sprint_stamina_skill": [#half: 2.5
+            {
+                "id": 1,
+                "ammount": 2.5,
+                "price": 150.00
+            },
+        ],
+        "attack_stamina_skill": [#half: 4.17
+            {
+                "id": 1,
+                "ammount": 4.17*5,
+                "price": 150.00
+            },
+        ]
+    }
 }
 
 WEAPONS_UPGRADES = {
@@ -1163,7 +1242,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 6,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 1,
@@ -1194,7 +1273,7 @@ WAVES = {
         "wave_message": "The death comes from above!",
         "timed_spawn_count": 8,
         "spawn_timer_ms": 6500,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
@@ -1234,7 +1313,7 @@ WAVES = {
         "wave_message": 'Remember the "Double Tap" rule!',
         "timed_spawn_count": 8,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.6,
@@ -1275,7 +1354,7 @@ WAVES = {
         "wave_message": 'You hear barks at the distance...',
         "timed_spawn_count": 8,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.6,
@@ -1325,7 +1404,7 @@ WAVES = {
         "wave_message": 'Some zombies have evolved...',
         "timed_spawn_count": 9,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.6,
@@ -1366,7 +1445,7 @@ WAVES = {
         "wave_message": "I'll take more than a headache to knock em down!",
         "timed_spawn_count": 9,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.6,
@@ -1416,7 +1495,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 9,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
@@ -1482,7 +1561,7 @@ WAVES = {
         "wave_number": 10,
         "wave_type": enums.WaveType.BOSS,
         "wave_message": "RUI IS COMMING!",
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "timed_spawn_count": 5,
         "spawn_timer_ms": 7000,
         "start_delay_ms": 2000,
@@ -1542,7 +1621,7 @@ WAVES = {
         "wave_message": "kill the remnants of the boss fight",
         "timed_spawn_count": 4,
         "spawn_timer_ms": 2000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.1,
@@ -1556,7 +1635,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-            
+
         ]
     },
     12: {
@@ -1565,7 +1644,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 8,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
@@ -1615,7 +1694,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 8,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 1,
@@ -1665,7 +1744,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 8,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
@@ -1733,12 +1812,12 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 9,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
         "enemies": [
-        
+
             {
                 "type": enums.Enemies.Z_RONALDO,
                 "count": 18,
@@ -1776,7 +1855,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-           
+
         ]
     },
     16: {
@@ -1785,12 +1864,12 @@ WAVES = {
         "wave_message": "Hope you've saved money so far",
         "timed_spawn_count": 9,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 1,
         "enemies": [
-        
+
             {
                 "type": enums.Enemies.Z_RONALDO,
                 "count": 5,
@@ -1828,7 +1907,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-           
+
         ]
     },
     17: {
@@ -1837,12 +1916,12 @@ WAVES = {
         "wave_message": "Look who's back, but more evolved",
         "timed_spawn_count": 9,
         "spawn_timer_ms": 6000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 1,
         "enemies": [
-             {
+            {
                 "type": enums.Enemies.Z_ROGER,
                 "count": 10,
                 "movement_speed": 0.15,
@@ -1851,7 +1930,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-        
+
             {
                 "type": enums.Enemies.Z_RONALDO,
                 "count": 18,
@@ -1861,7 +1940,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-            
+
             {
                 "type": enums.Enemies.Z_ROBERT,
                 "count": 3,
@@ -1880,7 +1959,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
             },
-           
+
         ]
     },
     18: {
@@ -1889,12 +1968,12 @@ WAVES = {
         "wave_message": "demon",
         "timed_spawn_count": 15,
         "spawn_timer_ms": 4000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 1,
         "enemies": [
-        
+
             {
                 "type": enums.Enemies.Z_ROBERT,
                 "count": 25,
@@ -1913,7 +1992,7 @@ WAVES = {
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1.7
             },
-           
+
         ]
     },
     19: {
@@ -1922,7 +2001,7 @@ WAVES = {
         "wave_message": "",
         "timed_spawn_count": 6,
         "spawn_timer_ms": 7000,
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "start_delay_ms": 2000,
         "end_delay_ms": 1000,
         "money_multiplier": 0.8,
@@ -1936,7 +2015,7 @@ WAVES = {
                 "damage": 18,
                 "max_alive": 99,
                 "spawn_chance_multiplier": 1
-            },     
+            },
             {
                 "type": enums.Enemies.Z_RAIMUNDO,
                 "count": 18,
@@ -1952,7 +2031,7 @@ WAVES = {
         "wave_number": 20,
         "wave_type": enums.WaveType.BOSS,
         "wave_message": "RUI RETURNED AND BRING HIS TWIN BROTHER WITH HIM!",
-        "wave_interval_s": 30,
+        "wave_interval_s": 45,
         "timed_spawn_count": 5,
         "spawn_timer_ms": 7000,
         "start_delay_ms": 2000,
