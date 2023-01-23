@@ -94,7 +94,7 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.DEAGLE)
+        self.add_weapon(enums.Weapons.MACHETE)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -224,6 +224,7 @@ class Player(pygame.sprite.Sprite):
         if not self.is_alive:
             self.grave_stone_anim(0.2)
             return
+            
         group_name = kwargs.pop("group_name", "")
         if group_name == "jumpable":
             return
@@ -377,7 +378,7 @@ class Player(pygame.sprite.Sprite):
         if pressing_right:
             # pressing right but not left
             if not pressing_left:
-                self.acceleration.x = self.movement_speed
+                self.acceleration.x = round(self.movement_speed, 6)
                 # was pressing both left and right, but released left
                 if was_pressing_left and was_pressing_right:
                     self.running = False
@@ -390,14 +391,14 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.turning_dir = -1
         elif was_pressing_right:
-                self.running = 0
+                self.running = False
                 self.turning_dir = -1
             
         # Move left
         if pressing_left:
             # pressing left but not right
             if not pressing_right:
-                self.acceleration.x = -self.movement_speed
+                self.acceleration.x = round(-self.movement_speed, 6)
                 # was pressing both left and right, but released right
                 if was_pressing_left and was_pressing_right:
                     self.running = False
@@ -410,12 +411,12 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.turning_dir = -1
         elif was_pressing_left and not pressing_right:
-                self.running = 0
+                self.running = False
                 self.turning_dir = -1
             
         # Movement
-        self.acceleration.x += self.speed.x * game.friction
-        self.speed.x += self.acceleration.x * mc.dt
+        self.acceleration.x = round(self.acceleration.x + self.speed.x * game.friction, 6)
+        self.speed.x += round(self.acceleration.x * mc.dt, 6)
         self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
         # Gravity
@@ -515,7 +516,7 @@ class Player(pygame.sprite.Sprite):
             self.jumping_frame = 0
             self.jumping_sideways = False
         self.image = game_controller.scale_image(self.jump_frames[int(self.jumping_frame)], self.image_scale)
-        if self.acceleration.x > 0:
+        if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
         self.jumping_frame += speed
     

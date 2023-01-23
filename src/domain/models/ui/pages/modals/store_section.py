@@ -24,7 +24,8 @@ class Store:
         
         self.ammo_h_scrollbar: ScrollBar = None
         self.items_h_scrollbar: ScrollBar = None
-        self.weapons_h_scrollbar: ScrollBar = None
+        self.primary_weapons_h_scrollbar: ScrollBar = None
+        self.secondary_weapons_h_scrollbar: ScrollBar = None
         self.image: pygame.Surface = None
         self.on_return = kwargs.pop("on_return", lambda: None)
         
@@ -62,7 +63,7 @@ class Store:
         
         def _unselect_card(card: StoreItem):
             btns_hovered = [b for b in self.buttons if b.hovered]
-            scroll_bars_held = [s for s in [self.ammo_h_scrollbar, self.items_h_scrollbar, self.weapons_h_scrollbar, self.store_v_scrollbar] if s.holding_bar]
+            scroll_bars_held = [s for s in [self.ammo_h_scrollbar, self.items_h_scrollbar, self.primary_weapons_h_scrollbar, self.store_v_scrollbar] if s.holding_bar]
             
             if len(btns_hovered) > 0 or len(scroll_bars_held) > 0:
                 return
@@ -92,13 +93,9 @@ class Store:
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
-        self.weapons:list[StoreItem] = [
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Machete", item_name = "machete", price = 0, icon_scale = 0.2, store_icon_scale = 0.1, bullet_type = enums.BulletType.MELEE, weapon_type = enums.Weapons.MACHETE, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80,store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.DEAGLE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Desert Eagle", item_name = "deagle", price = 850,  icon_scale = 1.2, store_icon_scale = 1.5, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.DEAGLE, **cards_dict),
+        self.primary_weapons:list[StoreItem] = [
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SHORT_BARREL, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Short Barrel", item_name = "short_barrel", price = 500, icon_scale = 1.8, store_icon_scale = 0.3, bullet_type = enums.BulletType.SHOTGUN, weapon_type = enums.Weapons.SHORT_BARREL, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.UZI, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "UZI", item_name = "uzi", price = 650, icon_scale = 1.1, store_icon_scale = 2.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.UZI, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93R, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93R, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.M16, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "M16", item_name = "m16", price = 1000, icon_scale = 2, store_icon_scale = 1.7, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.M16, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SV98, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SV98", item_name = "sv98", price = 1200, icon_scale = 2.3, store_icon_scale = 1.1, bullet_type = enums.BulletType.SNIPER, weapon_type = enums.Weapons.SV98, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.SCAR, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "SCAR-L", item_name = "scar", price = 1300, icon_scale = 1.9, store_icon_scale = 1.1, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.SCAR, **cards_dict),
@@ -106,7 +103,15 @@ class Store:
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
-        self.cards_list = [*self.ammos, *self.items, *self.weapons]
+        self.secondary_weapons: list[StoreItem] = [
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Machete", item_name = "machete", price = 0, icon_scale = 0.2, store_icon_scale = 0.1, bullet_type = enums.BulletType.MELEE, weapon_type = enums.Weapons.MACHETE, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80,store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93R, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93R, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.DEAGLE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Desert Eagle", item_name = "deagle", price = 850,  icon_scale = 1.2, store_icon_scale = 1.5, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.DEAGLE, **cards_dict),
+            StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
+        ]
+        
+        self.cards_list = [*self.ammos, *self.items, *self.primary_weapons, *self.secondary_weapons]
         for c in self.cards_list:
             c.description = _cards_descriptions.pop(c.item_name, "")
             
@@ -122,9 +127,13 @@ class Store:
                 Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_backward(100))
             ]
         
-        self.weapons_panel_buttons = [
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.weapons_h_scrollbar.move_backward(100))
+        self.primary_weapons_panel_buttons = [
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_forward(100)),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_backward(100))
+            ]
+        self.secondary_weapons_panel_buttons = [
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_forward(100)),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_backward(100))
             ]
         
         self.buttons: list[Button] = [
@@ -140,7 +149,7 @@ class Store:
             "dispersion": 90
         }
         
-        self.buttons.extend([*self.ammo_panel_buttons, *self.items_panel_buttons, *self.weapons_panel_buttons])
+        self.buttons.extend([*self.ammo_panel_buttons, *self.items_panel_buttons, *self.primary_weapons_panel_buttons, *self.secondary_weapons_panel_buttons])
     
     def update(self, **kwargs):
         events = kwargs.pop("events", [])
@@ -160,9 +169,12 @@ class Store:
             if self.items_h_scrollbar != None:
                 self.items_h_scrollbar.event_handler(e, self.store_v_scrollbar.scroll_offset)
                 self.items_h_scrollbar.update()
-            if self.weapons_h_scrollbar != None:
-                self.weapons_h_scrollbar.event_handler(e, self.store_v_scrollbar.scroll_offset)
-                self.weapons_h_scrollbar.update()
+            if self.primary_weapons_h_scrollbar != None:
+                self.primary_weapons_h_scrollbar.event_handler(e, self.store_v_scrollbar.scroll_offset)
+                self.primary_weapons_h_scrollbar.update()
+            if self.secondary_weapons_h_scrollbar != None:
+                self.secondary_weapons_h_scrollbar.event_handler(e, self.store_v_scrollbar.scroll_offset)
+                self.secondary_weapons_h_scrollbar.update()
                 
         for b in self.buttons:
             b.update()
@@ -293,12 +305,19 @@ class Store:
         self.items_panel_buttons[0].rect.right = items_panel_rect.left + image_rect.left - 5
         self.items_panel_buttons[1].rect.left = items_panel_rect.right + image_rect.left + 5
         
-        #panel weapons
-        weapons_panel, weapons_panel_rect, weapons_panel_scroll_rect = self.get_panel(image_rect, txt_store_title_rect.height + _panels_distance*2,"Weapons", self.weapons, self.weapons_h_scrollbar)
-        self.weapons_panel_buttons[0].rect.centery = self.weapons[0].rect.centery + self.panel_margin.y/2
-        self.weapons_panel_buttons[1].rect.centery = self.weapons[0].rect.centery + self.panel_margin.y/2
-        self.weapons_panel_buttons[0].rect.right = weapons_panel_rect.left + image_rect.left - 5
-        self.weapons_panel_buttons[1].rect.left = weapons_panel_rect.right + image_rect.left + 5
+        #panel primary weapons
+        prim_weapons_panel, prim_weapons_panel_rect, prim_weapons_panel_scroll_rect = self.get_panel(image_rect, txt_store_title_rect.height + _panels_distance*2,"Primary Weapons", self.primary_weapons, self.primary_weapons_h_scrollbar)
+        self.primary_weapons_panel_buttons[0].rect.centery = self.primary_weapons[0].rect.centery + self.panel_margin.y/2
+        self.primary_weapons_panel_buttons[1].rect.centery = self.primary_weapons[0].rect.centery + self.panel_margin.y/2
+        self.primary_weapons_panel_buttons[0].rect.right = prim_weapons_panel_rect.left + image_rect.left - 5
+        self.primary_weapons_panel_buttons[1].rect.left = prim_weapons_panel_rect.right + image_rect.left + 5
+
+        #panel secondary weapons
+        sec_weapons_panel, sec_weapons_panel_rect, sec_weapons_panel_scroll_rect = self.get_panel(image_rect, txt_store_title_rect.height + _panels_distance*3,"Secondary Weapons", self.secondary_weapons, self.secondary_weapons_h_scrollbar)
+        self.secondary_weapons_panel_buttons[0].rect.centery = self.secondary_weapons[0].rect.centery + self.panel_margin.y/2
+        self.secondary_weapons_panel_buttons[1].rect.centery = self.secondary_weapons[0].rect.centery + self.panel_margin.y/2
+        self.secondary_weapons_panel_buttons[0].rect.right = sec_weapons_panel_rect.left + image_rect.left - 5
+        self.secondary_weapons_panel_buttons[1].rect.left = sec_weapons_panel_rect.right + image_rect.left + 5
         
         if self.ammo_h_scrollbar == None:
             self.ammo_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.ammos)*1.9,1), pygame.Rect((ammo_panel_rect.left + self.panel_margin.x/2, ammo_panel_scroll_rect.bottom + 27), (ammo_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
@@ -306,11 +325,14 @@ class Store:
         if self.items_h_scrollbar == None:
             self.items_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.items)*1.9,1), pygame.Rect((items_panel_rect.left + self.panel_margin.x/2, items_panel_scroll_rect.bottom + 27), (items_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
         
-        if self.weapons_h_scrollbar == None:
-            self.weapons_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.weapons)*1.9,1), pygame.Rect((weapons_panel_rect.left + self.panel_margin.x/2, weapons_panel_scroll_rect.bottom + 27), (weapons_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
+        if self.primary_weapons_h_scrollbar == None:
+            self.primary_weapons_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.primary_weapons)*1.9,1), pygame.Rect((prim_weapons_panel_rect.left + self.panel_margin.x/2, prim_weapons_panel_scroll_rect.bottom + 27), (prim_weapons_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
+
+        if self.secondary_weapons_h_scrollbar == None:
+            self.secondary_weapons_h_scrollbar = ScrollBar(enums.Orientation.HORIZONTAL, vec(self.card_size.x * len(self.secondary_weapons)*1.9,1), pygame.Rect((sec_weapons_panel_rect.left + self.panel_margin.x/2, sec_weapons_panel_scroll_rect.bottom + 27), (sec_weapons_panel_scroll_rect.width, 20)), focused = False, auto_focus = False)
         
         if self.store_v_scrollbar == None:
-            self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + _item_description_size.y), (20,screen_rect.height - self.panel_margin.y*2 - _item_description_size.y)), use_arrows = False)
+            self.store_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1, 4 * (ammo_panel_rect.height + 50)), pygame.Rect((screen_rect.width - self.panel_margin.x, self.panel_margin.y + _item_description_size.y), (20,screen_rect.height - self.panel_margin.y*2 - _item_description_size.y)), use_arrows = False)
             
             
         p1_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 2.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
@@ -330,12 +352,14 @@ class Store:
         #panels
         self.image.blit(ammo_panel, ammo_panel_rect)
         self.image.blit(items_panel, items_panel_rect)
-        self.image.blit(weapons_panel, weapons_panel_rect)
+        self.image.blit(prim_weapons_panel, prim_weapons_panel_rect)
+        self.image.blit(sec_weapons_panel, sec_weapons_panel_rect)
         
         #scroll bars
         self.ammo_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
         self.items_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
-        self.weapons_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
+        self.primary_weapons_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
+        self.secondary_weapons_h_scrollbar.draw(self.image, self.store_v_scrollbar.scroll_offset - self.panel_margin/2)
         self.store_v_scrollbar.draw(self.image, - self.panel_margin/2)
         
         #buttons

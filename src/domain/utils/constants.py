@@ -135,8 +135,8 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          weapon_scale= 0.8,
                          bullet_max_range=700,
                          bullet_min_range=600,
-                         reload_end_frame=12,
-                         reload_speed_multiplier=2,
+                         reload_end_frame=10,
+                         reload_speed_multiplier=3,
                          barrel_offset=vec(0, 15),
                          store_scale=1,
                          )
@@ -1278,31 +1278,31 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
-    1: {
-        "wave_number": 1,
-        "wave_type": enums.WaveType.SIMPLE,
-        "wave_message": "And so it begins...",
-        "timed_spawn_count": 10,
-        "spawn_timer_ms": 8000,
-        "wave_interval_s": 6000,
-        "start_delay_ms": 0,
-        "end_delay_ms": 0,
-        "money_multiplier": 1,
-        "enemies": [
-            {
-                "type": enums.Enemies.Z_RONALDO,
-                "count": 10,
-                "movement_speed": 0.1,
-                "health": 24,
-                "damage": 20,
-                "max_alive": 99,
-                "spawn_chance_multiplier": 1
-            }
-        ]
-    }
-}
+#     1: {
+#         "wave_number": 1,
+#         "wave_type": enums.WaveType.SIMPLE,
+#         "wave_message": "And so it begins...",
+#         "timed_spawn_count": 10,
+#         "spawn_timer_ms": 8000,
+#         "wave_interval_s": 6000,
+#         "start_delay_ms": 0,
+#         "end_delay_ms": 0,
+#         "money_multiplier": 1,
+#         "enemies": [
+#             {
+#                 "type": enums.Enemies.Z_RONALDO,
+#                 "count": 10,
+#                 "movement_speed": 0.1,
+#                 "health": 24,
+#                 "damage": 20,
+#                 "max_alive": 1,
+#                 "spawn_chance_multiplier": 1
+#             }
+#         ]
+#     }
+# }
 
-{
+# {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,

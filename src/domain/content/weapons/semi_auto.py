@@ -20,7 +20,6 @@ class SemiAuto(Weapon):
         """The animation frames of this weapon when reloading."""
         
         self.playing_reload_end = False
-        print(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT) + f'01.mp3')
         self.shoot_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,3)]
         self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.EMPTY_TRIGGER))
         self.reload_start_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.RELOAD))

@@ -18,15 +18,12 @@ Spawna perto do player, cavando e saindo do chão
 Habilidade de rolar para frente, com cool down. Desvia de ataques
 
 
-
-
 --Bucket List--
 
 AA 12 shotgun                (Escopeta automática)
 Vector .45 ACP               (smg de alta cadência)
 Karabiner 98k                (sniper leve, rápida)
 P90                          (smg de alta capacidade de munição)
-Desert Eagle                 (pistola de alto dano)
 417 GIGN marksman rifle      (Fuzil semi automático, rápido e com alto dano, sem penetração)
 AK-47                        (fuzil automático de alto dano e capacidade de munição)
 P12 - GSG 9 Pistol           (pistola semi automática, disparo rápido e capacidade de munição mediana)
@@ -35,8 +32,6 @@ M79 grenade launcher         (lança granadas de tiro único)
 
 Granada
 Molotov
-
-
 
 
 #deploy
