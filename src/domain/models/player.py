@@ -94,7 +94,7 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
-        self.add_weapon(enums.Weapons.MACHETE)
+        self.add_weapon(enums.Weapons.DEAGLE)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -575,6 +575,8 @@ class Player(pygame.sprite.Sprite):
         match weapon_type:
             case enums.Weapons.P_1911:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+            case enums.Weapons.DEAGLE:
+                weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/2 + 30, backpack = self.backpack)
             case enums.Weapons.SHORT_BARREL:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.UZI:

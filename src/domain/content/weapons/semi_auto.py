@@ -1,4 +1,4 @@
-import pygame, math, datetime
+import pygame, math, datetime,random
 from pygame.math import Vector2 as vec
 
 from domain.models.weapon import Weapon
@@ -20,8 +20,8 @@ class SemiAuto(Weapon):
         """The animation frames of this weapon when reloading."""
         
         self.playing_reload_end = False
-        
-        self.shoot_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT))
+        print(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT) + f'01.mp3')
+        self.shoot_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.SHOOT) + f'0{i}.mp3') for i in range(1,3)]
         self.empty_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.EMPTY_TRIGGER))
         self.reload_start_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.RELOAD))
         self.reload_end_sound = pygame.mixer.Sound(resources.get_weapon_sfx(self.weapon_type,enums.AnimActions.RELOAD_END))
@@ -55,7 +55,7 @@ class SemiAuto(Weapon):
         super().shoot(bullet_pos, player_net_id, **kwargs)
         
         self.last_shot_time = datetime.datetime.now()
-        self.shoot_sound.play()
+        self.shoot_sounds[random.randint(0, len(self.shoot_sounds)-1)].play()
         return Projectile(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), max_range = self.bullet_max_range, min_range = self.bullet_min_range, bullet_type = self.bullet_type, kill_callback = self.bullet_kill_callback)
     
     def reload_anim(self, speed):

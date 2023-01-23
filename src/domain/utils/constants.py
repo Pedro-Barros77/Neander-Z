@@ -109,7 +109,41 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          store_scale=1,
                          )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 20, 0)
-            w.shoot_sound.set_volume(0.1)
+            for s in w.shoot_sounds:
+                s.set_volume(0.1)
+
+      
+            w.empty_sound.set_volume(0.1)
+            w.reload_start_sound.set_volume(0.3)
+            w.reload_end_sound.set_volume(0.5)
+        
+        case enums.Weapons.DEAGLE:
+            w = SemiAuto(pos,
+                         bullet_type=enums.BulletType.ASSAULT_RIFLE,
+                         weapon_type=weapon,
+                         is_primary=False,
+                         fire_mode=enums.FireMode.SEMI_AUTO,
+                         reload_type=enums.ReloadType.MAGAZINE,
+                         upgrades_dict=get_weapon_upgrade(weapon),
+                         display_name="Desert Eagle",
+                         weapon_switch_ms=200,
+                         damage=10,
+                         bullet_speed=30,
+                         fire_rate=3,
+                         reload_delay_ms=1100,
+                         magazine_size=7,
+                         weapon_scale= 0.8,
+                         bullet_max_range=700,
+                         bullet_min_range=600,
+                         reload_end_frame=12,
+                         reload_speed_multiplier=2,
+                         barrel_offset=vec(0, 15),
+                         store_scale=1,
+                         )
+            w.bullet_spawn_offset = vec(w.rect.width/2 , -5)
+            for s in w.shoot_sounds:
+                s.set_volume(0.3)
+         
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound.set_volume(0.3)
             w.reload_end_sound.set_volume(0.5)
@@ -596,6 +630,83 @@ WEAPONS_UPGRADES = {
             {
                 "id": 2,
                 "ammount": 2,
+                "price": 215.0
+            },
+            {
+                "id": 3,
+                "ammount": 3,
+                "price": 310.0
+            }
+        ]
+    },
+    enums.Weapons.DEAGLE: {
+        "damage": [
+            {
+                "id": 1,
+                "ammount": 2,
+                "price": 150.0
+            },
+            {
+                "id": 2,
+                "ammount": 2,
+                "price": 210.0
+            }
+        ],
+        "firerate": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 70.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.5,
+                "price": 95.0
+            },
+            {
+                "id": 3,
+                "ammount": 1,
+                "price": 120.0
+            },
+        ],
+        "reload_speed": [
+            {
+                "id": 1,
+                "ammount": 0.5,
+                "price": 30.0
+            },
+            {
+                "id": 2,
+                "ammount": 0.5,
+                "price": 55.0
+            },
+            {
+                "id": 3,
+                "ammount": 0.5,
+                "price": 70.0
+            }
+        ],
+        "range": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 70.0
+            },
+            {
+                "id": 2,
+                "ammount": 1.5,
+                "price": 100.0
+            },
+        ],
+        "magazine_size": [
+            {
+                "id": 1,
+                "ammount": 1,
+                "price": 95.0
+            },
+            {
+                "id": 2,
+                "ammount": 1,
                 "price": 215.0
             },
             {
