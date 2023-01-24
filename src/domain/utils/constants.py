@@ -394,7 +394,6 @@ def get_player_upgrade(character_name: enums.Characters):
 ITEMS_UPGRADES = {
     "backpack": [
         {
-            "id": 1,
             "max_pistol_ammo": 10,
             "max_shotgun_ammo": 5,
             "max_rifle_ammo": 10,
@@ -403,7 +402,6 @@ ITEMS_UPGRADES = {
             "price": 150.00
         },
         {
-            "id": 2,
             "max_pistol_ammo": 10,
             "max_shotgun_ammo": 10,
             "max_rifle_ammo": 10,
@@ -412,7 +410,6 @@ ITEMS_UPGRADES = {
             "price": 350.00
         },
         {
-            "id": 3,
             "max_pistol_ammo": 20,
             "max_shotgun_ammo": 10,
             "max_rifle_ammo": 20,
@@ -421,7 +418,6 @@ ITEMS_UPGRADES = {
             "price": 500.00
         },
         {
-            "id": 4,
             "max_pistol_ammo": 20,
             "max_shotgun_ammo": 10,
             "max_rifle_ammo": 20,
@@ -430,7 +426,6 @@ ITEMS_UPGRADES = {
             "price": 850.00
         },
         {
-            "id": 5,
             "max_pistol_ammo": 20,
             "max_shotgun_ammo": 10,
             "max_rifle_ammo": 20,
@@ -442,72 +437,178 @@ ITEMS_UPGRADES = {
     enums.Characters.CARLOS: {
         "max_health": [#half: 15
             {
-                "id": 1,
-                "ammount": 15,
-                "price": 150.00
+                "ammount": 50,
+                "price": 250.00
+            },
+            {
+                "ammount": 50,
+                "price": 350.00
+            },
+            {
+                "ammount": 50,
+                "price": 450.00
+            },
+            {
+                "ammount": 50,
+                "price": 600.00
             },
         ],
-        "movement_speed": [#half: 0.29
+        "movement_speed": [#half: 0.029
             {
-                "id": 1,
                 "ammount": 0.029,
-                "price": 150.00
+                "price": 170.00
+            },
+            {
+                "ammount": 0.029,
+                "price": 230.00
+            },
+            {
+                "ammount": 0.029,
+                "price": 285.00
             },
         ],
         "sprint_speed": [#half: 0.054
             {
-                "id": 1,
                 "ammount": 0.054,
-                "price": 150.00
+                "price": 130.00
+            },
+            {
+                "ammount": 0.054,
+                "price": 200.00
+            },
+            {
+                "ammount": 0.054,
+                "price": 290.00
             },
         ],
         "jump_force": [#half: 0.46
             {
-                "id": 1,
                 "ammount": 0.46,
                 "price": 150.00
+            },
+            {
+                "ammount": 0.46,
+                "price": 190.00
+            },
+            {
+                "ammount": 0.46,
+                "price": 210.00
             },
         ],
         "max_stamina": [#half: 62.5
             {
-                "id": 1,
-                "ammount": 62.5,
-                "price": 150.00
+                "ammount": 125,
+                "price": 170.00
+            },
+            {
+                "ammount": 125,
+                "price": 245.00
+            },
+            {
+                "ammount": 125,
+                "price": 300.00
+            },
+            {
+                "ammount": 125,
+                "price": 370.00
+            },
+            {
+                "ammount": 125,
+                "price": 420.00
             },
         ],
         "stamina_regen_rate": [#half: 0.375
             {
-                "id": 1,
-                "ammount": 0.375,
-                "price": 150.00
+                "ammount": 0.75,
+                "price": 130.00
+            },
+            {
+                "ammount": 0.75,
+                "price": 195.00
+            },
+            {
+                "ammount": 0.75,
+                "price": 250.00
+            },
+            {
+                "ammount": 0.75,
+                "price": 295.00
+            },
+            {
+                "ammount": 0.75,
+                "price": 340.00
             },
         ],
         "stamina_regen_haste": [#half: 0.75
             {
-                "id": 1,
-                "ammount": 0.75,
-                "price": 150.00
+                "ammount": 2.25,
+                "price": 180.00
+            },
+            {
+                "ammount": 2.25,
+                "price": 240.00
+            },
+            {
+                "ammount": 2.25,
+                "price": 310.00
+            },
+            {
+                "ammount": 2.25,
+                "price": 385.00
             },
         ],
         "jump_stamina_skill": [#half: 2.08
             {
-                "id": 1,
-                "ammount": 2.08,
-                "price": 150.00
+                "ammount": 4.16,
+                "price": 80.00
+            },
+            {
+                "ammount": 4.16,
+                "price": 95.00
+            },
+            {
+                "ammount": 4.16,
+                "price": 115.00
+            },
+            {
+                "ammount": 4.16,
+                "price": 140.00
             },
         ],
         "sprint_stamina_skill": [#half: 2.5
             {
-                "id": 1,
-                "ammount": 2.5,
-                "price": 150.00
+                "ammount": 5,
+                "price": 90.00
+            },
+            {
+                "ammount": 5,
+                "price": 120.00
+            },
+            {
+                "ammount": 5,
+                "price": 160.00
+            },
+            {
+                "ammount": 5,
+                "price": 205.00
             },
         ],
         "attack_stamina_skill": [#half: 4.17
             {
-                "id": 1,
-                "ammount": 4.17*5,
-                "price": 150.00
+                "ammount": 20.85,
+                "price": 50.00
+            },
+            {
+                "ammount": 20.85,
+                "price": 80.00
+            },
+            {
+                "ammount": 20.85,
+                "price": 115.00
+            },
+            {
+                "ammount": 20.85,
+                "price": 145.00
             },
         ]
     }
@@ -517,36 +618,30 @@ WEAPONS_UPGRADES = {
     enums.Weapons.MACHETE: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 3,
                 "price": 220.0
             }
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 200.0
             },
         ],
         "stamina": [
             {
-                "id": 1,
                 "ammount": 0.75,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 0.7,
                 "price": 220.0
             },
             {
-                "id": 2,
                 "ammount": 0.7,
                 "price": 220.0
             }
@@ -555,85 +650,70 @@ WEAPONS_UPGRADES = {
     enums.Weapons.P_1911: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 210.0
             }
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 70.0
             },
             {
-                "id": 2,
                 "ammount": 0.5,
                 "price": 95.0
             },
             {
-                "id": 3,
                 "ammount": 1,
                 "price": 120.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 30.0
             },
             {
-                "id": 2,
                 "ammount": 0.5,
                 "price": 55.0
             },
             {
-                "id": 3,
                 "ammount": 0.5,
                 "price": 70.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 70.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 100.0
             },
             {
-                "id": 3,
                 "ammount": 1.3,
                 "price": 155.0
             },
             {
-                "id": 4,
                 "ammount": 1.1,
                 "price": 195.0
             }
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 3,
                 "price": 95.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 215.0
             },
             {
-                "id": 3,
                 "ammount": 3,
                 "price": 310.0
             }
@@ -642,75 +722,62 @@ WEAPONS_UPGRADES = {
     enums.Weapons.DEAGLE: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 210.0
             }
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 70.0
             },
             {
-                "id": 2,
                 "ammount": 0.5,
                 "price": 95.0
             },
             {
-                "id": 3,
                 "ammount": 1,
                 "price": 120.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 30.0
             },
             {
-                "id": 2,
                 "ammount": 0.5,
                 "price": 55.0
             },
             {
-                "id": 3,
                 "ammount": 0.5,
                 "price": 70.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 70.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 100.0
             },
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 95.0
             },
             {
-                "id": 2,
                 "ammount": 1,
                 "price": 215.0
             },
             {
-                "id": 3,
                 "ammount": 3,
                 "price": 310.0
             }
@@ -719,82 +786,68 @@ WEAPONS_UPGRADES = {
     enums.Weapons.SHORT_BARREL: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 200.0
             },
             {
-                "id": 2,
                 "ammount": 1,
                 "price": 230.0
             },
             {
-                "id": 3,
                 "ammount": 1,
                 "price": 285.0
             }
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 90.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 130.0
             },
             {
-                "id": 2,
                 "ammount": 0.5,
                 "price": 155.0
             },
             {
-                "id": 3,
                 "ammount": 0.5,
                 "price": 270.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 0.8,
                 "price": 75.0
             },
             {
-                "id": 2,
                 "ammount": 1,
                 "price": 110.0
             },
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 95.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 130.0
             },
         ],
         "concentration": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 140.0
             },
             {
-                "id": 2,
                 "ammount": 1,
                 "price": 195.0
             },
             {
-                "id": 3,
                 "ammount": 1,
                 "price": 245.0
             }
@@ -803,80 +856,66 @@ WEAPONS_UPGRADES = {
     enums.Weapons.UZI: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 120.0
             },
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 250.0
             },
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.7,
                 "price": 90.0
             },
             {
-                "id": 2,
                 "ammount": 0.7,
                 "price": 115.0
             },
             {
-                "id": 3,
                 "ammount": 0.5,
                 "price": 170.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.8,
                 "price": 80.0
             },
             {
-                "id": 2,
                 "ammount": 0.8,
                 "price": 115.0
             },
             {
-                "id": 3,
                 "ammount": 0.8,
                 "price": 135.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 1.6,
                 "price": 185.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 210.0
             },
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 3,
                 "price": 100.0
             },
             {
-                "id": 2,
                 "ammount": 3,
                 "price": 130.0
             },
             {
-                "id": 2,
                 "ammount": 4,
                 "price": 145.0
             },
@@ -885,29 +924,24 @@ WEAPONS_UPGRADES = {
     enums.Weapons.RPG: {
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.8,
                 "price": 80.0
             },
             {
-                "id": 2,
                 "ammount": 0.8,
                 "price": 115.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 60.0
             },
             {
-                "id": 2,
                 "ammount": 1.6,
                 "price": 75.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 100.0
             },
@@ -916,73 +950,60 @@ WEAPONS_UPGRADES = {
     enums.Weapons.SV98: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 2.5,
                 "price": 145.0
             },
             {
-                "id": 3,
                 "ammount": 2.5,
                 "price": 180.0
             },
             {
-                "id": 4,
                 "ammount": 3,
                 "price": 220.0
             }
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.7,
                 "price": 80.0
             },
             {
-                "id": 2,
                 "ammount": 0.7,
                 "price": 95.0
             },
             {
-                "id": 3,
                 "ammount": 0.5,
                 "price": 120.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.8,
                 "price": 125.0
             },
             {
-                "id": 2,
                 "ammount": 0.8,
                 "price": 150.0
             },
             {
-                "id": 3,
                 "ammount": 0.8,
                 "price": 190.0
             }
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 180.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 235.0
             },
@@ -991,80 +1012,66 @@ WEAPONS_UPGRADES = {
     enums.Weapons.M16: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 150.0
             },
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.65,
                 "price": 100.0
             },
             {
-                "id": 2,
                 "ammount": 0.9,
                 "price": 125.0
             },
             {
-                "id": 3,
                 "ammount": 1,
                 "price": 170.0
             },
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.4,
                 "price": 95.0
             },
             {
-                "id": 2,
                 "ammount": 0.4,
                 "price": 120.0
             },
             {
-                "id": 3,
                 "ammount": 0.4,
                 "price": 140.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 1.6,
                 "price": 165.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 200.0
             },
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 3,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 3,
                 "price": 155.0
             },
             {
-                "id": 2,
                 "ammount": 4,
                 "price": 170.0
             },
@@ -1073,75 +1080,62 @@ WEAPONS_UPGRADES = {
     enums.Weapons.P_93R: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 115.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 135.0
             },
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.5,
                 "price": 100.0
             },
             {
-                "id": 2,
                 "ammount": 1.2,
                 "price": 125.0
             }
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.4,
                 "price": 110
             },
             {
-                "id": 2,
                 "ammount": 0.4,
                 "price": 125.0
             },
             {
-                "id": 3,
                 "ammount": 0.4,
                 "price": 150.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 1.5,
                 "price": 165.0
             },
             {
-                "id": 2,
                 "ammount": 1,
                 "price": 200.0
             },
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 3,
                 "price": 120.0
             },
             {
-                "id": 2,
                 "ammount": 3,
                 "price": 155.0
             },
             {
-                "id": 2,
                 "ammount": 4,
                 "price": 170.0
             },
@@ -1150,60 +1144,50 @@ WEAPONS_UPGRADES = {
     enums.Weapons.SCAR: {
         "damage": [
             {
-                "id": 1,
                 "ammount": 2,
                 "price": 180.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 245.0
             },
         ],
         "firerate": [
             {
-                "id": 1,
                 "ammount": 0.65,
                 "price": 100.0
             },
             {
-                "id": 2,
                 "ammount": 0.9,
                 "price": 125.0
             }
         ],
         "reload_speed": [
             {
-                "id": 1,
                 "ammount": 0.4,
                 "price": 150.0
             },
             {
-                "id": 2,
                 "ammount": 0.4,
                 "price": 185.0
             }
         ],
         "range": [
             {
-                "id": 1,
                 "ammount": 1,
                 "price": 125.0
             },
             {
-                "id": 2,
                 "ammount": 1.4,
                 "price": 180.0
             }
         ],
         "magazine_size": [
             {
-                "id": 1,
                 "ammount": 3,
                 "price": 145.0
             },
             {
-                "id": 2,
                 "ammount": 2,
                 "price": 205.0
             },
@@ -1278,31 +1262,31 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
-#     1: {
-#         "wave_number": 1,
-#         "wave_type": enums.WaveType.SIMPLE,
-#         "wave_message": "And so it begins...",
-#         "timed_spawn_count": 10,
-#         "spawn_timer_ms": 8000,
-#         "wave_interval_s": 6000,
-#         "start_delay_ms": 0,
-#         "end_delay_ms": 0,
-#         "money_multiplier": 1,
-#         "enemies": [
-#             {
-#                 "type": enums.Enemies.Z_RONALDO,
-#                 "count": 10,
-#                 "movement_speed": 0.1,
-#                 "health": 24,
-#                 "damage": 20,
-#                 "max_alive": 1,
-#                 "spawn_chance_multiplier": 1
-#             }
-#         ]
-#     }
-# }
+    1: {
+        "wave_number": 1,
+        "wave_type": enums.WaveType.SIMPLE,
+        "wave_message": "And so it begins...",
+        "timed_spawn_count": 10,
+        "spawn_timer_ms": 8000,
+        "wave_interval_s": 6000,
+        "start_delay_ms": 0,
+        "end_delay_ms": 0,
+        "money_multiplier": 1,
+        "enemies": [
+            {
+                "type": enums.Enemies.Z_RONALDO,
+                "count": 10,
+                "movement_speed": 0.1,
+                "health": 24,
+                "damage": 20,
+                "max_alive": 10,
+                "spawn_chance_multiplier": 1
+            }
+        ]
+    }
+}
 
-# {
+{
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,

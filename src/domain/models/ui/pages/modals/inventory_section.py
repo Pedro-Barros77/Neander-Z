@@ -154,7 +154,7 @@ class Inventory:
             ]
         
         weapons_btn_dict = {
-            "scale": 1.7,
+            "scale": 1.6,
             "text_color": colors.BLACK,
             "text_font": resources.px_font(20)
         }
@@ -326,7 +326,7 @@ class Inventory:
             secondary_icon_rect.center = secondary_slot_rect.center
         
         
-        pnl_right = pygame.Surface((image_rect.width*0.58, image_rect.height - header_rect.height), pygame.SRCALPHA)
+        pnl_right = pygame.Surface((image_rect.width*0.62, image_rect.height - header_rect.height), pygame.SRCALPHA)
         pnl_right_rect = pygame.Rect((0,0), pnl_right.get_size())
         pnl_right_rect.topright = (image_rect.width,header_rect.height)
 
@@ -341,7 +341,7 @@ class Inventory:
         pygame.draw.rect(pnl_right, colors.LIGHT_GRAY, ((0,0), pnl_right_rect.size), 1)
         
         #items
-        _items_margin = vec(40, 50)
+        _items_margin = vec(15, 50)
         for i, item in enumerate(self.cards_list):
             item.set_pos(vec(_items_margin.x, header_rect.height + _items_margin.y + (i * (_items_margin.y + self.card_size.y))) + self.inv_v_scrollbar.scroll_offset)
             item.draw(self.image, vec(0,0))
