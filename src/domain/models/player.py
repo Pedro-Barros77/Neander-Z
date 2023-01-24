@@ -94,7 +94,11 @@ class Player(pygame.sprite.Sprite):
         self.current_weapon: Weapon = None
         """The weapon on player's hand."""
 
+        self.current_throwable: Weapon = None
+        """The throwable on player's hand (grenade, molotov, etc)."""
+
         self.add_weapon(enums.Weapons.MACHETE)
+        self.add_throwable(enums.Throwables.FRAG_GRENADE, 1)
         
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -224,7 +228,7 @@ class Player(pygame.sprite.Sprite):
         if not self.is_alive:
             self.grave_stone_anim(0.2)
             return
-            
+        
         group_name = kwargs.pop("group_name", "")
         if group_name == "jumpable":
             return
@@ -265,6 +269,7 @@ class Player(pygame.sprite.Sprite):
         self.health_bar.update()
         self.stamina_bar.update()
         self.current_weapon.update()
+        self.current_throwable.update()
         
         if self.is_player1:
             _mouse_target = vec(pygame.mouse.get_pos())
@@ -283,28 +288,38 @@ class Player(pygame.sprite.Sprite):
         def flip():
             self.current_weapon.current_frame = pygame.transform.flip(self.current_weapon.current_frame, False, True)
             self.current_weapon.last_dir = self.current_weapon.dir
+            self.current_throwable.current_frame = pygame.transform.flip(self.current_throwable.current_frame, False, True)
+            self.current_throwable.last_dir = self.current_throwable.dir
             
         if game.focused:
             if _mouse_target.x < self.rect.centerx - _offset_camera_target.x:
                 self.current_weapon.dir = -1
+                self.current_throwable.dir = -1
                 if self.current_weapon.last_dir > self.current_weapon.dir:
                     flip()
             elif _mouse_target.x > self.rect.centerx- _offset_camera_target.x:
                 self.current_weapon.dir = 1
+                self.current_throwable.dir = 1
                 if self.current_weapon.last_dir < self.current_weapon.dir:
                     flip()
             else:
                 self.current_weapon.dir = 0
+                self.current_throwable.dir = 0
         
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
+        _grenade_center: vec = self.current_throwable.weapon_anchor + self.rect.topleft - _offset_camera_target
         
         if self.is_player1 and game.focused and not self.changing_weapon:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
+            self.current_throwable.weapon_aim_angle = game_controller.angle_to_mouse(_grenade_center, _mouse_target)
         
         # Weapon pos
         self.current_weapon.rect.center = game_controller.point_to_angle_distance(_weapon_center, self.current_weapon.weapon_distance, -maths.radians(self.current_weapon.weapon_aim_angle)) + self.current_weapon.barrel_offset
+        self.current_throwable.rect.center = game_controller.point_to_angle_distance(_grenade_center, self.current_throwable.weapon_distance, -maths.radians(self.current_throwable.weapon_aim_angle)) + self.current_throwable.barrel_offset
+        
         # Weapon rotation
         self.current_weapon.image, self.current_weapon.rect = game_controller.rotate_to_angle(self.current_weapon.current_frame, vec(self.current_weapon.rect.center),self.current_weapon.weapon_aim_angle)
+        self.current_throwable.image, self.current_throwable.rect = game_controller.rotate_to_angle(self.current_throwable.current_frame, vec(self.current_throwable.rect.center),self.current_throwable.weapon_aim_angle)
         
         #endregion Weapon Animation
         
@@ -336,6 +351,7 @@ class Player(pygame.sprite.Sprite):
         _target_offset = offset if not self.is_player1 else vec(0,0)
         
         self.current_weapon.draw(surface, offset)
+        self.current_throwable.draw(surface, offset)
         
         #popup
         if self.current_weapon.magazine_bullets == 0:
@@ -473,6 +489,10 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, **kwargs):
         _bullet_pos = game_controller.point_to_angle_distance(self.current_weapon.weapon_anchor + self.rect.topleft + vec(0,self.current_weapon.bullet_spawn_offset.y), self.current_weapon.bullet_spawn_offset.x, -maths.radians(self.current_weapon.weapon_aim_angle))
         return self.current_weapon.shoot(_bullet_pos, self.net_id, **kwargs)
+    
+    def throw_grenade(self, **kwargs):
+        _grenade_pos = game_controller.point_to_angle_distance(self.current_throwable.weapon_anchor + self.rect.topleft + vec(0,self.current_throwable.bullet_spawn_offset.y), self.current_throwable.bullet_spawn_offset.x, -maths.radians(self.current_throwable.weapon_aim_angle))
+        return self.current_throwable.shoot(_grenade_pos, self.net_id, **kwargs)
     
     def reload_weapon(self):
         return self.current_weapon.reload()
@@ -614,6 +634,25 @@ class Player(pygame.sprite.Sprite):
                 self.current_weapon = self.backpack.get_weapon(self.backpack.equipped_secondary)
         
         return weapon, True
+    
+    def add_throwable(self, throwable_type: enums.Throwables, count: int):
+        throwable = None
+        
+        default_weapon_distance = self.rect.width/2 + 30
+        default_weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
+        
+        match throwable_type:
+            case enums.Throwables.FRAG_GRENADE:
+                throwable = constants.get_throwable(throwable_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+            
+        if throwable == None:
+            return None, False
+        
+        self.backpack.throwables.append(throwable)
+        
+        self.current_throwable = self.backpack.get_throwable(throwable_type)
+        
+        return throwable, True
     
     def grave_stone_anim(self, speed: float):
         self.grave_drop_frame += speed

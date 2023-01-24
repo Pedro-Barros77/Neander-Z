@@ -18,6 +18,8 @@ class BackPack:
         self.sniper_ammo = 0
         self.rocket_ammo = 0
         
+        self.throwables = []
+        
         self.primary_weapons = [
         ]
         self.secondary_weapons = [
@@ -50,6 +52,15 @@ class BackPack:
             return prim[0]
         if sec:
             return sec[0]
+        
+    
+    def get_throwable(self, throwable_type: enums.Throwables):
+        throwable = [t for t in self.throwables if t.weapon_type == throwable_type]
+        
+        if len(throwable) == 0:
+            return None
+        
+        return throwable[0]
             
         
         

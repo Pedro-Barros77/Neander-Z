@@ -20,6 +20,7 @@ from domain.content.enemies.z_roger import ZRoger
 from domain.content.waves.simple_wave import SimpleWave
 from domain.content.waves.boss_wave import BossWave
 from domain.content.weapons.projectile import Projectile
+from domain.content.weapons.charge import Charge
 
 class Game(Page):
     def __init__(self, client_type: enums.ClientType, screen: pygame.Surface, **kwargs):
@@ -84,7 +85,6 @@ class Game(Page):
         self.game_over_time: datetime.datetime = None
         self.game_over_popup: Popup = None
         
-        
         #ui
         
         self._money_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\dollar.png').convert_alpha()
@@ -131,6 +131,7 @@ class Game(Page):
 
         game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
         game_controller.enemy_target_groups = [self.players_group]
+        
         
         if self.client_type != enums.ClientType.SINGLE:
             self.jumpable_group.add(self.player2)
@@ -434,8 +435,9 @@ class Game(Page):
         """        
         target.last_rect = target.rect.copy()
         
+        _scale = target.gravity_scale if hasattr(target, "gravity_scale") else 1
         target.acceleration.y = self.gravity_accelaration
-        target.speed.y += target.acceleration.y * mc.dt
+        target.speed.y += target.acceleration.y * mc.dt * _scale
         target.pos.y += (target.speed.y + 0.5 * target.acceleration.y) * mc.dt
     
     def process_gravitables(self):
@@ -551,6 +553,31 @@ class Game(Page):
             for b in _bullets:
                 self.current_wave.players_scores[1].bullets_shot += 1
                 self.bullets_group.add(b)
+                
+    def handle_grenades(self):
+        #if current weapon has burst firemode and can shoot one more round
+        
+        if pygame.K_g not in self.pressed_keys:
+            return
+        
+        def charge_kill_callback(hit_target):
+            if hit_target:
+                self.current_wave.players_scores[1].bullets_hit += 1
+        
+        
+        _charges = self.player.throw_grenade(kill_callback = charge_kill_callback)
+        if pygame.K_g in self.pressed_keys:
+            self.pressed_keys.remove(pygame.K_g)
+        
+        if _charges == None:
+            return
+
+        if type(_charges) != list:
+            _charges = [_charges]
+        if len(_charges) > 0:
+            for b in _charges:
+                self.current_wave.players_scores[1].bullets_shot += 1
+                self.bullets_group.add(b)
     
 
     def update(self, **kwargs):
@@ -594,6 +621,8 @@ class Game(Page):
         
         self.handle_shooting()
         
+        self.handle_grenades()
+        
         if self.wave_summary != None:
             self.focused = False
             self.wave_summary.update(events = events)
@@ -623,7 +652,7 @@ class Game(Page):
     
         self.process_gravitables()    
             
-        self.bullets_group.update(offset = self.player.offset_camera)
+        self.bullets_group.update(offset = self.player.offset_camera, game = self)
         
         self.center_camera()
         

@@ -15,6 +15,7 @@ class IGravitable:
     size = (10,10)
     rect = pygame.Rect((0,0), size)
     last_rect = rect.copy()
+    gravity_scale = 1
     
     gravity_enabled = True
     collision_enabled = True

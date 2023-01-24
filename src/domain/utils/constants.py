@@ -12,12 +12,52 @@ from domain.content.weapons.melee import Melee
 from domain.content.weapons.launcher import Launcher
 from domain.content.weapons.sniper import Sniper
 from domain.content.weapons.burst_fire import BurstFire
+from domain.content.weapons.throwable import Throwable
 from domain.models.weapon import Weapon
 
 
 pygame.font.init()
 
 HOLD_TRIGGER_FIREMODES = [enums.FireMode.FULL_AUTO, enums.FireMode.MELEE]
+
+def get_throwable(throwable: enums.Throwables, pos: vec, **kwargs):
+    t: Weapon = None
+    match throwable:
+        case enums.Throwables.FRAG_GRENADE:
+            t = Throwable(pos,
+                         weapon_type=throwable,
+                         display_name="Frag Grenade",
+                         bullet_speed=15,
+                         gravity_scale = 1,
+                         weapon_switch_ms=200,
+                         detonate_on_impact = False,
+                         fuse_timeout_ms = 3000,
+                         bounciness_multiplier = 0.5,
+                         friction_multiplier = 0.2,
+                         hit_damage = 0,
+                         damage=30,
+                         fire_rate=4,
+                         reload_delay_ms=1000,
+                         bullet_max_range=600,
+                         explosion_min_radius=100,
+                         explosion_max_radius=200,
+                         reload_speed_multiplier=2,
+                         barrel_offset=vec(0, 7),
+                         store_scale=1,
+                         )
+            t.bullet_spawn_offset = vec(t.rect.width/2 + 20, 0)
+            for s in t.shoot_sounds:
+                s.set_volume(0.1)
+
+      
+            t.reload_start_sound.set_volume(0.3)
+    
+    t.weapon_anchor = kwargs.pop("weapon_anchor", vec(0, 0))
+    t.weapon_distance = kwargs.pop("weapon_distance", 0)
+    t.player_backpack = kwargs.pop("backpack", None)
+    t.load_content = kwargs.pop("load_content", True)
+
+    return t
 
 
 def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
@@ -235,8 +275,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          barrel_offset=vec(-15, 3),
                          store_scale=2.2
                          )
-            w.bullet_spawn_offset = vec(
-                w.rect.width/2, -10) + vec(w.barrel_offset)
+            w.bullet_spawn_offset = vec(w.rect.width/2, -10) + vec(w.barrel_offset)
             w.shoot_sound.set_volume(0.1)
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound_launcher.set_volume(0.3)

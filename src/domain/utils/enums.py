@@ -48,6 +48,9 @@ class Weapons(Enum):
     SCAR = 'rifles\\scar'
     DEBUG = 'debug'
     
+class Throwables(Enum):
+    FRAG_GRENADE = 'throwables\\frag_grenade'
+    
 class AnimActions(Enum):
     #players/enemies
     TURN = "turn"

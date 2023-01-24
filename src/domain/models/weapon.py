@@ -45,6 +45,10 @@ class Weapon(pygame.sprite.Sprite):
         self.magazine_bullets = self.magazine_size
         """The number of bullets currently in the magazine."""
         
+        self.gravity_scale = kwargs.pop("gravity_scale", 1)
+        """How much the projectiles of this weapon are affected by the gravity."""
+        
+        
         self.weapon_distance = kwargs.pop("weapon_distance",0)
         """The distance from the weapon anchor to the weapon position."""
         self.barrel_offset = kwargs.pop("barrel_offset", vec(0,0))
