@@ -21,6 +21,7 @@ class Charge(pygame.sprite.Sprite):
         self.detonate_on_impact = kwargs.pop("detonate_on_impact", True)
         self.bounciness_multiplier = kwargs.pop("bounciness_multiplier", 0.5)
         self.friction_multiplier = kwargs.pop("friction_multiplier", 0.2)
+        self.rotation_speed = kwargs.pop("rotation_speed", 5)
         self.image = game_controller.load_sprites(resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.SHOOT), self.image_scale, enums.ConvertType.CONVERT_ALPHA)[0]
         self.current_frame: pygame.Surface = self.image.copy()
         self.rect = self.image.get_rect()
@@ -38,6 +39,7 @@ class Charge(pygame.sprite.Sprite):
         self.start_pos = pos
         self.start_time = datetime.datetime.now()
         self.hit_targets: list[int] = []
+        self.rotation_angle = 0
         
         self.thrown = False
         self.was_grounded = False
@@ -72,6 +74,10 @@ class Charge(pygame.sprite.Sprite):
         
         self.acceleration.x = 0
         
+        self.rotation_angle -= self.rotation_speed * self.speed.x
+        if self.rotation_angle > 360:
+            self.rotation_angle -= 360
+        
         game = kwargs.pop("game", None)
         self.last_rect = self.rect.copy()
         
@@ -98,14 +104,6 @@ class Charge(pygame.sprite.Sprite):
         self.speed.x += round(self.acceleration.x, 6) * mc.dt
         self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
-        
-        print(self.speed.x)
-        
-        
-        self.image, self.rect = game_controller.rotate_to_angle(self.current_frame, _new_pos, self.angle)
-        
-        
-        
         # Gravity
         if self.is_alive and not self.exploding:
             self.last_rect = self.rect.copy()
@@ -131,8 +129,9 @@ class Charge(pygame.sprite.Sprite):
                 self.destroy()
                 
         # if will be out of the map bounds
-        if self.rect.centerx > game_controller.map_size.x or self.rect.centerx < 0 or\
-            self.rect.centery > game_controller.map_size.y or self.rect.centery < 0:
+        _margin = 20
+        if self.rect.centerx > game_controller.map_size.x + _margin or self.rect.centerx < -_margin or\
+            self.rect.centery > game_controller.map_size.y + _margin or self.rect.centery < -_margin:
             self.kill()
         self.thrown = True
         
@@ -144,11 +143,16 @@ class Charge(pygame.sprite.Sprite):
         if self.exploding:
             self.image = self.current_frame.copy()
         
-        screen.blit(self.image, vec(self.rect.topleft) - offset)
+        _image = self.image.copy()
+            
+        if self.rotation_speed != 0:
+            _image = game_controller.rotate_image(self.image, self.rotation_angle)
+        
+        screen.blit(_image, vec(self.rect.topleft) - offset)
         
         # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
         
-        pygame.draw.rect(screen, colors.GREEN, ((self.rect.topleft) - offset, self.rect.size), 2)
+        # pygame.draw.rect(screen, colors.GREEN, ((self.rect.topleft) - offset, self.rect.size), 2)
     
     def explosion_anim(self, speed: float):
         self.explosion_frame += speed

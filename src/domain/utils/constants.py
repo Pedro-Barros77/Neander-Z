@@ -35,19 +35,21 @@ def get_throwable(throwable: enums.Throwables, pos: vec, **kwargs):
                          bounciness_multiplier = 0.5,
                          friction_multiplier = 0.1,
                          hit_damage = 0,
+                         weapon_scale=0.8,
+                         rotation_speed = 5,
                          damage=30,
-                         fire_rate=4,
-                         reload_delay_ms=1000,
+                         fire_rate=1,
+                         reload_delay_ms=400,
                          bullet_max_range=600,
                          explosion_min_radius=100,
                          explosion_max_radius=200,
-                         reload_speed_multiplier=2,
-                         barrel_offset=vec(0, 7),
+                         reload_speed_multiplier=1,
+                         barrel_offset=vec(0, 40),
                          store_scale=1,
                          )
-            t.bullet_spawn_offset = vec(t.rect.width/2 + 20, 0)
+            t.bullet_spawn_offset = vec(-t.rect.width*2, -25)
             for s in t.shoot_sounds:
-                s.set_volume(0.1)
+                s.set_volume(0.2)
 
       
             t.reload_start_sound.set_volume(0.3)

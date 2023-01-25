@@ -525,7 +525,7 @@ class Game(Page):
         #if current weapon has burst firemode and can shoot one more round
         _is_burst = self.player.current_weapon.fire_mode == enums.FireMode.BURST
         
-        if self.player.rolling:
+        if self.player.rolling or self.player.current_throwable.throwing or self.player.current_throwable.cook_start_time != None:
             return
         
         if "mouse_0" not in self.pressed_keys and (not _is_burst or(_is_burst and not self.player.current_weapon.firing_burst)):
@@ -560,15 +560,22 @@ class Game(Page):
     def handle_grenades(self):
         #if current weapon has burst firemode and can shoot one more round
         
-        if pygame.K_g not in self.pressed_keys:
+        if (pygame.K_g not in self.pressed_keys and self.player.current_throwable.cook_start_time == None)or\
+            (pygame.K_g in self.pressed_keys and self.player.current_throwable.cook_start_time != None):
             return
         
         def charge_kill_callback(hit_target):
             if hit_target:
                 self.current_wave.players_scores[1].bullets_hit += 1
+                
+        if self.player.current_throwable.cook_start_time == None and not self.player.current_weapon.reloading:
+            self.player.current_throwable.cook_grenade()
+            return
+        
         
         
         _charges = self.player.throw_grenade(kill_callback = charge_kill_callback)
+        
         if pygame.K_g in self.pressed_keys:
             self.pressed_keys.remove(pygame.K_g)
         

@@ -329,12 +329,14 @@ class Player(pygame.sprite.Sprite):
         if game.focused:
             if _mouse_target.x < self.rect.centerx - _offset_camera_target.x:
                 self.current_weapon.dir = -1
-                self.current_throwable.dir = -1
+                if not self.current_throwable.throwing:
+                    self.current_throwable.dir = -1
                 if self.current_weapon.last_dir > self.current_weapon.dir:
                     flip()
             elif _mouse_target.x > self.rect.centerx- _offset_camera_target.x:
                 self.current_weapon.dir = 1
-                self.current_throwable.dir = 1
+                if not self.current_throwable.throwing:
+                    self.current_throwable.dir = 1
                 if self.current_weapon.last_dir < self.current_weapon.dir:
                     flip()
             else:
@@ -344,7 +346,7 @@ class Player(pygame.sprite.Sprite):
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
         _grenade_center: vec = self.current_throwable.weapon_anchor + self.rect.topleft - _offset_camera_target
         
-        if self.is_player1 and game.focused and not self.changing_weapon and not self.current_throwable.firing:
+        if self.is_player1 and game.focused and not self.changing_weapon and not self.current_throwable.throwing:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
             self.current_throwable.weapon_aim_angle = game_controller.angle_to_mouse(_grenade_center, _mouse_target)
 
@@ -359,9 +361,6 @@ class Player(pygame.sprite.Sprite):
         #endregion Weapon Animation
 
         #region Animation Triggers
-
-        pressing_right = pygame.K_d in game.pressed_keys
-        pressing_left = pygame.K_a in game.pressed_keys
 
         if self.turning_dir != 0:
             self.turn_anim(0.3 * mc.dt)
@@ -395,7 +394,7 @@ class Player(pygame.sprite.Sprite):
         if not self.rolling:
             self.current_throwable.draw(surface, offset)
 
-            if not self.current_throwable.firing:
+            if not self.current_throwable.throwing and self.current_throwable.cook_start_time == None:
                 self.current_weapon.draw(surface, offset)
             
         #popup
@@ -528,6 +527,12 @@ class Player(pygame.sprite.Sprite):
 
         if pygame.K_c in game.pressed_keys and self.stamina > self.roll_stamina_drain and self.grounded and not _collid_wall:
             _now = datetime.datetime.now()
+            
+            if self.current_throwable.throwing or self.current_throwable.cook_start_time != None:
+                return
+            
+            if self.current_weapon.reloading:
+                return
 
             if _now < self.last_roll + datetime.timedelta(milliseconds= self.roll_cooldown_ms):
                 return
@@ -541,7 +546,7 @@ class Player(pygame.sprite.Sprite):
                 self.roll_dir = -1
                 self.last_roll = _now
                 self.rolling = True
-
+                
 
     def collision(self, game, targets: pygame.sprite.Group, direction: enums.Orientation, obj = None, game_obj = None):
         """Handles collision between the player and collidable objects.
@@ -566,12 +571,23 @@ class Player(pygame.sprite.Sprite):
         return self.current_weapon.shoot(_bullet_pos, self.net_id, **kwargs)
 
     def throw_grenade(self, **kwargs):
+        if self.current_weapon.reloading:
+            return
+        
+        if self.rolling:
+            return
+        
         _grenade_pos = game_controller.point_to_angle_distance(self.current_throwable.weapon_anchor + self.rect.topleft + vec(0,self.current_throwable.bullet_spawn_offset.y), self.current_throwable.bullet_spawn_offset.x, -maths.radians(self.current_throwable.weapon_aim_angle))
         return self.current_throwable.shoot(_grenade_pos, self.net_id, **kwargs)
 
     def reload_weapon(self):
+        if self.current_throwable.throwing or self.current_throwable.cook_start_time != None:
+            return
+        
+        if self.rolling:
+            return
+        
         return self.current_weapon.reload()
-
 
     def turn_anim(self, speed: float):
         self.turning_frame = math.clamp(self.turning_frame + (speed * self.turning_dir), 0, len(self.turn_frames)-1)
@@ -728,8 +744,8 @@ class Player(pygame.sprite.Sprite):
     def add_throwable(self, throwable_type: enums.Throwables, count: int):
         throwable = None
 
-        default_weapon_distance = self.rect.width/2 + 30
-        default_weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
+        default_weapon_distance = self.rect.width/8 - self.rect.width/5
+        default_weapon_anchor = vec(self.rect.width/1.8, self.rect.height/3)
 
         match throwable_type:
             case enums.Throwables.FRAG_GRENADE:
