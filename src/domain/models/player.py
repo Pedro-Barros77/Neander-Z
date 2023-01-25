@@ -343,8 +343,8 @@ class Player(pygame.sprite.Sprite):
 
         _weapon_center: vec = self.current_weapon.weapon_anchor + self.rect.topleft - _offset_camera_target
         _grenade_center: vec = self.current_throwable.weapon_anchor + self.rect.topleft - _offset_camera_target
-
-        if self.is_player1 and game.focused and not self.changing_weapon:
+        
+        if self.is_player1 and game.focused and not self.changing_weapon and not self.current_throwable.firing:
             self.current_weapon.weapon_aim_angle = game_controller.angle_to_mouse(_weapon_center, _mouse_target)
             self.current_throwable.weapon_aim_angle = game_controller.angle_to_mouse(_grenade_center, _mouse_target)
 
@@ -391,11 +391,13 @@ class Player(pygame.sprite.Sprite):
 
         surface.blit(self.image, self.pos - offset)
         _target_offset = offset if not self.is_player1 else vec(0,0)
-
+        
         if not self.rolling:
-            self.current_weapon.draw(surface, offset)
             self.current_throwable.draw(surface, offset)
 
+            if not self.current_throwable.firing:
+                self.current_weapon.draw(surface, offset)
+            
         #popup
         if self.current_weapon.magazine_bullets == 0:
             if self.reload_popup == None:

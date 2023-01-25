@@ -146,10 +146,10 @@ class Enemy(pygame.sprite.Sprite):
         # Movement
         if self.dir.x != 0:
             self.acceleration.x = self.movement_speed * self.dir.x
-        # if not self.attacking and not self.dying and not has_attack_range:
-        #     self.acceleration.x += self.speed.x * game.friction
-        #     self.speed.x += self.acceleration.x * mc.dt
-        #     self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
+        if not self.attacking and not self.dying and not has_attack_range:
+            self.acceleration.x += self.speed.x * game.friction
+            self.speed.x += self.acceleration.x * mc.dt
+            self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
         # Gravity
         game.apply_gravity(self)
@@ -199,6 +199,10 @@ class Enemy(pygame.sprite.Sprite):
         _result.blit(self.image, (0,0))
         _result.set_alpha(self.image_alpha)
         surface.blit(_result, self.pos - offset)
+        
+        # self.blit_debug = True
+        # pygame.draw.rect(surface, colors.BLUE, math.rect_offset(self.rect, -offset), 1)
+
 
 
         self.health_bar.rect.center = vec(self.rect.centerx, self.rect.top - 15) - offset

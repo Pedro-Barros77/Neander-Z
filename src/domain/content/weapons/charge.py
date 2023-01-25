@@ -40,6 +40,7 @@ class Charge(pygame.sprite.Sprite):
         self.hit_targets: list[int] = []
         
         self.thrown = False
+        self.was_grounded = False
         
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
@@ -127,7 +128,9 @@ class Charge(pygame.sprite.Sprite):
         _vector = vec(self.rect.topleft) - _new_pos
         if not self.thrown:
             self.speed -= _vector
-        self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction*self.friction_multiplier), 6)
+            
+        _ground_friction_multiplier = 8 if self.was_grounded else 1
+        self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction*self.friction_multiplier*_ground_friction_multiplier), 6)
         self.speed.x += round(self.acceleration.x * mc.dt, 6)
         self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
@@ -150,6 +153,7 @@ class Charge(pygame.sprite.Sprite):
         collided = self.bullet_collision()
         _last_y_speed = self.speed.y
         _ground_collided = self.ground_collision(game, game.collision_group)
+        self.was_grounded = _ground_collided
         
         if _ground_collided and not self.detonate_on_impact:
             self.speed.y = -_last_y_speed * self.bounciness_multiplier

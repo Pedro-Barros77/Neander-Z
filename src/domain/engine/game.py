@@ -101,7 +101,7 @@ class Game(Page):
         """Starts the game.
         """
         
-        self.current_wave = self.create_wave(constants.WAVES[1])
+        self.current_wave = self.create_wave(constants.WAVES[10])
         self.start_wave()
         self.map = Map(self.screen, f"{resources.IMAGES_PATH}map_graveyard.png", floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
@@ -477,7 +477,7 @@ class Game(Page):
             
                 case enums.Orientation.VERTICAL:
                     # collision on the bottom
-                    if obj.rect.bottom >= o.rect.top and obj.last_rect.bottom <= o.last_rect.top:
+                    if obj.rect.bottom >= o.rect.top: #and obj.last_rect.bottom <= o.last_rect.top:
                         obj.rect.bottom = o.rect.top
                         obj.pos.y = obj.rect[1]
                         obj.speed.y = 0
