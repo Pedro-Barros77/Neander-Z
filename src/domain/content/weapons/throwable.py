@@ -44,6 +44,7 @@ class Throwable(Weapon):
         
         if self.firing_frame > len(self.fire_frames)-1:
             self.firing_frame = 0
+            self.firing = False
         self.current_frame = self.fire_frames[int(self.firing_frame)]
         
         if self.dir < 0:
