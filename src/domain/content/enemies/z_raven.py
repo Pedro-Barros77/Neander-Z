@@ -244,10 +244,7 @@ class ZRaven(Enemy):
             
             _distance = abs(self.rect.centerx - target.centerx)
             if _distance <= self.attack_distance:
-                if self.attack_start_sounds != None and not self.attacking:
-                    print("iiih faltou em")
-                    # rand_sound = random.randint(0, len(self.attack_start_sounds)-1)
-                    # self.attack_start_sounds[rand_sound].play()
+                
                 self.attacking = True
             else:
                 self.rising = True

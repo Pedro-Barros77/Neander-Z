@@ -125,7 +125,7 @@ class Game(Page):
             self.player2.pos = vec(self.player.rect.topleft)
         
         self.collision_group = pygame.sprite.Group([self.map.floor, self.map.left_wall, self.map.right_wall])
-        self.players_group =  pygame.sprite.Group([self.player])
+        self.players_group =  pygame.sprite.Group([self.player.hitbox_body])
         self.jumpable_group = pygame.sprite.Group([self.map.floor])
         self.bullets_group = pygame.sprite.Group()
 
@@ -524,6 +524,9 @@ class Game(Page):
     def handle_shooting(self):
         #if current weapon has burst firemode and can shoot one more round
         _is_burst = self.player.current_weapon.fire_mode == enums.FireMode.BURST
+        
+        if self.player.rolling:
+            return
         
         if "mouse_0" not in self.pressed_keys and (not _is_burst or(_is_burst and not self.player.current_weapon.firing_burst)):
             return

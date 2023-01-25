@@ -56,6 +56,7 @@ class AnimActions(Enum):
     TURN = "turn"
     JUMP = "jump"
     RUN = "run"
+    ROLL = "roll"
     FALL_GROUND = "fall_ground"
     DEATH = "death"
     ATTACK = "attack"

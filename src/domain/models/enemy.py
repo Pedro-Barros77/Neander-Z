@@ -159,7 +159,6 @@ class Enemy(pygame.sprite.Sprite):
         self.grounded = self.collision(game, game.collision_group, enums.Orientation.VERTICAL)
         # if self.dir.y > 0 and self.grounded:
         #     self.speed.y = - self.jump_force
-        
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL, self.hitbox_body if self.hitbox_body != None else self)
 
