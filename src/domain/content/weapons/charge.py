@@ -66,42 +66,6 @@ class Charge(pygame.sprite.Sprite):
 
         sound.play()
         
-    def get_tail(self):
-        _tail_rect = self.rect.copy()
-        _tail_rect.width = self.rect.width * self.bullet_speed/2
-        if self.image_scale != 1:
-            _tail_rect.width *= self.image_scale-1
-        
-        if abs(self.angle) < 90:
-            _tail_rect.topright = self.rect.topright
-        else:
-            _tail_rect.topleft = self.rect.topleft
-            
-        
-        
-        if self.start_pos.x > _tail_rect.x and abs(self.angle) < 90:
-            _tail_rect.width -= abs(self.start_pos.x - _tail_rect.left)
-            _tail_rect.topright = self.rect.topright
-        elif self.start_pos.x < _tail_rect.x and abs(self.angle) > 90:
-            _tail_rect.width -= abs(_tail_rect.right - (self.start_pos.x + self.rect.width))
-            _tail_rect.topleft = self.rect.topleft
-        _tail_rect.width = abs(_tail_rect.width)
-        _rec = Rectangle(_tail_rect.size, _tail_rect.topleft)
-        return _rec
-    
-    def draw(self, screen: pygame.Surface, offset: vec):
-        if not self.is_alive:
-            return    
-        
-        if self.exploding:
-            self.image = self.current_frame.copy()
-        
-        screen.blit(self.image, vec(self.rect.topleft) - offset)
-        
-        # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
-        
-        pygame.draw.rect(screen, colors.GREEN, ((self.rect.topleft) - offset, self.rect.size), 2)
-        
     def update(self, **kwargs):
         if not self.is_alive:
             return
@@ -124,15 +88,18 @@ class Charge(pygame.sprite.Sprite):
             self.destroy()
             
         # movement
-        _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.bullet_speed * mc.dt, -math.radians(self.angle))
-        _vector = vec(self.rect.topleft) - _new_pos
+        _new_pos = game_controller.point_to_angle_distance(vec(self.rect.topleft), self.bullet_speed, -math.radians(self.angle))
         if not self.thrown:
+            _vector = vec(self.rect.topleft) - _new_pos
             self.speed -= _vector
             
         _ground_friction_multiplier = 8 if self.was_grounded else 1
         self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction*self.friction_multiplier*_ground_friction_multiplier), 6)
-        self.speed.x += round(self.acceleration.x * mc.dt, 6)
+        self.speed.x += round(self.acceleration.x, 6) * mc.dt
         self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
+        
+        
+        print(self.speed.x)
         
         
         self.image, self.rect = game_controller.rotate_to_angle(self.current_frame, _new_pos, self.angle)
@@ -168,7 +135,20 @@ class Charge(pygame.sprite.Sprite):
             self.rect.centery > game_controller.map_size.y or self.rect.centery < 0:
             self.kill()
         self.thrown = True
-            
+        
+        
+    def draw(self, screen: pygame.Surface, offset: vec):
+        if not self.is_alive:
+            return    
+        
+        if self.exploding:
+            self.image = self.current_frame.copy()
+        
+        screen.blit(self.image, vec(self.rect.topleft) - offset)
+        
+        # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
+        
+        pygame.draw.rect(screen, colors.GREEN, ((self.rect.topleft) - offset, self.rect.size), 2)
     
     def explosion_anim(self, speed: float):
         self.explosion_frame += speed

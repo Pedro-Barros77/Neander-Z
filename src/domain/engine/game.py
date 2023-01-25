@@ -101,7 +101,7 @@ class Game(Page):
         """Starts the game.
         """
         
-        self.current_wave = self.create_wave(constants.WAVES[10])
+        self.current_wave = self.create_wave(constants.WAVES[1])
         self.start_wave()
         self.map = Map(self.screen, f"{resources.IMAGES_PATH}map_graveyard.png", floor_y = 50)
         self.map.rect.bottomleft = self.screen.get_rect().bottomleft
