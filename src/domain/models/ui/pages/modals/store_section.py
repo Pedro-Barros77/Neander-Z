@@ -220,7 +220,7 @@ class Store:
                         t = bkp.get_throwable(self.selected_card.bullet_type)
                         _count = t.count if t != None else 0
                         if _count < bkp.max_grenade_type:
-                            btn_text = f'Buy +{_count}'
+                            btn_text = f'Buy +1'
                         else:
                             btn_text = "Full"
                     else:

@@ -139,7 +139,6 @@ class Throwable(Weapon):
         
         self.last_shot_time = datetime.datetime.now()
         self.shoot_sounds[random.randint(0, len(self.shoot_sounds)-1)].play()
-        self.cook_start_time = None
         
         charge_dict = {
             "max_range": self.bullet_max_range,
@@ -154,8 +153,10 @@ class Throwable(Weapon):
             "bounciness_multiplier": self.bounciness_multiplier,
             "friction_multiplier": self.friction_multiplier,
             "hit_damage": self.hit_damage,
-            "rotation_speed": self.rotation_speed
+            "rotation_speed": self.rotation_speed,
+            "start_time": self.cook_start_time
         }
+        self.cook_start_time = None
         
         return Charge(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), **charge_dict)
     
