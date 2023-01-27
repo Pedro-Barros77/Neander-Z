@@ -17,7 +17,7 @@ class Weapon(pygame.sprite.Sprite):
         
         self.player_backpack: BackPack = kwargs.pop("backpack", None)
         self.bullet_type: enums.BulletType = kwargs.pop("bullet_type", enums.BulletType.PISTOL)
-        self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.P_1911)
+        self.weapon_type: enums.Weapons = kwargs.pop("weapon_type", enums.Weapons.COLT_1911)
         self.display_name = kwargs.pop("display_name", "Weapon")
         self.purchase_price = kwargs.pop("purchase_price", 0)
         

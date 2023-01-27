@@ -128,7 +128,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             for h in w.hit_sounds:
                 h.set_volume(0.5)
 
-        case enums.Weapons.P_1911:
+        case enums.Weapons.COLT_1911:
             w = SemiAuto(pos,
                          bullet_type=enums.BulletType.PISTOL,
                          weapon_type=weapon,
@@ -348,7 +348,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.reload_start_sound_burst.set_volume(0.3)
             w.reload_end_sound.set_volume(0.4)
 
-        case enums.Weapons.P_93R:
+        case enums.Weapons.BERETTA_93R:
             w = BurstFire(pos,
                           bullet_type=enums.BulletType.PISTOL,
                           weapon_type=weapon,
@@ -689,7 +689,7 @@ WEAPONS_UPGRADES = {
             }
         ],
     },
-    enums.Weapons.P_1911: {
+    enums.Weapons.COLT_1911: {
         "damage": [
             {
                 "ammount": 2,
@@ -1119,7 +1119,7 @@ WEAPONS_UPGRADES = {
             },
         ],
     },
-    enums.Weapons.P_93R: {
+    enums.Weapons.BERETTA_93R: {
         "damage": [
             {
                 "ammount": 2,

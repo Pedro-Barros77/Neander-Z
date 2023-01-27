@@ -36,9 +36,9 @@ class Enemies(Enum):
     Z_RONALD = "z_ronald"
     
 class Weapons(Enum):
-    P_1911 = 'pistols\\1911'
+    COLT_1911 = 'pistols\\1911'
     DEAGLE = 'pistols\\deagle'
-    P_93R = 'pistols\\93r'
+    BERETTA_93R = 'pistols\\93r'
     SHORT_BARREL = 'shotguns\\short_barrel'
     UZI = 'smgs\\uzi'
     MACHETE = 'melee\\machete'

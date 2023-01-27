@@ -106,8 +106,8 @@ class Store:
         
         self.secondary_weapons: list[StoreItem] = [
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.MACHETE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Machete", item_name = "machete", price = 0, icon_scale = 0.2, store_icon_scale = 0.1, bullet_type = enums.BulletType.MELEE, weapon_type = enums.Weapons.MACHETE, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80,store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_1911, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Weapons.P_93R, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.P_93R, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.COLT_1911, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Colt 1911", item_name = "p_1911", price = 80,store_icon_scale = 2, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.COLT_1911, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Weapons.BERETTA_93R, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Beretta 93R", item_name = "93r", price = 730, icon_scale = 1.1, store_icon_scale = 1.3, bullet_type = enums.BulletType.PISTOL, weapon_type = enums.Weapons.BERETTA_93R, **cards_dict),
             StoreItem(f'{resources.get_weapon_path(enums.Weapons.DEAGLE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Desert Eagle", item_name = "deagle", price = 850,  icon_scale = 1.2, store_icon_scale = 1.5, bullet_type = enums.BulletType.ASSAULT_RIFLE, weapon_type = enums.Weapons.DEAGLE, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]

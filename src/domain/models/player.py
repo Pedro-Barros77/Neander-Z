@@ -103,7 +103,7 @@ class Player(pygame.sprite.Sprite):
         self.current_throwable: Weapon = None
         """The throwable on player's hand (grenade, molotov, etc)."""
 
-        self.add_weapon(enums.Weapons.DEAGLE)
+        self.add_weapon(enums.Weapons.COLT_1911)
         self.add_throwable(enums.Throwables.FRAG_GRENADE, 3)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -188,8 +188,7 @@ class Player(pygame.sprite.Sprite):
 
         self.hitbox_body: Rectangle = Rectangle(self.rect.size, self.rect.topleft, border_color = colors.GREEN, border_radius = 8, take_damage_callback = lambda value, attacker: self.take_damage(value), name = "player_body", id = self.net_id, owner = self)
         self.hitbox_body.set_rect(pygame.Rect((0,0),(self.hitbox_body.rect.width * 0.35, self.hitbox_body.rect.height)))
-
-
+        self.start_hitbox_size = self.hitbox_body.rect.size
 
         self.survived_wave = 0
 
@@ -271,7 +270,14 @@ class Player(pygame.sprite.Sprite):
         game = kwargs.pop("game", None)
 
         if self.hitbox_body != None:
-            self.hitbox_body.rect.top = self.pos.y
+            if self.crouching:
+                self.hitbox_body.rect.height = self.start_hitbox_size[1] - 20
+            else:
+                self.hitbox_body.rect.height = self.start_hitbox_size[1] 
+            
+            self.hitbox_body.set_rect(self.hitbox_body.rect)
+                
+            self.hitbox_body.rect.bottom = self.rect.bottom
             self.hitbox_body.rect.centerx = self.rect.centerx
             self.hitbox_body.update_pos()
 
@@ -441,7 +447,7 @@ class Player(pygame.sprite.Sprite):
         self.stamina_bar.draw(surface, self.offset_camera)
 
         #debug
-        # self.hitbox_body.draw(surface, self.offset_camera)
+        self.hitbox_body.draw(surface, self.offset_camera)
         # pygame.draw.rect(surface, colors.BLUE, math.rect_offset(self.rect, -offset), 3)
 
 
@@ -757,7 +763,7 @@ class Player(pygame.sprite.Sprite):
         default_weapon_anchor = vec(self.rect.width/2, self.rect.height/3)
 
         match weapon_type:
-            case enums.Weapons.P_1911:
+            case enums.Weapons.COLT_1911:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.DEAGLE:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/8 + 30, backpack = self.backpack)
@@ -773,7 +779,7 @@ class Player(pygame.sprite.Sprite):
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.M16:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = self.rect.width/8 + 20, backpack = self.backpack)
-            case enums.Weapons.P_93R:
+            case enums.Weapons.BERETTA_93R:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
             case enums.Weapons.SCAR:
                 weapon = constants.get_weapon(weapon_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
