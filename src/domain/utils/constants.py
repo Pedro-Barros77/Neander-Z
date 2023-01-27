@@ -412,6 +412,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
             w.reload_end_sound.set_volume(0.3)
 
     w.weapon_anchor = kwargs.pop("weapon_anchor", vec(0, 0))
+    w.start_weapon_anchor = w.weapon_anchor.copy()
     w.weapon_distance = kwargs.pop("weapon_distance", 0)
     w.player_backpack = kwargs.pop("backpack", None)
     w.load_content = kwargs.pop("load_content", True)
@@ -1303,31 +1304,31 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
-    1: {
-        "wave_number": 1,
-        "wave_type": enums.WaveType.SIMPLE,
-        "wave_message": "And so it begins...",
-        "timed_spawn_count": 10,
-        "spawn_timer_ms": 8000,
-        "wave_interval_s": 6000,
-        "start_delay_ms": 0,
-        "end_delay_ms": 0,
-        "money_multiplier": 1,
-        "enemies": [
-            {
-                "type": enums.Enemies.Z_RONALDO,
-                "count": 5,
-                "movement_speed": 0.1,
-                "health": 24,
-                "damage": 20,
-                "max_alive": 99,
-                "spawn_chance_multiplier": 1
-            }
-        ]
-    }
-}
+#     1: {
+#         "wave_number": 1,
+#         "wave_type": enums.WaveType.SIMPLE,
+#         "wave_message": "And so it begins...",
+#         "timed_spawn_count": 10,
+#         "spawn_timer_ms": 8000,
+#         "wave_interval_s": 6000,
+#         "start_delay_ms": 0,
+#         "end_delay_ms": 0,
+#         "money_multiplier": 1,
+#         "enemies": [
+#             {
+#                 "type": enums.Enemies.Z_RONALDO,
+#                 "count": 5,
+#                 "movement_speed": 0.1,
+#                 "health": 24,
+#                 "damage": 20,
+#                 "max_alive": 99,
+#                 "spawn_chance_multiplier": 1
+#             }
+#         ]
+#     }
+# }
 
-{
+# {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,

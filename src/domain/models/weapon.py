@@ -115,6 +115,8 @@ class Weapon(pygame.sprite.Sprite):
         self.weapon_anchor = kwargs.pop("weapon_anchor", vec(0,0))
         """The anchor point of the weapon (the center of the circle it orbits around), relative to the player position"""
 
+        self.start_weapon_anchor = self.weapon_anchor.copy()
+
         self.weapon_aim_angle: float = 0
         """The angle that the container is rotated along with the weapon."""
 

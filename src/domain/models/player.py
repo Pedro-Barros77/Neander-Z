@@ -72,9 +72,11 @@ class Player(pygame.sprite.Sprite):
         """If the player is touching the ground (or any jumpable object)."""
         self.image_scale = 2
         """How much the image will be scaled from original file."""
+        self.idle_frame = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.character, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
 
-        self.image = game_controller.scale_image(pygame.image.load(resources.get_character_path(self.character, enums.AnimActions.IDLE)), self.image_scale, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.image = self.idle_frame.copy()
         """The surface of the player."""
+
 
         self.rect = self.image.get_rect()
         """The rect of the player."""
@@ -101,7 +103,7 @@ class Player(pygame.sprite.Sprite):
         self.current_throwable: Weapon = None
         """The throwable on player's hand (grenade, molotov, etc)."""
 
-        self.add_weapon(enums.Weapons.M16)
+        self.add_weapon(enums.Weapons.RPG)
         self.add_throwable(enums.Throwables.FRAG_GRENADE, 1)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
@@ -134,9 +136,9 @@ class Player(pygame.sprite.Sprite):
         """The frames of the running animation."""
 
         self.rolling = False
-        """If the running animation is running."""
+        """If the rolling animation is rolling."""
         self.rolling_frame = 0
-        """The current frame index of the running animation."""
+        """The current frame index of the rolling animation."""
         roll_folder = resources.get_character_path(self.character, enums.AnimActions.ROLL)
         self.roll_frames = game_controller.load_sprites(roll_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
 
@@ -145,6 +147,18 @@ class Player(pygame.sprite.Sprite):
         self.rolling_forward = False
         self.friction_mutiplier = kwargs.pop("friction_mutiplier", 1)
         self.roll_dir = 0
+
+
+        self.crouching = False
+        """If the rolling animation is rolling."""
+        self.crouched_frame = 0
+        """The current frame index of the rolling animation."""
+        crouch_folder = resources.get_character_path(self.character, enums.AnimActions.CROUCH)
+        self.crouch_frames = game_controller.load_sprites(crouch_folder, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self.raising = False
+        self.crouch_step = 0
+        self.crouch_distance_step = 6
+
 
         self.falling_ground = False
         """If the falling ground animation is running."""
@@ -300,6 +314,9 @@ class Player(pygame.sprite.Sprite):
 
         self.stamina = self.stamina_bar.value
 
+        self.current_weapon.weapon_anchor.y = self.current_weapon.start_weapon_anchor.y + self.crouch_step
+        self.current_throwable.weapon_anchor.y = self.current_throwable.start_weapon_anchor.y + self.crouch_step
+        
 
         self.health_bar.update()
         self.stamina_bar.update()
@@ -368,8 +385,15 @@ class Player(pygame.sprite.Sprite):
             self.fall_ground_anim(0.2 * mc.dt)
         if self.running:
             self.run_anim(abs(self.speed.x / 26.4) * mc.dt)
+        if self.crouching:
+            self.crouch_anim(0.2 * mc.dt)
+        if self.raising:
+            self.crouch_anim(0.2 * mc.dt, True)
+           
         if self.rolling:
             self.roll_anim(0.2 * mc.dt)
+            self.crouching = False
+
 
 
         if self.jumping_sideways:
@@ -434,7 +458,8 @@ class Player(pygame.sprite.Sprite):
         was_pressing_right = pygame.K_d in game.last_pressed_keys
         was_pressing_left = pygame.K_a in game.last_pressed_keys
         self.sprinting = pygame.K_LSHIFT in game.pressed_keys and self.running and self.stamina > self.sprint_stamina_drain
-
+        
+        
         # Move right
         if pressing_right:
             # pressing right but not left
@@ -477,10 +502,11 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.turning_dir = -1
 
-        # Movement
-        self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction * self.friction_mutiplier), 6)
-        self.speed.x += round(self.acceleration.x * mc.dt, 6)
-        self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
+        if not self.crouching and not self.raising:
+            # Movement
+            self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction * self.friction_mutiplier), 6)
+            self.speed.x += round(self.acceleration.x * mc.dt, 6)
+            self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
 
         # Gravity
         game.apply_gravity(self)
@@ -499,9 +525,19 @@ class Player(pygame.sprite.Sprite):
             if pressing_left != pressing_right:
                 self.running = True
 
+        was_pressing_c = pygame.K_c in game.last_pressed_keys
+       
+        if pygame.K_c in game.pressed_keys and self.grounded and not self.rolling:
+            self.crouching =True
+            self.raising = False
 
+        elif was_pressing_c and pygame.K_c not in game.pressed_keys:  
+            
+            self.crouching = False
+            self.raising = True
+           
 
-        if (pygame.K_SPACE in game.pressed_keys or pygame.K_w in game.pressed_keys) and self.grounded and self.stamina > self.jump_stamina_drain and not self.rolling:
+        if (pygame.K_SPACE in game.pressed_keys or pygame.K_w in game.pressed_keys) and self.grounded and self.stamina > self.jump_stamina_drain and not self.rolling and not self.crouching:
             self.speed.y = -self.jump_force
             self.jump_sounds.play()
             self.jumping = True
@@ -510,8 +546,7 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.jumping_sideways = True
 
-            if pygame.K_c in game.pressed_keys:
-                game.pressed_keys.remove(pygame.K_c)
+            
             if pygame.K_SPACE in game.pressed_keys:
                 game.pressed_keys.remove(pygame.K_SPACE)
             elif pygame.K_w in game.pressed_keys:
@@ -525,7 +560,7 @@ class Player(pygame.sprite.Sprite):
             self.pos = vec(self.rect.topleft)
         self.update_feet()
 
-        if pygame.K_c in game.pressed_keys and self.stamina > self.roll_stamina_drain and self.grounded and not _collid_wall:
+        if pygame.K_LCTRL in game.pressed_keys and self.stamina > self.roll_stamina_drain and self.grounded and not _collid_wall:
             _now = datetime.datetime.now()
             
             if self.current_throwable.throwing or self.current_throwable.cook_start_time != None:
@@ -642,14 +677,36 @@ class Player(pygame.sprite.Sprite):
 
     def run_anim(self, speed: float):
         self.running_frame += speed
-
         if self.running_frame > len(self.run_frames):
             self.running_frame = 0
         self.image = game_controller.scale_image(self.run_frames[int(self.running_frame)], self.image_scale)
         if self.speed.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
 
+    def crouch_anim(self, speed: float, reverse = False):
+        if reverse:
+            self.crouched_frame -= speed
+        else:
+            self.crouched_frame += speed
+        
+        if self.crouched_frame > len(self.crouch_frames):
+            self.crouched_frame  = len(self.crouch_frames) - 1
+            
+            
+        self.crouch_step = math.clamp(self.crouch_distance_step * self.crouched_frame, 0,( len(self.crouch_frames) - 1) * self.crouch_distance_step)
+        if self.crouched_frame < 0:
+            self.crouched_frame  = 0
+            if not self.running:
+                self.image = self.idle_frame.copy()
+            self.raising = False
+            return
+        self.image = game_controller.scale_image(self.crouch_frames[int(self.crouched_frame)], self.image_scale)
+        if self.current_weapon.dir == 1:
+            self.image = pygame.transform.flip(self.image, True, False)
+
     def roll_anim(self, speed: float):
+        if int(self.rolling_frame) == 0 and self.crouching:
+            self.rolling_frame = 2
         if int(self.rolling_frame) == 2 and not self.rolling_forward:
             self.speed.x += self.roll_distance * self.roll_dir
             self.rolling_forward = True
