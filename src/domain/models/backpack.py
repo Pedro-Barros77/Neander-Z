@@ -11,6 +11,7 @@ class BackPack:
         self.max_rifle_ammo = 90
         self.max_sniper_ammo = 15
         self.max_rocket_ammo = 5
+        self.max_grenade_type = 3
         
         self.pistol_ammo = 3
         self.shotgun_ammo = 0
@@ -61,6 +62,7 @@ class BackPack:
             return None
         
         return throwable[0]
+    
             
         
         

@@ -477,7 +477,7 @@ class Game(Page):
             
                 case enums.Orientation.VERTICAL:
                     # collision on the bottom
-                    if obj.rect.bottom >= o.rect.top: #and obj.last_rect.bottom <= o.last_rect.top:
+                    if obj.rect.bottom >= o.rect.top and obj.last_rect.bottom <= o.last_rect.top:
                         obj.rect.bottom = o.rect.top
                         obj.pos.y = obj.rect[1]
                         obj.speed.y = 0
@@ -559,9 +559,13 @@ class Game(Page):
                 
     def handle_grenades(self):
         #if current weapon has burst firemode and can shoot one more round
+        _explode_cooked = False
+        _now = datetime.datetime.now()
+        if self.player.current_throwable.cook_start_time != None and self.player.current_throwable.fuse_timeout_ms > 0 and _now > self.player.current_throwable.cook_start_time + datetime.timedelta(milliseconds=self.player.current_throwable.fuse_timeout_ms):
+            _explode_cooked = True
         
-        if (pygame.K_g not in self.pressed_keys and self.player.current_throwable.cook_start_time == None)or\
-            (pygame.K_g in self.pressed_keys and self.player.current_throwable.cook_start_time != None):
+        if ((pygame.K_g not in self.pressed_keys and self.player.current_throwable.cook_start_time == None)or\
+            (pygame.K_g in self.pressed_keys and self.player.current_throwable.cook_start_time != None)) and not _explode_cooked:
             return
         
         def charge_kill_callback(hit_target):
@@ -575,7 +579,7 @@ class Game(Page):
         
         
         _charges = self.player.throw_grenade(kill_callback = charge_kill_callback)
-        
+            
         if pygame.K_g in self.pressed_keys:
             self.pressed_keys.remove(pygame.K_g)
         
@@ -584,10 +588,11 @@ class Game(Page):
 
         if type(_charges) != list:
             _charges = [_charges]
-        if len(_charges) > 0:
-            for b in _charges:
-                self.current_wave.players_scores[1].bullets_shot += 1
-                self.bullets_group.add(b)
+        for c in _charges:
+            self.current_wave.players_scores[1].bullets_shot += 1
+            self.bullets_group.add(c)
+            if _explode_cooked:
+                c.destroy()
     
 
     def update(self, **kwargs):

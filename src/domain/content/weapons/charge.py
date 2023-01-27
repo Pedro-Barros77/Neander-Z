@@ -30,7 +30,7 @@ class Charge(pygame.sprite.Sprite):
         self.rect.topleft = pos
         self.angle = angle
         self.bullet_speed = bullet_speed
-        self.collision_groups = game_controller.bullet_target_groups
+        self.collision_groups = game_controller.bullet_target_groups + game_controller.enemy_target_groups
         self.damage = damage
         self.hit_damage = kwargs.pop("hit_damage", damage)
         self.total_damage = damage
@@ -179,7 +179,7 @@ class Charge(pygame.sprite.Sprite):
                     
                     collided_explosion = pygame.sprite.spritecollide(_explosion_max_hitbox, group, False, pygame.sprite.collide_circle)
                     for c in collided_explosion:
-                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body":
+                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body" or c.name == "player_body":
                             
                             
                             _distance = vec(self.rect.center).distance_to(c.rect.center)

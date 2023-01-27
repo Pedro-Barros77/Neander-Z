@@ -125,7 +125,7 @@ class Projectile(pygame.sprite.Sprite):
         
         if collided:
             if self.explosion_min_radius > 0:
-                for group in self.collision_groups:
+                for group in self.collision_groups + game_controller.enemy_target_groups:
                     _explosion_min_hitbox = Rectangle((self.explosion_min_radius*2, self.explosion_min_radius*2), vec(self.rect.topleft), radius = self.explosion_min_radius)
                     _explosion_min_hitbox.rect.center = self.rect.center
                     _explosion_max_hitbox = Rectangle((self.explosion_max_radius*2, self.explosion_max_radius*2), vec(self.rect.topleft), radius = self.explosion_max_radius)
@@ -133,7 +133,7 @@ class Projectile(pygame.sprite.Sprite):
                     
                     collided_explosion = pygame.sprite.spritecollide(_explosion_max_hitbox, group, False, pygame.sprite.collide_circle)
                     for c in collided_explosion:
-                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body":
+                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body" or c.name == "player_body":
                             
                             
                             _distance = vec(self.rect.center).distance_to(c.rect.center)
