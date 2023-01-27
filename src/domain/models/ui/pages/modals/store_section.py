@@ -55,6 +55,7 @@ class Store:
             
             "first_aid_kit": "tags:Restores 30 of your health.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
             "medkit": "tags:Completely restores your health.\nIn a world of virtual zombies and\npixels, the medkit is your best\nfriend. Just a quick tap and you'll\nbe back to 100% health in no time!",
+            "throwable_frag_grenade": "tags:Area-damage, high-damage\nThe party starter for your zombie\nshindig. Just pull the pin, toss it in\nthe crowd and watch the zombies\ngo wild (and dead) in a fiery dance\nof destruction.",
         }
         
         def _select_card(card: StoreItem):
@@ -89,7 +90,7 @@ class Store:
         self.items:list[StoreItem] = [
             StoreItem(f'{resources.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
-            StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True),
+            StoreItem(f'{resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Frag Grenade", item_name = "throwable_frag_grenade", price = 80, count = 1, icon_scale = 1.2,store_icon_scale = 4, bullet_type = enums.Throwables.FRAG_GRENADE, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
@@ -215,6 +216,13 @@ class Store:
                             btn_text = f'Buy +{self.selected_card.count}'
                         else:
                             btn_text = f'Buy +{_diff}'
+                    elif self.selected_card.item_name.startswith("throwable"):
+                        t = bkp.get_throwable(self.selected_card.bullet_type)
+                        _count = t.count if t != None else 0
+                        if _count < bkp.max_grenade_type:
+                            btn_text = f'Buy +1'
+                        else:
+                            btn_text = "Full"
                     else:
                         btn_text = f'Buy +{self.selected_card.count}'
                 else:
@@ -401,10 +409,14 @@ class Store:
             count_text = ""
             p = self.player
             
-            if self.selected_card.bullet_type != None and self.selected_card.bullet_type != enums.BulletType.MELEE:
+            if self.selected_card.bullet_type != None and "_ammo" in self.selected_card.item_name and self.selected_card.bullet_type != enums.BulletType.MELEE:
                 count_text = f'{p.backpack.get_ammo(self.selected_card.bullet_type)}/{p.backpack.get_max_ammo(self.selected_card.bullet_type)}'
             if self.selected_card.item_name.endswith("kit"):
                 count_text = f'{round(self.player.health,2)}/{round(self.player.max_health,2)}'
+            if self.selected_card.item_name.startswith("throwable"):
+                t = p.backpack.get_throwable(self.selected_card.bullet_type)
+                _count = t.count if t != None else 0
+                count_text = f'{_count}/{p.backpack.max_grenade_type}'
             
             if len(count_text) > 0:
                 txt_bullets = menu_controller.get_text_surface(count_text, colors.WHITE, resources.px_font(20))
@@ -563,6 +575,18 @@ class Store:
         if item.item_name.endswith("kit"):
             self.player.get_health(item.count if item.count > 0 else 9999)
             bought = True
+            
+        if item.item_name.startswith("throwable"):
+            t = self.player.backpack.get_throwable(self.selected_card.bullet_type)
+            _count = t.count if t != None else 0
+            bought = False
+            if _count < self.player.backpack.max_grenade_type:
+                bought = True
+                match item.bullet_type:
+                    case enums.Throwables.FRAG_GRENADE:
+                        self.player.add_throwable(item.bullet_type, item.count, equip=True)
+                    case _:
+                        bought = False
             
             
             

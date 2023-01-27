@@ -11,6 +11,7 @@ map_size: vec = vec(0,0)
 
 bullet_target_groups = []
 enemy_target_groups = []
+players_groups = None
 
 enemies_count = 0
 bullets_count = 0

@@ -30,14 +30,14 @@ class Charge(pygame.sprite.Sprite):
         self.rect.topleft = pos
         self.angle = angle
         self.bullet_speed = bullet_speed
-        self.collision_groups = game_controller.bullet_target_groups
+        self.collision_groups = game_controller.bullet_target_groups + game_controller.enemy_target_groups
         self.damage = damage
         self.hit_damage = kwargs.pop("hit_damage", damage)
         self.total_damage = damage
         self.owner_offset = vec(0,0)
         self.is_alive = True
         self.start_pos = pos
-        self.start_time = datetime.datetime.now()
+        self.start_time = kwargs.pop("start_time", datetime.datetime.now())
         self.hit_targets: list[int] = []
         self.rotation_angle = 0
         
@@ -74,9 +74,10 @@ class Charge(pygame.sprite.Sprite):
         
         self.acceleration.x = 0
         
-        self.rotation_angle -= self.rotation_speed * self.speed.x
-        if self.rotation_angle > 360:
-            self.rotation_angle -= 360
+        if not self.exploding:
+            self.rotation_angle -= self.rotation_speed * self.speed.x
+            if self.rotation_angle > 360:
+                self.rotation_angle -= 360
         
         game = kwargs.pop("game", None)
         self.last_rect = self.rect.copy()
@@ -145,7 +146,7 @@ class Charge(pygame.sprite.Sprite):
         
         _image = self.image.copy()
             
-        if self.rotation_speed != 0:
+        if self.rotation_speed != 0 and not self.exploding:
             _image = game_controller.rotate_image(self.image, self.rotation_angle)
         
         screen.blit(_image, vec(self.rect.topleft) - offset)
@@ -179,7 +180,7 @@ class Charge(pygame.sprite.Sprite):
                     
                     collided_explosion = pygame.sprite.spritecollide(_explosion_max_hitbox, group, False, pygame.sprite.collide_circle)
                     for c in collided_explosion:
-                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body":
+                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body" or c.name == "player_body":
                             
                             
                             _distance = vec(self.rect.center).distance_to(c.rect.center)

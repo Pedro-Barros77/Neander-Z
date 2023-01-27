@@ -24,6 +24,7 @@ class Throwable(Weapon):
         self.throwing_frame = 0
         self.throw_end_frame = 6
         self.throw_callback = lambda x: None
+        self.count = kwargs.pop("count", 1)
         
         self.cook_start_time = None
         
@@ -91,10 +92,34 @@ class Throwable(Weapon):
         self.hand_surface.fill((0,0,0,0))
         self.hand_surface.blit(self.hand_frames[int(self.throwing_frame)], (0,0))
         self.hand_surface.blit(self.fingers_frames[int(self.throwing_frame)], (0,0))
+        
+    def can_shoot(self):
+        # if ran out of ammo
+        if self.count <= 0:
+            return False
+        
+        _now = datetime.datetime.now()
+        
+        #if the player is switching weapons
+        if self.changing_weapon:
+            return False
+        
+        # if is still reloading
+        if self.reload_start_time != None and _now - datetime.timedelta(milliseconds= self.reload_delay_ms) <= self.reload_start_time:
+            return False
+        
+        if self.last_shot_time != None and _now - datetime.timedelta(milliseconds= self.fire_rate_ratio/self.fire_rate) > self.last_shot_time:
+            return True
+        
+        return False
              
     def cook_grenade(self):
-        if self.throwing or self.cook_start_time != None:
+        if not self.can_shoot() and self.last_shot_time != None:
+            return None
+        
+        if self.throwing or self.cook_start_time != None or self.count == 0:
             return
+        
         self.cook_start_time = datetime.datetime.now()
         
         self.reload_start_sound.play()
@@ -104,16 +129,16 @@ class Throwable(Weapon):
         self.hand_surface.blit(self.fingers_frames[0], (0,0))
     
     def shoot(self, bullet_pos: vec, player_net_id: int, **kwargs):
-        if not self.can_shoot():
+        if not self.can_shoot() and self.last_shot_time != None:
             return None
 
+        self.count -= 1
         self.throwing = True
         self.firing = True
         self.bullet_kill_callback = kwargs.pop("kill_callback", lambda b: None)
         
         self.last_shot_time = datetime.datetime.now()
         self.shoot_sounds[random.randint(0, len(self.shoot_sounds)-1)].play()
-        self.cook_start_time = None
         
         charge_dict = {
             "max_range": self.bullet_max_range,
@@ -128,8 +153,10 @@ class Throwable(Weapon):
             "bounciness_multiplier": self.bounciness_multiplier,
             "friction_multiplier": self.friction_multiplier,
             "hit_damage": self.hit_damage,
-            "rotation_speed": self.rotation_speed
+            "rotation_speed": self.rotation_speed,
+            "start_time": self.cook_start_time
         }
+        self.cook_start_time = None
         
         return Charge(bullet_pos, self.weapon_aim_angle, self.bullet_speed, self.damage, player_net_id, game_controller.get_bullet_id(), **charge_dict)
     

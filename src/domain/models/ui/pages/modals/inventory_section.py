@@ -140,6 +140,7 @@ class Inventory:
         self.items.extend([
             StoreItem(f'{resources.IMAGES_PATH}items\\backpack.png', pygame.Rect((0,0), self.card_size), "Backpack", item_name = "backpack", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png', pygame.Rect((0,0), self.card_size), "Player", item_name = "player", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
+            *[StoreItem(resources.get_weapon_path(i.weapon_type, enums.AnimActions.ICON), pygame.Rect((0,0), self.card_size), i.display_name, item_name = str(i.weapon_type.value), price = 0, count = i.count, icon_scale = 1, store_icon_scale = 1, price_text=f"{i.count}/{self.player.backpack.max_grenade_type}", **cards_dict) for i in self.player.backpack.throwables]
         ])
             
         #Cards
