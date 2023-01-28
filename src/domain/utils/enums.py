@@ -50,6 +50,7 @@ class Weapons(Enum):
     
 class Throwables(Enum):
     FRAG_GRENADE = 'throwables\\frag_grenade'
+    MOLOTOV = 'throwables\\molotov'
     
 class AnimActions(Enum):
     #players/enemies

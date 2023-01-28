@@ -18,11 +18,13 @@ class Charge(pygame.sprite.Sprite):
         self.image_scale = kwargs.pop("image_scale", 1)
         self.gravity_scale = kwargs.pop("gravity_scale", 1)
         self.fuse_timeout_ms = kwargs.pop("fuse_timeout_ms", 3000)
+        self.effect_timeout_ms = kwargs.pop("effect_timeout_ms", 3000)
         self.detonate_on_impact = kwargs.pop("detonate_on_impact", True)
         self.bounciness_multiplier = kwargs.pop("bounciness_multiplier", 0.5)
         self.friction_multiplier = kwargs.pop("friction_multiplier", 0.2)
         self.rotation_speed = kwargs.pop("rotation_speed", 5)
-        self.image = game_controller.load_sprites(resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.SHOOT), self.image_scale, enums.ConvertType.CONVERT_ALPHA)[0]
+        self.image = game_controller.load_sprites(resources.get_weapon_path(self.charge_type, enums.AnimActions.SHOOT), self.image_scale, enums.ConvertType.CONVERT_ALPHA)[0]
+        self.anim_frames = kwargs.pop("anim_frames", [self.image])
         self.current_frame: pygame.Surface = self.image.copy()
         self.rect = self.image.get_rect()
         self.last_rect = self.rect.copy()
@@ -30,7 +32,8 @@ class Charge(pygame.sprite.Sprite):
         self.rect.topleft = pos
         self.angle = angle
         self.bullet_speed = bullet_speed
-        self.collision_groups = game_controller.bullet_target_groups + game_controller.enemy_target_groups
+        self.solid_collision_groups = game_controller.collision_group
+        self.target_collision_groups = game_controller.bullet_target_groups
         self.damage = damage
         self.hit_damage = kwargs.pop("hit_damage", damage)
         self.total_damage = damage
@@ -38,6 +41,7 @@ class Charge(pygame.sprite.Sprite):
         self.is_alive = True
         self.start_pos = pos
         self.start_time = kwargs.pop("start_time", datetime.datetime.now())
+        self.destroy_time = kwargs.pop("destroy_time", None)
         self.hit_targets: list[int] = []
         self.rotation_angle = 0
         
@@ -47,6 +51,7 @@ class Charge(pygame.sprite.Sprite):
         self.speed = kwargs.pop("speed", vec(0,0))
         self.acceleration: vec = kwargs.pop("acceleration", vec(0,0))
         
+        self.charge_destroy_pos = vec(0,0)
         self.hit_callback: function = kwargs.pop("hit_callback", lambda s: None)
         self.kill_callback: function = kwargs.pop("kill_callback", lambda s: None)
         
@@ -55,6 +60,13 @@ class Charge(pygame.sprite.Sprite):
         self.explosion_max_radius = kwargs.pop("explosion_max_radius", 0)
         self.explosion_min_radius = kwargs.pop("explosion_min_radius", 0)
         
+        self.last_hit_sound = datetime.datetime.now() - datetime.timedelta(milliseconds=2000)
+        self.hit_interval_ms = 100
+        
+        self.idle_frame = 0
+        self.animating_idle = True
+        self.idle_anim_speed = kwargs.pop("anim_speed", 1)
+        
         self.explosion_frame = 0
         self.exploding = False
         if self.explosion_max_radius > 0:
@@ -62,6 +74,23 @@ class Charge(pygame.sprite.Sprite):
             self.explosion_sounds = [pygame.mixer.Sound(resources.get_weapon_sfx(enums.Weapons.RPG,enums.AnimActions.HIT) + f'0{i}.mp3') for i in range(1,4)]
             for s in self.explosion_sounds:
                 s.set_volume(0.1)
+                
+                
+        self.floor_fire_frames_start, self.floor_fire_frames_end, self.floor_fire_frames_loop, self.floor_fire_surface = None, None, None, None
+        self.burn_frame = 0
+        self.burning_loop = False
+        self.burning_start = False
+        self.burning_end = False
+        self.burn_tick_ms = kwargs.pop("burn_tick_ms", 500)
+        self.last_burn_tick = datetime.datetime.now()
+        self.burn_hitbox: Rectangle = None
+        if self.charge_type == enums.Throwables.MOLOTOV:
+            self.floor_fire_frames_start = game_controller.load_sprites(f'{resources.IMAGES_PATH}weapons\\effects\\floor_flames\\start',2, enums.ConvertType.CONVERT_ALPHA)
+            self.floor_fire_frames_end = game_controller.load_sprites(f'{resources.IMAGES_PATH}weapons\\effects\\floor_flames\\end',2, enums.ConvertType.CONVERT_ALPHA)
+            self.floor_fire_frames_loop = game_controller.load_sprites(f'{resources.IMAGES_PATH}weapons\\effects\\floor_flames\\loop',2, enums.ConvertType.CONVERT_ALPHA)
+            self.floor_fire_surface = self.floor_fire_frames_start[0].copy()
+                
+        
             
     def explosion_sound(self):
         sound = self.explosion_sounds[random.randint(0, len(self.explosion_sounds)-1)]
@@ -71,6 +100,8 @@ class Charge(pygame.sprite.Sprite):
     def update(self, **kwargs):
         if not self.is_alive:
             return
+        
+        _now = datetime.datetime.now()
         
         self.acceleration.x = 0
         
@@ -86,12 +117,38 @@ class Charge(pygame.sprite.Sprite):
             self.explosion_anim(0.5)
             return
         
+        _burn_speed = 0.15
+        if self.burning_start:
+            self.burn_start_anim(_burn_speed * 1.5 * mc.dt)
+            
+        if self.burning_loop:
+            self.burn_loop_anim(_burn_speed * mc.dt)
+            
+        if self.burning_end:
+            self.burn_end_anim(_burn_speed * mc.dt)
+            
+        if self.burning_start or self.burning_loop:
+            if _now > self.last_burn_tick + datetime.timedelta(milliseconds=self.burn_tick_ms):
+                if self.destroy_time == None or _now < self.destroy_time + datetime.timedelta(milliseconds=self.effect_timeout_ms):
+                    self.last_burn_tick = _now
+                    self.fire_damage()
+                else:
+                    self.burning_loop = False
+                    self.burning_end = True
+            return
+        
+        if self.burning_end:
+            return
+
+        if self.animating_idle:
+            self.idle_anim(self.idle_anim_speed)
+        
         if self.max_range > 0:
             _distance = vec(self.rect.topleft).distance_to(vec(self.start_pos))
             if _distance >= self.max_range:
                 self.destroy()
                 
-        if datetime.datetime.now() > self.start_time + datetime.timedelta(milliseconds=self.fuse_timeout_ms):
+        if self.fuse_timeout_ms > 0 and datetime.datetime.now() > self.start_time + datetime.timedelta(milliseconds=self.fuse_timeout_ms):
             self.destroy()
             
         # movement
@@ -116,7 +173,7 @@ class Charge(pygame.sprite.Sprite):
         self.rect.topleft = self.pos
         
         
-        collided = self.bullet_collision()
+        collided = self.bullet_collision([self.solid_collision_groups])
         _last_y_speed = self.speed.y
         _ground_collided = self.ground_collision(game, game.collision_group)
         self.was_grounded = _ground_collided
@@ -141,8 +198,12 @@ class Charge(pygame.sprite.Sprite):
         if not self.is_alive:
             return    
         
-        if self.exploding:
-            self.image = self.current_frame.copy()
+        if self.floor_fire_surface != None and (self.burning_start or self.burning_loop or self.burning_end) and self.burn_hitbox != None:
+            screen.blit(self.floor_fire_surface, maths.rect_offset(self.burn_hitbox.rect, - offset))
+            return
+            
+            
+        self.image = self.current_frame.copy()
         
         _image = self.image.copy()
             
@@ -150,6 +211,7 @@ class Charge(pygame.sprite.Sprite):
             _image = game_controller.rotate_image(self.image, self.rotation_angle)
         
         screen.blit(_image, vec(self.rect.topleft) - offset)
+        
         
         # pygame.draw.circle(screen, colors.RED, self.rect.center - offset, self.explosion_min_radius, 2)
         
@@ -168,46 +230,62 @@ class Charge(pygame.sprite.Sprite):
             _rect.center = self.rect.center
             self.rect = _rect
             
+    def idle_anim(self, speed: float):
+        self.idle_frame += speed
+        
+        if self.idle_frame > len(self.anim_frames):
+            self.idle_frame = 0
+        else:
+            self.current_frame = self.anim_frames[int(self.idle_frame)]
+            
+    def burn_start_anim(self, speed: float):
+        self.burn_frame += speed
+        
+        if self.burn_frame > len(self.floor_fire_frames_start):
+            self.burn_frame = 0
+            self.burning_start = False
+            self.burning_loop = True
+        self.floor_fire_surface = self.floor_fire_frames_start[int(self.burn_frame)]
+    
+    def burn_loop_anim(self, speed: float):
+        self.burn_frame += speed
+        
+        if self.burn_frame > len(self.floor_fire_frames_loop):
+            self.burn_frame = 0
+        self.floor_fire_surface = self.floor_fire_frames_loop[int(self.burn_frame)]
+        
+    def burn_end_anim(self, speed: float):
+        self.burn_frame += speed
+        
+        if self.burn_frame > len(self.floor_fire_frames_end)-1:
+            self.burn_frame = 0
+            self.burning_start = False
+            self.burning_end = False
+            self.burning_loop = False
+            self.kill()
+            
+        self.floor_fire_surface = self.floor_fire_frames_end[int(self.burn_frame)]
+            
+    def fire_damage(self):
+        groups = self.target_collision_groups + game_controller.enemy_target_groups
+        for group in groups:
+            collided_fire = pygame.sprite.spritecollide(self.burn_hitbox, group, False)
+            for c in collided_fire:
+                if (not isinstance(c, Enemy) and not isinstance(c, Rectangle)) and (c.name != "zombie_body" and c.name != "player_body"):
+                    continue
+                
+                c.take_damage(self.damage, self.owner)
     
     def destroy(self):
-        if self.explosion_min_radius > 0:
-            if self.explosion_min_radius > 0:
-                for group in self.collision_groups:
-                    _explosion_min_hitbox = Rectangle((self.explosion_min_radius*2, self.explosion_min_radius*2), vec(self.rect.topleft), radius = self.explosion_min_radius)
-                    _explosion_min_hitbox.rect.center = self.rect.center
-                    _explosion_max_hitbox = Rectangle((self.explosion_max_radius*2, self.explosion_max_radius*2), vec(self.rect.topleft), radius = self.explosion_max_radius)
-                    _explosion_max_hitbox.rect.center = self.rect.center
-                    
-                    collided_explosion = pygame.sprite.spritecollide(_explosion_max_hitbox, group, False, pygame.sprite.collide_circle)
-                    for c in collided_explosion:
-                        if isinstance(c, Enemy) or isinstance(c, Rectangle) and c.name == "zombie_body" or c.name == "player_body":
-                            
-                            
-                            _distance = vec(self.rect.center).distance_to(c.rect.center)
-                            if _distance >= self.explosion_max_radius:
-                                break
-                            if _distance > self.explosion_min_radius:
-                                _diff = _distance - self.explosion_min_radius
-                                _range = self.explosion_max_radius - self.explosion_min_radius
-                                
-                                _percentage = (_diff * 100 / _range) / 100
-                                
-                                self.damage = self.total_damage - (_percentage * self.total_damage)
-                            
-                            c.take_damage(self.damage, self.owner)
-            
-            self.explosion_sound()
-            self.exploding = True
-        else:
-            self.kill()
+        self.destroy_time = datetime.datetime.now()
+        self.kill_callback(self)
     
     def kill(self):
         self.is_alive = False
-        self.kill_callback(len(self.hit_targets) > 0)
         super().kill()
     
-    def bullet_collision(self):
-        for group in self.collision_groups:
+    def bullet_collision(self, groups: list[pygame.sprite.Group]):
+        for group in groups:
             collisions = pygame.sprite.spritecollide(self, group, False)
             for c in collisions:
                 if c.id in self.hit_targets:

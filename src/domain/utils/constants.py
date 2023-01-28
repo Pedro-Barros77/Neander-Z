@@ -32,6 +32,7 @@ def get_throwable(throwable: enums.Throwables, pos: vec, **kwargs):
                          weapon_switch_ms=200,
                          detonate_on_impact = False,
                          fuse_timeout_ms = 3000,
+                         effect_timeout_ms = 0,
                          bounciness_multiplier = 0.5,
                          friction_multiplier = 0.1,
                          hit_damage = 0,
@@ -44,12 +45,50 @@ def get_throwable(throwable: enums.Throwables, pos: vec, **kwargs):
                          explosion_min_radius=100,
                          explosion_max_radius=200,
                          reload_speed_multiplier=1,
-                         barrel_offset=vec(0, 40),
+                         barrel_offset=vec(0, 55),
                          store_scale=1,
+                         charge_offset = vec(0,0),
+                         anim_speed = 0
                          )
             t.bullet_spawn_offset = vec(-t.rect.width*2, -25)
             for s in t.shoot_sounds:
                 s.set_volume(0.2)
+            for s in t.hit_sounds:
+                s.set_volume(0.1)
+            t.reload_start_sound.set_volume(0.3)
+            
+        case enums.Throwables.MOLOTOV:
+            t = Throwable(pos,
+                         weapon_type=throwable,
+                         display_name="Molotov",
+                         bullet_speed=20,
+                         gravity_scale = 1,
+                         weapon_switch_ms=200,
+                         detonate_on_impact = True,
+                         fuse_timeout_ms = 0,
+                         effect_timeout_ms = 5000,
+                         bounciness_multiplier = 0,
+                         friction_multiplier = 0.1,
+                         hit_damage = 10,
+                         weapon_scale=0.8,
+                         rotation_speed = 0.5,
+                         damage=5,
+                         fire_rate=1,
+                         reload_delay_ms=400,
+                         bullet_max_range=600,
+                         explosion_min_radius=100,
+                         explosion_max_radius=200,
+                         reload_speed_multiplier=1,
+                         barrel_offset=vec(20, 55),
+                         store_scale=1,
+                         charge_offset = vec(-8,-15),
+                         anim_speed = 0.15
+                         )
+            t.bullet_spawn_offset = vec(-t.rect.width*2, -25)
+            for s in t.shoot_sounds:
+                s.set_volume(0.2)
+            for s in t.hit_sounds:
+                s.set_volume(0.5)
 
       
             t.reload_start_sound.set_volume(0.3)
@@ -1304,31 +1343,31 @@ ATTRIBUTE_BARS = {
 }
 
 WAVES = {
-    1: {
-        "wave_number": 1,
-        "wave_type": enums.WaveType.SIMPLE,
-        "wave_message": "And so it begins...",
-        "timed_spawn_count": 10,
-        "spawn_timer_ms": 8000,
-        "wave_interval_s": 6000,
-        "start_delay_ms": 0,
-        "end_delay_ms": 0,
-        "money_multiplier": 1,
-        "enemies": [
-            {
-                "type": enums.Enemies.Z_RAIMUNDO,
-                "count": 5,
-                "movement_speed": 0.1,
-                "health": 24,
-                "damage": 20,
-                "max_alive": 99,
-                "spawn_chance_multiplier": 1
-            }
-        ]
-    }
-}
+#     1: {
+#         "wave_number": 1,
+#         "wave_type": enums.WaveType.SIMPLE,
+#         "wave_message": "And so it begins...",
+#         "timed_spawn_count": 10,
+#         "spawn_timer_ms": 8000,
+#         "wave_interval_s": 6000,
+#         "start_delay_ms": 0,
+#         "end_delay_ms": 0,
+#         "money_multiplier": 1,
+#         "enemies": [
+#             {
+#                 "type": enums.Enemies.Z_RAIMUNDO,
+#                 "count": 5,
+#                 "movement_speed": 0.1,
+#                 "health": 24,
+#                 "damage": 20,
+#                 "max_alive": 99,
+#                 "spawn_chance_multiplier": 1
+#             }
+#         ]
+#     }
+# }
 
-{
+# {
     1: {
         "wave_number": 1,
         "wave_type": enums.WaveType.SIMPLE,

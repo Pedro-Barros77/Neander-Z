@@ -143,13 +143,13 @@ class Enemy(pygame.sprite.Sprite):
         
         has_attack_range = abs(player_center.x - self.rect.centerx) <= self.attack_distance and player.rect.bottom > self.rect.top
         
-        # Movement
-        # if self.dir.x != 0:
-        #     self.acceleration.x = self.movement_speed * self.dir.x
-        # if not self.attacking and not self.dying and not has_attack_range:
-        #     self.acceleration.x += self.speed.x * game.friction
-        #     self.speed.x += self.acceleration.x * mc.dt
-        #     self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
+        #Movement
+        if self.dir.x != 0:
+            self.acceleration.x = self.movement_speed * self.dir.x
+        if not self.attacking and not self.dying and not has_attack_range:
+            self.acceleration.x += self.speed.x * game.friction
+            self.speed.x += self.acceleration.x * mc.dt
+            self.pos.x += (self.speed.x + 0.5 * self.acceleration.x) * mc.dt
         
         # Gravity
         game.apply_gravity(self)
@@ -157,7 +157,7 @@ class Enemy(pygame.sprite.Sprite):
         
         # jump
         self.grounded = self.collision(game, game.collision_group, enums.Orientation.VERTICAL)
-        # if self.dir.y > 0 and self.grounded:
+        # if self.dir.y > 0 and self.grounded:da
         #     self.speed.y = - self.jump_force
         # solid collision
         self.collision(game, game.collision_group, enums.Orientation.HORIZONTAL, self.hitbox_body if self.hitbox_body != None else self)

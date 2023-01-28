@@ -103,8 +103,8 @@ class Player(pygame.sprite.Sprite):
         self.current_throwable: Weapon = None
         """The throwable on player's hand (grenade, molotov, etc)."""
 
-        self.add_weapon(enums.Weapons.UZI)
-        self.add_throwable(enums.Throwables.FRAG_GRENADE, 93)
+        self.add_weapon(enums.Weapons.DEAGLE)
+        self.add_throwable(enums.Throwables.MOLOTOV, 90)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -813,11 +813,13 @@ class Player(pygame.sprite.Sprite):
             t.count += count
             return
             
-        default_weapon_distance = self.rect.width/8 - self.rect.width/5
+        default_weapon_distance = self.rect.width/2 
         default_weapon_anchor = vec(self.rect.width/1.8, self.rect.height/3)
 
         match throwable_type:
             case enums.Throwables.FRAG_GRENADE:
+                throwable = constants.get_throwable(throwable_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
+            case enums.Throwables.MOLOTOV:
                 throwable = constants.get_throwable(throwable_type, vec(self.rect.width, self.rect.centery), weapon_anchor = default_weapon_anchor, weapon_distance = default_weapon_distance, backpack = self.backpack)
 
         if throwable == None:

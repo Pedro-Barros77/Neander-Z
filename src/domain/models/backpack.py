@@ -13,7 +13,7 @@ class BackPack:
         self.max_rocket_ammo = 5
         self.max_grenade_type = 3
         
-        self.pistol_ammo = 3
+        self.pistol_ammo = 0
         self.shotgun_ammo = 0
         self.rifle_ammo = 90
         self.sniper_ammo = 0

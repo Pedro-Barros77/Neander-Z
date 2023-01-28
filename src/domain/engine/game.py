@@ -131,6 +131,7 @@ class Game(Page):
 
         game_controller.bullet_target_groups = [self.collision_group, self.current_wave.enemies_hitbox_group]
         game_controller.enemy_target_groups = [self.players_group]
+        game_controller.collision_group = self.collision_group
         
         
         if self.client_type != enums.ClientType.SINGLE:
@@ -561,7 +562,7 @@ class Game(Page):
         #if current weapon has burst firemode and can shoot one more round
         _explode_cooked = False
         _now = datetime.datetime.now()
-        if self.player.current_throwable.cook_start_time != None and self.player.current_throwable.fuse_timeout_ms > 0 and _now > self.player.current_throwable.cook_start_time + datetime.timedelta(milliseconds=self.player.current_throwable.fuse_timeout_ms):
+        if self.player.current_throwable.fuse_timeout_ms > 0 and self.player.current_throwable.cook_start_time != None and self.player.current_throwable.fuse_timeout_ms > 0 and _now > self.player.current_throwable.cook_start_time + datetime.timedelta(milliseconds=self.player.current_throwable.fuse_timeout_ms):
             _explode_cooked = True
         
         if ((pygame.K_g not in self.pressed_keys and self.player.current_throwable.cook_start_time == None)or\
