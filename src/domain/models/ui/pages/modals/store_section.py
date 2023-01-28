@@ -56,6 +56,7 @@ class Store:
             "first_aid_kit": "tags:Restores 30 of your health.\nDon't let a little digital bloodshed\nslow you down. Heal it back up\nbefore it becomes a truly mess!",
             "medkit": "tags:Completely restores your health.\nIn a world of virtual zombies and\npixels, the medkit is your best\nfriend. Just a quick tap and you'll\nbe back to 100% health in no time!",
             "throwable_frag_grenade": "tags:Area-damage, high-damage\nThe party starter for your zombie\nshindig. Just pull the pin, toss it in\nthe crowd and watch the zombies\ngo wild (and dead) in a fiery dance\nof destruction.",
+            "throwable_molotov": "tags:Area-damage, over-time\nLight up the night and watch the\nundead dance in the flames with\nthis handy homemade weapon!",
         }
         
         def _select_card(card: StoreItem):
@@ -90,7 +91,8 @@ class Store:
         self.items:list[StoreItem] = [
             StoreItem(f'{resources.IMAGES_PATH}items\\first_aid_kit.png', pygame.Rect((0,0), self.card_size), "First Aid Kit", item_name = "first_aid_kit", price = 75, count = 30, icon_scale = 0.9, store_icon_scale = 1.9, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}items\\medkit.png', pygame.Rect((0,0), self.card_size), "MedKit", item_name = "medkit", price = 230, count = 0,icon_scale = 1.2,store_icon_scale = 2, **cards_dict),
-            StoreItem(f'{resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Frag Grenade", item_name = "throwable_frag_grenade", price = 80, count = 1, icon_scale = 1.2,store_icon_scale = 4, bullet_type = enums.Throwables.FRAG_GRENADE, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Frag Grenade", item_name = "throwable_frag_grenade", price = 80, count = 1, icon_scale = 1.1,store_icon_scale = 4, bullet_type = enums.Throwables.FRAG_GRENADE, **cards_dict),
+            StoreItem(f'{resources.get_weapon_path(enums.Throwables.MOLOTOV, enums.AnimActions.ICON)}', pygame.Rect((0,0), self.card_size), "Molotov Cocktail", item_name = "throwable_molotov", price = 45, count = 1, icon_scale = 1.5,store_icon_scale = 1.3, bullet_type = enums.Throwables.MOLOTOV, **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\lock.png', pygame.Rect((0,0), self.card_size), "Locked", locked = True)
         ]
         
@@ -584,6 +586,8 @@ class Store:
                 bought = True
                 match item.bullet_type:
                     case enums.Throwables.FRAG_GRENADE:
+                        self.player.add_throwable(item.bullet_type, item.count, equip=True)
+                    case enums.Throwables.MOLOTOV:
                         self.player.add_throwable(item.bullet_type, item.count, equip=True)
                     case _:
                         bought = False
