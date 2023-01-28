@@ -103,8 +103,8 @@ class Player(pygame.sprite.Sprite):
         self.current_throwable: Weapon = None
         """The throwable on player's hand (grenade, molotov, etc)."""
 
-        self.add_weapon(enums.Weapons.COLT_1911)
-        self.add_throwable(enums.Throwables.FRAG_GRENADE, 3)
+        self.add_weapon(enums.Weapons.UZI)
+        self.add_throwable(enums.Throwables.FRAG_GRENADE, 93)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()
@@ -263,7 +263,7 @@ class Player(pygame.sprite.Sprite):
         if not self.is_alive:
             self.grave_stone_anim(0.2)
             return
-
+        
         group_name = kwargs.pop("group_name", "")
         if group_name == "jumpable":
             return
@@ -285,7 +285,7 @@ class Player(pygame.sprite.Sprite):
         _now = datetime.datetime.now()
 
 
-        if self.sprinting:
+        if self.sprinting and not self.crouching and not self.rolling:
             self.movement_speed = self.start_movement_speed * self.sprint_speed_multiplier
             self.stamina_bar.remove_value(self.sprint_stamina_drain * mc.dt)
             self.last_stamina_use = _now
@@ -447,7 +447,7 @@ class Player(pygame.sprite.Sprite):
         self.stamina_bar.draw(surface, self.offset_camera)
 
         #debug
-        self.hitbox_body.draw(surface, self.offset_camera)
+        # self.hitbox_body.draw(surface, self.offset_camera)
         # pygame.draw.rect(surface, colors.BLUE, math.rect_offset(self.rect, -offset), 3)
 
 
@@ -508,7 +508,7 @@ class Player(pygame.sprite.Sprite):
                 self.running = False
                 self.turning_dir = -1
 
-        if not self.crouching and not self.raising:
+        if not self.crouching and (not self.raising or (self.rolling or self.jumping)):
             # Movement
             self.acceleration.x = round(self.acceleration.x + self.speed.x * (game.friction * self.friction_mutiplier), 6)
             self.speed.x += round(self.acceleration.x * mc.dt, 6)
@@ -531,13 +531,14 @@ class Player(pygame.sprite.Sprite):
             if pressing_left != pressing_right:
                 self.running = True
 
-        was_pressing_c = pygame.K_c in game.last_pressed_keys
+        was_pressing_crouch = pygame.K_c in game.last_pressed_keys or pygame.K_s in game.last_pressed_keys
        
-        if pygame.K_c in game.pressed_keys and self.grounded and not self.rolling:
+        if (pygame.K_c in game.pressed_keys or pygame.K_s in game.pressed_keys) and self.grounded and not self.rolling:
             self.crouching =True
             self.raising = False
+            self.speed.x = 0
 
-        elif was_pressing_c and pygame.K_c not in game.pressed_keys:  
+        elif was_pressing_crouch and (pygame.K_c not in game.pressed_keys and pygame.K_s not in game.pressed_keys):  
             
             self.crouching = False
             self.raising = True

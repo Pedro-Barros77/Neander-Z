@@ -135,7 +135,7 @@ def app_loop():
                     current_page.player.money += 100
                 if event.key == pygame.K_DOWN:
                     current_page.player.money -= 100
-                
+                    
         
         playing = current_page.name == "Game"
             

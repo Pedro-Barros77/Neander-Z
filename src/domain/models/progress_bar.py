@@ -120,12 +120,20 @@ class ProgressBar(pygame.sprite.Sprite):
         
         #increasing animation
         if self.value < self.target_value:
-            self.value = math.clamp(self.value + self.value_anim_speed, 0, self.max_value)
+            _value = self.value + self.value_anim_speed
+            if abs(_value - self.target_value) < self.value_anim_speed:
+                _value = self.target_value
+            
+            self.value = math.clamp(_value, 0, self.max_value)
             transition_width = int(abs(self.target_value - self.value) / self.value_ratio)
             transition_color = self.anim_add_color
         #decreasing animation
         if self.value > self.target_value:
-            self.value = math.clamp(self.value - self.value_anim_speed, 0, self.max_value)
+            _value = self.value - self.value_anim_speed
+            if abs(_value - self.target_value) < self.value_anim_speed:
+                _value = self.target_value
+            
+            self.value = math.clamp(_value, 0, self.max_value)
             transition_width = int(abs(self.target_value - self.value) / self.value_ratio)
             transition_color = self.anim_remove_color
             

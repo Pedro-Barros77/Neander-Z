@@ -572,6 +572,9 @@ class Game(Page):
             if hit_target:
                 self.current_wave.players_scores[1].bullets_hit += 1
                 
+        if self.player.rolling:
+            return
+                
         if self.player.current_throwable.cook_start_time == None and not self.player.current_weapon.reloading:
             self.player.current_throwable.cook_grenade()
             return
@@ -715,8 +718,15 @@ class Game(Page):
         # Map
         self.screen.blit(self.map.image, vec(self.map.rect.topleft) - self.player.offset_camera)
         
+        if self.pause_screen != None and self.pause_screen.active:
+            self.pause_screen.draw(self.screen)
+            return
+        
         if self.wave_summary != None:
             self.wave_summary.draw(self.screen)
+            if self.player.reload_popup != None:
+                self.player.reload_popup.destroy()
+                self.player.reload_popup = None
             return
         
         def draw_players():
@@ -752,8 +762,6 @@ class Game(Page):
             
         # self.blit_debug()
         
-        if self.pause_screen != None and self.pause_screen.active:
-            self.pause_screen.draw(self.screen)
         
     def blit_debug(self):
         """Draws objects that are invisible to the player. For debugging only.

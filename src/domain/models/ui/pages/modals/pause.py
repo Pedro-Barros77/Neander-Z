@@ -32,9 +32,11 @@ class Pause(Modal):
     
     def main_menu(self):
         pygame.mixer.music.stop()
-        menu_controller.pages_history = menu_controller.pages_history[:1]
+        for p in menu_controller.popup_group.sprites():
+            p.destroy()
         if self.game.game_over_popup != None:
             self.game.game_over_popup.destroy()
+        menu_controller.pages_history = menu_controller.pages_history[:1]
         
     def show(self):
         self.game.focused = False
