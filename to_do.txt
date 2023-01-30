@@ -30,8 +30,6 @@ P12 - GSG 9 Pistol           (pistola semi automática, disparo rápido e capaci
 SPAS-12                      (escopeta pump action de alto dano)
 M79 grenade launcher         (lança granadas de tiro único)
 
-Granada
-Molotov
 
 
 #deploy

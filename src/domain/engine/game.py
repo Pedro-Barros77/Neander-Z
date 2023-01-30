@@ -90,10 +90,12 @@ class Game(Page):
         self._money_icon = pygame.image.load(f'{resources.IMAGES_PATH}ui\\dollar.png').convert_alpha()
         self._pistol_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\pistol_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         self._shotgun_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\shotgun_ammo_icon.png'), 2.7, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
-        self._melee_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\melee_ammo_icon.png'), 1.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rifle_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rifle_ammo_icon.png'), 2.8, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._sniper_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\sniper_ammo_icon.png'), 2.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._rocket_ammo_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\rocket_ammo_icon.png'), 2.4, convert_type=enums.ConvertType.CONVERT_ALPHA)
+
+        self._frag_grenade_icon = game_controller.scale_image(pygame.image.load(resources.get_weapon_path(enums.Throwables.FRAG_GRENADE, enums.AnimActions.ICON)), 1.5, convert_type=enums.ConvertType.CONVERT_ALPHA)
+        self._molotov_icon = game_controller.scale_image(pygame.image.load(resources.get_weapon_path(enums.Throwables.MOLOTOV, enums.AnimActions.ICON)), 0.6, convert_type=enums.ConvertType.CONVERT_ALPHA)
         
         
         
@@ -206,12 +208,18 @@ class Game(Page):
             case enums.BulletType.ROCKET:
                 return self._rocket_ammo_icon
             case enums.BulletType.MELEE:
-                return self._melee_ammo_icon
+                return None
+            
+            case enums.Throwables.FRAG_GRENADE:
+                return self._frag_grenade_icon
+            case enums.Throwables.MOLOTOV:
+                return self._molotov_icon
     
     def draw_ui(self):
         
         _top_margin = 10
         _horizontal_margin = 10
+        bkp = self.player.backpack
         
         _player_head = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png'), 3, convert_type=enums.ConvertType.CONVERT_ALPHA)
         _head_rect = _player_head.get_rect()
@@ -253,11 +261,76 @@ class Game(Page):
         _txt_enemies_rect.right = _skull_rect.left - _horizontal_margin
         
         
-        _ammo_icon = self.get_ammo_icon(self.player.current_weapon.bullet_type)
-        _ammo_icon_rect = _ammo_icon.get_rect()
-        _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
-        _ammo_icon_rect.left = _horizontal_margin
+        _weapon_size = 40
+        _sec_weapon_size = 20
+        _weapon_offset = 0
         
+        _weapon_icon = None
+        _equiped_prim = False
+        
+        #primary
+        if bkp.equipped_primary != None and self.player.current_weapon.weapon_type == bkp.equipped_primary:
+            _weapon_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_primary, enums.AnimActions.ICON))
+            _equiped_prim = True
+            
+        elif bkp.equipped_secondary != None and self.player.current_weapon.weapon_type == bkp.equipped_secondary:
+            _weapon_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_secondary, enums.AnimActions.ICON))
+
+        _max_dim = max(*_weapon_icon.get_size())
+        _ratio = abs(_weapon_icon.get_width() / _weapon_icon.get_height())
+        if _ratio >= 4:
+            _max_dim *= 0.8
+            
+        _percentage = ((_weapon_size * 100 / _max_dim)/100)
+        _weapon_icon = game_controller.scale_image(_weapon_icon, _percentage, enums.ConvertType.CONVERT_ALPHA)
+        _weapon_icon_rect = _weapon_icon.get_rect()
+        _weapon_icon_rect.left = _horizontal_margin
+        if _weapon_icon_rect.width < _weapon_size:
+            _weapon_offset = _weapon_size
+            
+        ##
+        
+        
+        #secondary
+        _sec_weapon_icon = None
+        if bkp.equipped_secondary != None and bkp.equipped_primary != None:
+            if _equiped_prim:
+                _sec_weapon_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_secondary, enums.AnimActions.ICON))
+            else:
+                _sec_weapon_icon = pygame.image.load(resources.get_weapon_path(bkp.equipped_primary, enums.AnimActions.ICON))
+        if _sec_weapon_icon != None:
+            _max_dim = max(*_sec_weapon_icon.get_size())
+            _ratio = abs(_sec_weapon_icon.get_width() / _sec_weapon_icon.get_height())
+            if _ratio >= 4:
+                _max_dim *= 0.6
+                
+            _percentage = ((_sec_weapon_size * 100 / _max_dim)/100)
+            _sec_weapon_icon = game_controller.scale_image(_sec_weapon_icon, _percentage, enums.ConvertType.CONVERT_ALPHA)
+            _sec_weapon_icon_rect = _sec_weapon_icon.get_rect()
+            _sec_weapon_icon_rect.left = _weapon_icon_rect.right + _weapon_offset
+        ##
+        
+        #ammo
+        if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
+            _ammo_icon = self.get_ammo_icon(self.player.current_weapon.bullet_type)
+            _ammo_icon_rect = _ammo_icon.get_rect()
+            _ammo_icon_rect.bottom = self.screen.get_height() - _top_margin
+            _ammo_icon_rect.left = max(_weapon_icon_rect.right + _horizontal_margin, _weapon_offset)
+            ##
+            _weapon_icon_rect.centery = _ammo_icon_rect.centery
+        else:
+            _weapon_icon_rect.bottom = self.screen.get_height() - _top_margin
+        
+        #swap
+        if _sec_weapon_icon != None:
+            _sec_weapon_icon_rect.bottom = _weapon_icon_rect.top - _top_margin
+            _swap_icon = game_controller.scale_image(pygame.image.load(f'{resources.IMAGES_PATH}ui\\swap.png'), 0.8, convert_type=enums.ConvertType.CONVERT_ALPHA)
+            _swap_icon_rect = _swap_icon.get_rect()
+            _swap_icon_rect.centery = _sec_weapon_icon_rect.centery
+            _swap_icon_rect.centerx = max(_weapon_icon_rect.centerx, _weapon_offset)
+        ##
+        
+        ##ammo
         _bullets_color = None
         if self.player.current_weapon.magazine_bullets <= 0:
             _bullets_color = colors.RED
@@ -268,14 +341,36 @@ class Game(Page):
         
         if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
             _txt_ammo = mc.get_text_surface(f'{self.player.current_weapon.magazine_bullets}', _bullets_color, resources.px_font(20))
-            _txt_ammo_rect = _txt_ammo.get_rect()
-            _txt_ammo_rect.centery = _ammo_icon_rect.centery
-            _txt_ammo_rect.left = _horizontal_margin + 40
+            _txt_total_ammo = mc.get_text_surface(f'/ {bkp.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, resources.px_font(20))
+        else:
+            _txt_ammo = mc.get_text_surface('-', colors.WHITE, resources.px_font(20))
+            _txt_total_ammo = mc.get_text_surface(f'/-', colors.WHITE, resources.px_font(20))
             
-            _txt_total_ammo = mc.get_text_surface(f'/ {self.player.backpack.get_ammo(self.player.current_weapon.bullet_type)}', colors.WHITE, resources.px_font(20))
-            _txt_total_ammo_rect = _txt_total_ammo.get_rect()
-            _txt_total_ammo_rect.centery = _ammo_icon_rect.centery
-            _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
+        _txt_ammo_rect = _txt_ammo.get_rect()
+        _txt_ammo_rect.centery = _weapon_icon_rect.centery
+        if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
+            _txt_ammo_rect.left = _ammo_icon_rect.right + _horizontal_margin
+        else:
+            _txt_ammo_rect.left = _weapon_icon_rect.right + _horizontal_margin
+        
+        _txt_total_ammo_rect = _txt_total_ammo.get_rect()
+        _txt_total_ammo_rect.centery = _txt_ammo_rect.centery
+        _txt_total_ammo_rect.left = _txt_ammo_rect.right + 2
+        ##
+        
+        #grenade
+        _throwable_icon = self.get_ammo_icon(self.player.current_throwable.weapon_type)
+        _throwable_icon_rect = _throwable_icon.get_rect()
+        _throwable_icon_rect.centery = _weapon_icon_rect.centery
+        _throwable_icon_rect.left = _txt_total_ammo_rect.right + _horizontal_margin*3
+        
+        _throwable_color = colors.WHITE if self.player.current_throwable.count > 0 else colors.RED
+        _txt_throwables = mc.get_text_surface(f'{self.player.current_throwable.count}', _throwable_color, resources.px_font(16))
+        _txt_throwables_rect = _txt_throwables.get_rect()
+        _txt_throwables_rect.centery = _throwable_icon_rect.centery
+        _txt_throwables_rect.left = _throwable_icon_rect.right + _horizontal_margin
+        
+        ##
         
         
         
@@ -289,10 +384,16 @@ class Game(Page):
         self.screen.blit(_skull, _skull_rect)
         self.screen.blit(_txt_enemies_count, _txt_enemies_rect)
         
-        self.screen.blit(_ammo_icon, _ammo_icon_rect)
+        self.screen.blit(_weapon_icon, _weapon_icon_rect)
+        if _sec_weapon_icon != None:
+            self.screen.blit(_sec_weapon_icon, _sec_weapon_icon_rect)
+            self.screen.blit(_swap_icon, _swap_icon_rect)
         if self.player.current_weapon.bullet_type != enums.BulletType.MELEE:
-            self.screen.blit(_txt_ammo, _txt_ammo_rect)
-            self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
+            self.screen.blit(_ammo_icon, _ammo_icon_rect)
+        self.screen.blit(_txt_ammo, _txt_ammo_rect)
+        self.screen.blit(_txt_total_ammo, _txt_total_ammo_rect)
+        self.screen.blit(_throwable_icon, _throwable_icon_rect)
+        self.screen.blit(_txt_throwables, _txt_throwables_rect)
         
     
             
