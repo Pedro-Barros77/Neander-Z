@@ -174,6 +174,14 @@ class Wave():
             if e.enemy_name != enums.Enemies.Z_RUI:
                 e.take_damage(99999, 1, True)
         self.players_scores[1].bullets_shot += 1
+        
+    def force_end(self):
+        while len(self.enemies) > 0:
+            e = self.enemies[0]
+            self.enemies.remove(e)
+            self.spawn_enemy(self.create_enemy(e["type"], (-500,0), e))
+        self.enemies_count = 0
+        self.kill_all()
 
     def handle_score(self, enemy: Enemy, attacker, headshot_kill = False):
         if attacker == None:

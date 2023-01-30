@@ -105,7 +105,7 @@ class Player(pygame.sprite.Sprite):
 
         self.add_weapon(enums.Weapons.DEAGLE)
         self.add_weapon(enums.Weapons.RPG)
-        self.add_throwable(enums.Throwables.MOLOTOV, 5)
+        self.add_throwable(enums.Throwables.MOLOTOV, 3)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
         self.last_weapon_switch: datetime.datetime = datetime.datetime.now()

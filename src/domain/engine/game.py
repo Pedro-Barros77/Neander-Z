@@ -793,6 +793,9 @@ class Game(Page):
             self.pressed_keys.remove(pygame.K_DELETE)
         if pygame.K_l in self.pressed_keys:
             self.restart_game()
+        if pygame.K_END in self.pressed_keys:
+            self.current_wave.force_end()
+            self.pressed_keys.remove(pygame.K_END)
         if pygame.K_m in self.pressed_keys and pygame.K_LCTRL in self.pressed_keys:
             match self.player.current_weapon.bullet_type:
                 case enums.BulletType.PISTOL:
