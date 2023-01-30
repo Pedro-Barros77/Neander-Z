@@ -793,6 +793,23 @@ class Game(Page):
             self.pressed_keys.remove(pygame.K_DELETE)
         if pygame.K_l in self.pressed_keys:
             self.restart_game()
+        if pygame.K_m in self.pressed_keys and pygame.K_LCTRL in self.pressed_keys:
+            match self.player.current_weapon.bullet_type:
+                case enums.BulletType.PISTOL:
+                    self.player.backpack.set_ammo(self.player.backpack.max_pistol_ammo, enums.BulletType.PISTOL)
+                case enums.BulletType.ASSAULT_RIFLE:
+                    self.player.backpack.set_ammo(self.player.backpack.max_rifle_ammo, enums.BulletType.ASSAULT_RIFLE)
+                case enums.BulletType.SHOTGUN:
+                    self.player.backpack.set_ammo(self.player.backpack.max_shotgun_ammo, enums.BulletType.SHOTGUN)
+                case enums.BulletType.SNIPER:
+                    self.player.backpack.set_ammo(self.player.backpack.max_sniper_ammo, enums.BulletType.SNIPER)
+                case enums.BulletType.ROCKET:
+                    self.player.backpack.set_ammo(self.player.backpack.max_rocket_ammo, enums.BulletType.ROCKET)
+
+            self.player.backpack.get_throwable(self.player.current_throwable.weapon_type).count = self.player.backpack.max_grenade_type
+                    
+            self.pressed_keys.remove(pygame.K_m)
+            self.pressed_keys.remove(pygame.K_LCTRL)
 
         if self.player.pos.y > self.map.rect.height:
             self.player.rect.bottom = self.map.rect.bottom - self.map.floor_y
