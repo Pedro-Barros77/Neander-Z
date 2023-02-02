@@ -23,6 +23,7 @@ config_state = {
     "port": ""
 }
 
+buttons = []
 dt = 0
 
 
@@ -77,6 +78,41 @@ def start_page(page):
     pygame.key.set_repeat(200, 25)
     pages_history.append(page)
     app_loop()
+    
+def sort_btn_index(btns: list):
+    btns.sort(key= lambda x: x.z_index, reverse=True)
+    return btns
+    
+def handle_btn_action(btn):
+    global buttons
+    mouse_pos = pygame.mouse.get_pos()
+    btns_clicked = [b for b in buttons if b.rect.collidepoint(mouse_pos)]
+    sort_btn_index(btns_clicked)
+    for b in btns_clicked:
+        if b.block_raycast:
+            if b == btn:
+                return True
+            else:
+                return False
+            
+    return True
+    
+def add_btns(btns):
+    global buttons
+    for b in btns:
+        if b not in buttons:
+            b.on_raycast_hit = handle_btn_action
+            buttons.append(b)
+            
+    sort_btn_index(buttons)
+    
+def remove_btns(btns):
+    global buttons
+    for b in btns:
+        if b in buttons:
+            buttons.remove(b)
+            
+    sort_btn_index(buttons)
 
 def fade_out_color(color: tuple[int,int,int], start_alpha: int, start_time: datetime.datetime, end_time: datetime.datetime):
         

@@ -17,6 +17,8 @@ class Button(pygame.sprite.Sprite):
         
         self.name = kwargs.pop("name", "")
         self.text = kwargs.pop("text", "")
+        self.z_index = kwargs.pop("z_index", 0)
+        self.block_raycast = kwargs.pop("block_raycast", True)
         self.visible = kwargs.pop("visible", True)
         self.text_color = kwargs.pop("text_color", colors.WHITE)
         self.text_font: pygame.font.Font = kwargs.pop("text_font", pygame.font.SysFont('arial', 30))
@@ -37,12 +39,21 @@ class Button(pygame.sprite.Sprite):
         
         self.on_hover: function = kwargs.pop("on_hover", lambda btn: self.default_on_hover(btn))
         self.on_click: function = kwargs.pop("on_click", lambda: print('clicked ' + self.text))
+        self.on_raycast_hit: function = kwargs.pop("on_raycast_hit", lambda btn: True)
         
         self.enabled = kwargs.pop("enabled", True)
         if not self.enabled:
             self.enable(False)
         self.clicked = False
         self.hovered = False
+        
+    def default_on_click(self) -> bool:
+        can_click = self.on_raycast_hit(self)
+        if not can_click:
+            return False
+        
+        self.on_click()
+        return True
         
     def set_pos(self, pos: vec):
         self.rect.topleft = pos
@@ -99,7 +110,6 @@ class Button(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.center = self.center
             self.sound_hover.play()
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else: #hover out
             self.image = self.start_image.copy()
             self.text_surface = self.start_text
@@ -118,10 +128,17 @@ class Button(pygame.sprite.Sprite):
         mouse_pos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()[0] == 1
         
-        if not self.enabled:
-            return
         _was_hovered = self.hovered
         self.hovered = self.rect.collidepoint(mouse_pos)
+        if self.hovered:
+            self.hovered = self.on_raycast_hit(self)
+            
+        if not self.enabled:
+            return
+            
+        if self.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            
         
         
         if self.hovered:
@@ -130,7 +147,7 @@ class Button(pygame.sprite.Sprite):
             if clicked and not self.clicked and not self.last_clicked:
                 self.sound_clicked.play()
                 self.clicked = True
-                self.on_click()
+                self.default_on_click()
                 
         elif _was_hovered:
             self.on_hover(self)

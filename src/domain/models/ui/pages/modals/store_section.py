@@ -60,7 +60,9 @@ class Store:
         }
         
         def _select_card(card: StoreItem):
-            card.default_on_click()
+            clicked = card.default_on_click()
+            if not clicked:
+                return
             self.selected_card = card
         
         def _unselect_card(card: StoreItem):
@@ -119,29 +121,32 @@ class Store:
             c.description = _cards_descriptions.pop(c.item_name, "")
             
         
+        arrow_btn_dict = {
+            "z_index": 5
+        }
         
         self.ammo_panel_buttons = [
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_forward(100), **arrow_btn_dict),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.ammo_h_scrollbar.move_backward(100), **arrow_btn_dict)
             ]
         
         self.items_panel_buttons = [
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_forward(100), **arrow_btn_dict),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.items_h_scrollbar.move_backward(100), **arrow_btn_dict)
             ]
         
         self.primary_weapons_panel_buttons = [
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_forward(100), **arrow_btn_dict),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.primary_weapons_h_scrollbar.move_backward(100), **arrow_btn_dict)
             ]
         self.secondary_weapons_panel_buttons = [
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_forward(100)),
-                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_backward(100))
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\left_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_forward(100), **arrow_btn_dict),
+                Button((0,0), f'{resources.IMAGES_PATH}ui\\right_arrow.png', scale = 1.7, on_click = lambda: self.secondary_weapons_h_scrollbar.move_backward(100), **arrow_btn_dict)
             ]
         
         self.buttons: list[Button] = [
                 Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_return.png', scale = 2, on_click = self.on_return),
-                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text_font = resources.px_font(20), text_color = colors.BLACK, scale=1.4, visible = False, hover_scale=1, on_click = self.process_purchase)
+                Button(vec(self.panel_margin.x, self.panel_margin.y), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', text_font = resources.px_font(20), text_color = colors.BLACK, scale=1.4, visible = False, hover_scale=1, on_click = self.process_purchase, z_index= 5)
             ]
         
         self.attributes_max = {
@@ -153,6 +158,11 @@ class Store:
         }
         
         self.buttons.extend([*self.ammo_panel_buttons, *self.items_panel_buttons, *self.primary_weapons_panel_buttons, *self.secondary_weapons_panel_buttons])
+    
+    def load_store(self):
+        menu_controller.buttons.clear()
+        menu_controller.add_btns(self.buttons)
+        menu_controller.add_btns(self.cards_list)
     
     def update(self, **kwargs):
         events = kwargs.pop("events", [])

@@ -45,7 +45,6 @@ class MainMenu(Page):
         self.logo_image: pygame.Surface = None
         
         self.set_background(f'{resources.IMAGES_PATH}ui\\bg_main_menu.png')
-    
         
     def open_new_game(self):
         

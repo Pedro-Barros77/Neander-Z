@@ -35,6 +35,8 @@ class Inventory:
         self.cards_list = []
         self.buttons: list[Button] = []
         
+        self.pnl_right_rect = pygame.Rect(-100,-100,0,0)
+        
         self.weapon_attributes_max = kwargs.pop("weapon_attributes_max",{
             "damage": 50,
             "firerate": 15,
@@ -106,14 +108,20 @@ class Inventory:
         
         #region cards callbacks
         def _select_card(card: StoreItem):
-            card.default_on_click()
+            clicked = card.default_on_click()
+            if not clicked:
+                return
             self.selected_card = card
         
         def _unselect_card(card: StoreItem):
             btns_hovered = [b for b in self.buttons if b.hovered and "equip" not in b.name]
             scroll_bars_held = [s for s in [self.inv_v_scrollbar] if s.holding_bar]
+            safe_areas: list[pygame.Rect] = [self.pnl_right_rect]
+            _mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (1,1))
             
-            if len(btns_hovered) > 0 or len(scroll_bars_held) > 0:
+            safe_clicked = _mouse_rect.collidelist(safe_areas) != -1
+            
+            if len(btns_hovered) > 0 or len(scroll_bars_held) > 0 or safe_clicked:
                 return
             
             for b in self.buttons:
@@ -177,6 +185,10 @@ class Inventory:
             self.buttons.append(
                 Button((0,0), f'{resources.IMAGES_PATH}ui\\plus.png', on_click = lambda: print("click"), text_font = resources.px_font(20),name = f'btn_upgrade_player_{att}', text_color = colors.BLACK, scale = 0.5, visible = False)
             )
+            
+        menu_controller.buttons.clear()
+        menu_controller.add_btns(self.buttons)
+        menu_controller.add_btns(self.cards_list)
         
     def update(self, **kwargs):
         events = kwargs.pop("events", [])
@@ -326,10 +338,10 @@ class Inventory:
             secondary_icon_rect = secondary_icon.get_rect()
             secondary_icon_rect.center = secondary_slot_rect.center
         
-        
         pnl_right = pygame.Surface((image_rect.width*0.62, image_rect.height - header_rect.height), pygame.SRCALPHA)
         pnl_right_rect = pygame.Rect((0,0), pnl_right.get_size())
         pnl_right_rect.topright = (image_rect.width,header_rect.height)
+        self.pnl_right_rect = pnl_right_rect
 
         if self.inv_v_scrollbar == None:
             self.inv_v_scrollbar = ScrollBar(enums.Orientation.VERTICAL, vec(1,(screen_rect.height-self.panel_margin.y) *2), pygame.Rect((pnl_right_rect.left + self.panel_margin.x/2 - 20, txt_store_title_rect.height + self.panel_margin.y/1.3), (20, image_rect.height - txt_store_title_rect.height - self.panel_margin.y/2)), use_arrows = False)

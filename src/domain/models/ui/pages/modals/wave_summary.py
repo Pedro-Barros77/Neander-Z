@@ -42,6 +42,7 @@ class WaveSummary(Modal):
         self.buttons.append(
             Button(vec(self.buttons[-1].rect.topright), f'{resources.IMAGES_PATH}ui\\btn_square.png', scale = 2, text = "P2", on_click = lambda: None, on_hover = lambda: None, enabled = False,**btn_dict)
         )
+        self.set_tab(0)
     
     def set_tab(self, i: int):
         self.tab_index = i
@@ -54,6 +55,7 @@ class WaveSummary(Modal):
                 self.buttons[0].hide()
                 self.buttons[1].hide()
                 self.buttons[2].hide()
+                self.store_section.load_store()
             case 2:
                 self.buttons[0].hide()
                 self.buttons[1].hide()

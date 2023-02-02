@@ -31,6 +31,9 @@ class StoreItem:
         self.on_hover:function = kwargs.pop("on_hover", self.default_on_hover)
         self.on_click:function = kwargs.pop("on_click", self.default_on_click)
         self.on_blur: function = kwargs.pop("on_blur", self.default_on_blur)
+        self.on_raycast_hit: function = kwargs.pop("on_raycast_hit", lambda s: True)
+        self.z_index = kwargs.pop("z_index", 0)
+        self.block_raycast = kwargs.pop("block_raycast", True)
         
         self.icon = pygame.image.load(self.icon_path).convert_alpha()
         _icon_ratio = self.rect.width / self.icon.get_width()
@@ -73,7 +76,6 @@ class StoreItem:
         
         if self.hovered: #hover in
             self.card_background_color = colors.add(self.card_background_color, (_brightness, _brightness, _brightness))
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else: #hover out
             self.card_background_color = colors.add(self.card_background_color, (-_brightness, -_brightness, -_brightness))
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -81,10 +83,15 @@ class StoreItem:
     def default_on_blur(self, card = None):
         self.selected = False
         
-    def default_on_click(self, card = None):
+    def default_on_click(self, card = None) -> bool:
+        can_click = self.on_raycast_hit(self)
+        if not can_click:
+            return False
         if self.locked:
-            return
+            return False
+
         self.selected = True
+        return True
         
         
     def update(self, offset: vec = vec(0,0), player_money: int = 0):
@@ -96,6 +103,12 @@ class StoreItem:
         _rect = self.rect.copy()
         _rect.topleft += offset
         self.hovered = _rect.collidepoint(mouse_pos)
+        if self.hovered:
+            self.hovered = self.on_raycast_hit(self)
+            
+        if self.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            
         if self.hovered:
             if not _was_hovered:
                 self.on_hover()
