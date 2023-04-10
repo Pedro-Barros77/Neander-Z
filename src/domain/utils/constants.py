@@ -92,7 +92,8 @@ def get_throwable(throwable: enums.Throwables, pos: vec, **kwargs):
 
       
             t.reload_start_sound.set_volume(0.3)
-    
+            
+    t.bullet_type = enums.BulletType.THROWABLE
     t.weapon_anchor = kwargs.pop("weapon_anchor", vec(0, 0))
     t.weapon_distance = kwargs.pop("weapon_distance", 0)
     t.player_backpack = kwargs.pop("backpack", None)
@@ -444,7 +445,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                          )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 20, 0)
             for s in w.shoot_sounds:
-                s.set_volume(0.3)
+                s.set_volume(0.5)
 
             w.empty_sound.set_volume(0.1)
             w.reload_start_sound.set_volume(0.3)

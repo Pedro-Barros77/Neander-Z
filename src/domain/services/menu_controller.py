@@ -86,9 +86,9 @@ def sort_btn_index(btns: list):
 def handle_btn_action(btn):
     global buttons
     mouse_pos = pygame.mouse.get_pos()
-    btns_clicked = [b for b in buttons if b.rect.collidepoint(mouse_pos)]
-    sort_btn_index(btns_clicked)
-    for b in btns_clicked:
+    btns_hit = [b for b in buttons if b.rect.collidepoint(mouse_pos)]
+    sort_btn_index(btns_hit)
+    for b in btns_hit:
         if b.block_raycast:
             if b == btn:
                 return True
@@ -97,7 +97,7 @@ def handle_btn_action(btn):
             
     return True
     
-def add_btns(btns):
+def add_btns(btns: list):
     global buttons
     for b in btns:
         if b not in buttons:

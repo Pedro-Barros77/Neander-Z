@@ -109,7 +109,7 @@ class BulletType(Enum):
     ASSAULT_RIFLE = "rifle"
     SNIPER = "sniper"
     ROCKET = "rocket"
-    GRENADE = "grenade"
+    THROWABLE = "throwable"
     
 class FireMode(Enum):
     MELEE = 0

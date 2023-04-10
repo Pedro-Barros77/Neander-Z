@@ -146,9 +146,9 @@ class Inventory:
             )
             
         self.items.extend([
+            *[StoreItem(resources.get_weapon_path(t.weapon_type, enums.AnimActions.ICON), pygame.Rect((0,0), self.card_size), t.display_name, item_name = f'throwable_{t.weapon_type.value}', price = 0, count = t.count, icon_scale = 1, store_icon_scale = 1, price_text=f"{t.count}/{self.player.backpack.max_grenade_type}", bullet_type = t.bullet_type, weapon_type = t.weapon_type, **cards_dict) for t in self.player.backpack.throwables],
             StoreItem(f'{resources.IMAGES_PATH}items\\backpack.png', pygame.Rect((0,0), self.card_size), "Backpack", item_name = "backpack", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
             StoreItem(f'{resources.IMAGES_PATH}ui\\characters\\{self.player.character.value}\\head_icon.png', pygame.Rect((0,0), self.card_size), "Player", item_name = "player", price = 0, count = 0, icon_scale = 1, store_icon_scale = 1, price_text=" ", **cards_dict),
-            *[StoreItem(resources.get_weapon_path(i.weapon_type, enums.AnimActions.ICON), pygame.Rect((0,0), self.card_size), i.display_name, item_name = str(i.weapon_type.value), price = 0, count = i.count, icon_scale = 1, store_icon_scale = 1, price_text=f"{i.count}/{self.player.backpack.max_grenade_type}", **cards_dict) for i in self.player.backpack.throwables]
         ])
             
         #Cards
@@ -173,6 +173,7 @@ class Inventory:
             [
                 *[Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', on_click = lambda w_type = w.weapon_type: self.equip_weapon(w_type, True), name = f'equip-primary_{w.weapon_type.value}', **weapons_btn_dict) for w in self.weapons],
                 *[Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', on_click = lambda w_type = w.weapon_type: self.equip_weapon(w_type), name = f'equip-secondary_{w.weapon_type.value}', **weapons_btn_dict) for w in self.weapons],
+                *[Button(vec(0,0), f'{resources.IMAGES_PATH}ui\\btn_small_green.png', on_click = lambda w_type = w.weapon_type: self.equip_throwable(w_type), name = f'equip-primary_{w.weapon_type.value}', **weapons_btn_dict) for w in self.items if w.bullet_type == enums.BulletType.THROWABLE],
             ]
         )
         
@@ -231,15 +232,43 @@ class Inventory:
 
         for card in self.cards_list:
             #if the item is a weapon
-            if card.weapon_type != None:
+            if card.weapon_type != None:#card.bullet_type != enums.BulletType.THROWABLE
+                _is_throwable = card.bullet_type == enums.BulletType.THROWABLE
                 btn_equip_prim = [b for b in self.buttons if b.name == f"equip-primary_{card.weapon_type.value}"][0]
-                btn_equip_sec = [b for b in self.buttons if b.name == f"equip-secondary_{card.weapon_type.value}"][0]
+                if not _is_throwable:
+                    btn_equip_sec = [b for b in self.buttons if b.name == f"equip-secondary_{card.weapon_type.value}"][0]
+                
                 
                 _btn_margin = vec(15, 5)
                 btn_equip_prim.rect.bottomleft = card.rect.bottomright + vec(_btn_margin.x,0) + self.panel_margin/2
-                btn_equip_sec.rect.bottomleft = card.rect.bottomright + vec(_btn_margin.x,-btn_equip_prim.rect.height -_btn_margin.y) + self.panel_margin/2
+                if not _is_throwable:
+                    btn_equip_sec.rect.bottomleft = card.rect.bottomright + vec(_btn_margin.x,-btn_equip_prim.rect.height -_btn_margin.y) + self.panel_margin/2
                 
+                if _is_throwable:
+                    t = bkp.get_throwable(card.weapon_type)
+                    if self.player.current_throwable.weapon_type == t.weapon_type:
+                        card.price_text = "Equiped"
+                        if btn_equip_prim.text != "Unequip":
+                            btn_equip_prim.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
+                            btn_equip_prim.text_surface = btn_equip_prim.start_text
+                            btn_equip_prim.set_text("Unequip")
+                            
+                    else:
+                        card.price_text = " "
+                        if btn_equip_prim.text == "Unequip" or btn_equip_prim.text == "":
+                            btn_equip_prim.set_image(f'{resources.IMAGES_PATH}ui\\btn_small_green.png')
+                            btn_equip_prim.text_surface = btn_equip_prim.start_text
+                            btn_equip_prim.set_text("Equip")
+                            
+                    
+                    btn_equip_prim.visible = len(bkp.throwables) > 1
+                
+                    card.update(self.panel_margin/2, self.player.money)
+                    continue
+                    
                 weapon = bkp.get_weapon(card.weapon_type)
+                    
+                
                 
                 #if this weapon is the equiped primary or secondary
                 if bkp.equipped_primary == card.weapon_type or bkp.equipped_secondary == card.weapon_type:
@@ -247,7 +276,8 @@ class Inventory:
                         btn_equip_prim.set_image(f'{resources.IMAGES_PATH}ui\\btn_small.png')
                         btn_equip_prim.text_surface = btn_equip_prim.start_text
                         btn_equip_prim.set_text("Unequip")
-                    btn_equip_sec.visible = False
+                    if not _is_throwable:
+                        btn_equip_sec.visible = False
                     if bkp.equipped_primary == card.weapon_type:
                         card.price_text = "Primary"
                     else: 
@@ -260,11 +290,13 @@ class Inventory:
                     
                     if weapon.is_primary:
                         btn_equip_prim.set_text("Equip primary")
-                        btn_equip_sec.visible = False
+                        if not _is_throwable:
+                            btn_equip_sec.visible = False
                     else:
                         btn_equip_prim.set_text("Equip as primary")
-                        btn_equip_sec.set_text("Equip as secondary")
-                        btn_equip_sec.visible = True
+                        if not _is_throwable:
+                            btn_equip_sec.set_text("Equip as secondary")
+                            btn_equip_sec.visible = True
             
             card.update(self.panel_margin/2, self.player.money)
 
@@ -390,7 +422,7 @@ class Inventory:
         _weapon_upgrade_btns = [b for b in self.buttons if b.name.startswith("btn_upgrade_weapon")]
         _player_upgrade_btns = [b for b in self.buttons if b.name.startswith("btn_upgrade_player")]
         if self.selected_card != None:
-            if self.selected_card.weapon_type != None:
+            if self.selected_card.weapon_type != None and self.selected_card.bullet_type != enums.BulletType.THROWABLE:
                 if self.selected_weapon == None or self.selected_weapon.weapon_type != self.selected_card.weapon_type:
                     self.selected_weapon = self.get_weapon_or_default(self.selected_card.weapon_type)
                 weapon = self.selected_weapon
@@ -1044,6 +1076,17 @@ class Inventory:
 
                 self.attack_stamina_skill_bar.draw(pnl_right, vec(0,0))
                 pnl_right.blit(_txt_attack_stamina, _txt_attack_stamina_rect)
+            elif self.selected_card.item_name.startswith('throwable_'):
+                t = self.get_wthrowable_or_default(self.selected_card.weapon_type)
+                
+                _txt_throwable_title = menu_controller.get_text_surface(t.display_name, colors.WHITE, resources.px_font(40))
+                _txt_throwable_title_rect = _txt_throwable_title.get_rect()
+                _txt_throwable_title_rect.top = 5
+                _txt_throwable_title_rect.centerx = pnl_right_rect.width/2
+                
+                
+                
+                pnl_right.blit(_txt_throwable_title, _txt_throwable_title_rect)
         else:
             for b in _player_upgrade_btns:
                 b.visible = False
@@ -1067,6 +1110,13 @@ class Inventory:
             return w
         
         return constants.get_weapon(weapon_type, vec(0,0), load_content = False)
+    
+    def get_wthrowable_or_default(self, throwable_type: enums.Throwables):
+        t = self.player.backpack.get_throwable(throwable_type)
+        if t != None:
+            return t
+        
+        return constants.get_throwable(throwable_type, vec(0,0), load_content = False)
     
     def upgrade_backpack(self):
         bkp = self.player.backpack
@@ -1104,6 +1154,12 @@ class Inventory:
             return
             
         self.player.current_weapon = bkp.equip_weapon(weapon_type, as_primary)
+        
+    def equip_throwable(self, throwable_type: enums.Throwables):
+        bkp = self.player.backpack
+        p = self.player
+        
+        p.current_throwable = bkp.get_throwable(throwable_type)
         
     def buy_weapon_upgrade(self, weapon_type: enums.Weapons, attr_name):
         
