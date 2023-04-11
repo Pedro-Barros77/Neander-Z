@@ -159,7 +159,7 @@ def get_weapon(weapon: enums.Weapons, pos: vec, **kwargs):
                       attack_box=vec(50, 20),
                       weapon_scale=0.08,
                       store_scale=0.2,
-                      stamina_use=2
+                      stamina_use=1.5
                       )
             w.bullet_spawn_offset = vec(w.rect.width/2 + 30, 0)
             for s in w.swipe_sounds:

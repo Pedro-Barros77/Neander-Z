@@ -103,8 +103,7 @@ class Player(pygame.sprite.Sprite):
         self.current_throwable: Weapon = None
         """The throwable on player's hand (grenade, molotov, etc)."""
 
-        self.add_weapon(enums.Weapons.DEAGLE)
-        self.add_weapon(enums.Weapons.SCAR)
+        self.add_weapon(enums.Weapons.MACHETE)
         self.add_throwable(enums.Throwables.MOLOTOV, 3)
 
         """Time in milliseconds to wait since last weapon switch to be able to switch again."""
