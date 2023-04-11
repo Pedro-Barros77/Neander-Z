@@ -1,0 +1,39 @@
+--idéias--
+
+> Granada de distração:
+Atrai todos os zumbis em sua direção, aglomerando para então usar uma arma de dano em área.
+
+> Torreta sentry:
+Robô montável que atira automaticamente nos inimigos 
+(até passar um certo tempo, acabar a munição ou levar muito dano)
+Será considerada como um target para os inimigos na função get_closest_player()
+
+> Zumbi em chamas:
+Zumbi pegando fogo que CORRE até você, se te acertar te coloca fogo por alguns segundos
+
+> Zumbi cemitério:
+Spawna perto do player, cavando e saindo do chão
+
+--Bucket List--
+
+AA 12 shotgun                (Escopeta automática)
+Vector .45 ACP               (smg de alta cadência)
+Karabiner 98k                (sniper leve, rápida)
+P90                          (smg de alta capacidade de munição)
+417 GIGN marksman rifle      (Fuzil semi automático, rápido e com alto dano, sem penetração)
+AK-47                        (fuzil automático de alto dano e capacidade de munição)
+P12 - GSG 9 Pistol           (pistola semi automática, disparo rápido e capacidade de munição mediana)
+SPAS-12                      (escopeta pump action de alto dano)
+M79 grenade launcher         (lança granadas de tiro único)
+
+
+
+#deploy
+pyinstaller --onefile -w "src\app.py"
+
+#revert commit
+git reset --hard <old_commit>
+git push -f origin master
+
+#log commits
+git log --pretty=oneline
